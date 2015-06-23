@@ -81,11 +81,23 @@ void PlayState::Input() {
 	if (glfwGetKey(window, GLFW_KEY_D)) {
 		m_Camera->MoveRight(m_Camera->GetSpeed());
 	}
-	if (glfwGetKey(window, GLFW_KEY_UP)) {
+	if (glfwGetKey(window, GLFW_KEY_R)) {
 		m_Camera->MoveUp(m_Camera->GetSpeed());
 	}
-	if (glfwGetKey(window, GLFW_KEY_DOWN)) {
+	if (glfwGetKey(window, GLFW_KEY_F)) {
 		m_Camera->MoveDown(m_Camera->GetSpeed());
+	}
+	if (glfwGetKey(window, GLFW_KEY_UP)) {
+		m_Camera->SetPitch(m_Camera->GetPitch() + m_Camera->GetSpeed() * -1);
+	}
+	if (glfwGetKey(window, GLFW_KEY_DOWN)) {
+		m_Camera->SetPitch(m_Camera->GetPitch() + m_Camera->GetSpeed());
+	}
+	if (glfwGetKey(window, GLFW_KEY_LEFT)) {
+		m_Camera->SetYaw(m_Camera->GetYaw() + m_Camera->GetSpeed() * -1);
+	}
+	if (glfwGetKey(window, GLFW_KEY_RIGHT)) {
+		m_Camera->SetYaw(m_Camera->GetYaw() + m_Camera->GetSpeed());
 	}
 
 	// Mouse buttons
@@ -132,7 +144,7 @@ void PlayState::Input() {
 	if (MouseActiveButton & LEFT) {
 		if (dx != 0 && dy != 0)
 		{
-			m_Camera->SetViewByMouse(dx, dy);
+			//m_Camera->SetViewByMouse(dx, dy); this method sucks
 		}
 	}
 

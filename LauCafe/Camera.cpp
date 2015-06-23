@@ -71,7 +71,7 @@ vec3 Camera::GetView()
 // This returns the camera's right vector (the direction pointing perpendicular to the view and up vector)
 vec3 Camera::GetUp()
 {
-	// Calculate the right vector by taking the inverse of the rotation matrix multiplied by a 
+	// Calculate the up vector by taking the inverse of the rotation matrix multiplied by a 
 	// default up vector.
 	vec4 upVector = inverse(GetRotationMatrix()) * vec4(0, 1, 0, 1);
 
