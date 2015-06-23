@@ -29,12 +29,19 @@ int PlayState::Initialize() {
 	m_Camera = new Camera(); 
 	m_Camera->SetPerspective(glm::radians(60.0f), ScreenWidth / (float)ScreenHeight, 0.01f, 1000);
 	//					     Position	  Yaw	 Pitch
-	m_Camera->PositionCamera(0, 0, 5,     0,     0);
+	m_Camera->PositionCamera(0, 1, 5,     0,     0);
 
-	g_Axis.Initialize(Model::axis, 6, "Shaders/Shader.vertex", "Shaders/Shader.fragment");
+	g_Axis.Initialize(Model::axis, 6, GL_LINES, "Shaders/Shader.vertex", "Shaders/Shader.fragment");
 	g_Axis.SetCamera(m_Camera); 
 	g_Axis.SetPosition(vec3(0, 0, 0));
 
+	g_SampleSquare.Initialize(Model::square, 6, GL_TRIANGLES, "Shaders/Shader.vertex", "Shaders/Shader.fragment");
+	g_SampleSquare.SetCamera(m_Camera);
+	g_SampleSquare.SetPosition(vec3(3, 0, 0));
+
+	g_SampleSquare2.Initialize(Model::square2, 6, GL_TRIANGLES, "Shaders/Shader.vertex", "Shaders/Shader.fragment");
+	g_SampleSquare2.SetCamera(m_Camera);
+	g_SampleSquare2.SetPosition(vec3(3, 0, 0));
 	return 1; // OK
 }
 
@@ -127,6 +134,8 @@ void PlayState::Draw() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	g_Axis.Render();
+	g_SampleSquare.Render();
+	g_SampleSquare2.Render();
 
 	glfwSwapBuffers(window);
 	glfwPollEvents();

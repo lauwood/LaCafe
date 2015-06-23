@@ -36,6 +36,8 @@ private:
 	int MouseActiveButton;
 	
 	Model g_Axis;
+	Model g_SampleSquare;
+	Model g_SampleSquare2;
 };
 
 ////////////////////////////////////////////////////////////////////////////////

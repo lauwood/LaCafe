@@ -20,6 +20,8 @@ class Model
 {
 public:
 	static Vertex3 axis[6];
+	static Vertex3 square[6];
+	static Vertex3 square2[6];
 
 	// These are created to standardize the index properties used for vertex properties.
 	static const GLuint VertexIndex = 0;				// This is for the x,y,z vertices
@@ -33,7 +35,7 @@ public:
 
 	// Takes in a list of x,y,z vertices and vertex length to create the VBO and VAO's from,
 	// as well as the text file locations for the vertex and fragment shaders to load.
-	void Initialize(Vertex3 pVertices[], int length, std::string vert, std::string frag);
+	void Initialize(Vertex3 pVertices[], int length, GLenum pFace, std::string vert, std::string frag);
 
 	void Render();
 
@@ -57,6 +59,7 @@ public:
 	void Destroy();
 
 protected:
+	GLenum FaceMode;
 	Vertex3 *vertices;									// The list of the vertices
 	GLint verticesLength;								// The length of the vertices
 	GLuint VBO;											// The VertexBufferObject Id stored by the VAO

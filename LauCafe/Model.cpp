@@ -7,7 +7,22 @@ Vertex3 Model::axis[6] = { vec3(1.0, 0.0, 0.0), vec4(1, 0, 0, 1),
 						   vec3(0.0, 0.0, 1.0), vec4(0, 0, 1, 1),
 						   vec3(0.0, 0.0, 0.0), vec4(0, 0, 1, 1) };
 
-void Model::Initialize(Vertex3 pVertices[], int length, std::string vert, std::string frag) {
+Vertex3 Model::square[6] = { vec3( 0.0,  0.0,  0.0), vec4(1, 1, 0, 1),
+							 vec3( 0.0, -1.0,  0.0), vec4(1, 1, 0, 1),
+							 vec3( 1.0, -1.0,  0.0), vec4(0, 0, 1, 1),
+							 vec3( 1.0, -1.0,  0.0), vec4(0, 0, 1, 1),
+							 vec3( 1.0,  0.0,  0.0), vec4(1, 1, 0, 1),
+							 vec3( 0.0,  0.0,  0.0), vec4(1, 1, 0, 1) };
+
+Vertex3 Model::square2[6] = { vec3( 0.0,  0.0,  0.0), vec4(1, 1, 0, 1),
+							  vec3( 0.0,  0.0, -1.0), vec4(1, 1, 0, 1),
+							  vec3( 1.0,  0.0, -1.0), vec4(0, 0, 1, 1),
+							  vec3( 1.0,  0.0, -1.0), vec4(0, 0, 1, 1),
+							  vec3( 1.0,  0.0,  0.0), vec4(1, 1, 0, 1),
+							  vec3( 0.0,  0.0,  0.0), vec4(1, 1, 0, 1) };
+
+void Model::Initialize(Vertex3 pVertices[], int length, GLenum pFace, std::string vert, std::string frag) {
+	FaceMode = pFace;
 	m_Shader.Init(vert, frag);
 
 	vertices = pVertices;
@@ -48,7 +63,7 @@ void Model::Render() {
 	glBindVertexArray(VAO);
 	glEnableVertexAttribArray(VertexIndex);
 	glEnableVertexAttribArray(ColorIndex);
-	glDrawArrays(GL_LINES, 0, verticesLength);
+	glDrawArrays(FaceMode, 0, verticesLength);
 	glDisableVertexAttribArray(ColorIndex);
 	glDisableVertexAttribArray(VertexIndex);
 	glBindVertexArray(0);
