@@ -9,6 +9,7 @@
 #include "GameState.h"
 #include "Camera.h"
 #include "Model.h"
+#include <vector>
 
 #define LEFT        1
 #define MIDDLE      2
@@ -38,6 +39,7 @@ private:
 	Model g_Axis;
 	Model g_SampleSquare;
 	Model g_SampleSquare2;
+	std::vector<Model> g_SampleSquare3;
 };
 
 ////////////////////////////////////////////////////////////////////////////////

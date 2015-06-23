@@ -3,6 +3,7 @@
 ////////////////////////////////////////
 
 #include "PlayState.h"
+#include "Area.h"
 #include <cstdio>
 
 #define LEFT        1	//0001
@@ -42,6 +43,15 @@ int PlayState::Initialize() {
 	g_SampleSquare2.Initialize(Model::square2, 6, GL_TRIANGLES, "Shaders/Shader.vertex", "Shaders/Shader.fragment");
 	g_SampleSquare2.SetCamera(m_Camera);
 	g_SampleSquare2.SetPosition(vec3(3, 0, 0));
+
+	g_SampleSquare3 = std::vector<Model>(100);
+	for (int i = 0; i < g_SampleSquare3.size(); i++) {
+		g_SampleSquare3[i].Initialize(Model::square, 6, GL_TRIANGLES, "Shaders/Shader.vertex", "Shaders/Shader.fragment");
+		g_SampleSquare3[i].SetCamera(m_Camera);
+		g_SampleSquare3[i].SetPosition(vec3(i%10, i/10, 0));
+		g_SampleSquare3[i].SetScale(vec3(0.5, 0.5, 0.5));
+	}
+	
 	return 1; // OK
 }
 
@@ -133,9 +143,28 @@ void PlayState::Draw() {
 	// Clear the screen
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+	/*
 	g_Axis.Render();
 	g_SampleSquare.Render();
 	g_SampleSquare2.Render();
+	*/
+
+	Area a(10, 10, 1, 1);
+	a.fillPaths();
+	vector<int> v(100);
+	a.getPathMap(v);
+
+	for (int i = 0; i < v.size(); i++) {
+		if (v[i] == 7) {
+			g_SampleSquare3[i].Initialize(Model::square2, 6, GL_TRIANGLES, "Shaders/Shader.vertex", "Shaders/Shader.fragment");
+			g_SampleSquare3[i].SetCamera(m_Camera);
+			g_SampleSquare3[i].SetPosition(vec3(i % 10, i / 10, 0));
+			g_SampleSquare3[i].SetScale(vec3(0.5, 0.5, 0.5));
+		}
+	}
+		
+	for (int i = 0; i < g_SampleSquare3.size(); i++)
+		g_SampleSquare3[i].Render();
 
 	glfwSwapBuffers(window);
 	glfwPollEvents();
