@@ -1,11 +1,11 @@
 #include "Model.h"
 
-Vertex3 Model::axis[6] = { vec3(1.0, 0.0, 0.0), vec4(0, 0, 0, 1),
-						   vec3(0.0, 0.0, 0.0), vec4(0, 0, 0, 1),
-						   vec3(0.0, 1.0, 0.0), vec4(0, 0, 0, 1),
-						   vec3(0.0, 0.0, 0.0), vec4(0, 0, 0, 1),
-						   vec3(0.0, 0.0, 1.0), vec4(0, 0, 0, 1),
-						   vec3(0.0, 0.0, 0.0), vec4(0, 0, 0, 1) };
+Vertex3 Model::axis[6] = { vec3(1.0, 0.0, 0.0), vec4(1, 0, 0, 1),
+						   vec3(0.0, 0.0, 0.0), vec4(1, 0, 0, 1),
+						   vec3(0.0, 1.0, 0.0), vec4(0, 1, 0, 1),
+						   vec3(0.0, 0.0, 0.0), vec4(0, 1, 0, 1),
+						   vec3(0.0, 0.0, 1.0), vec4(0, 0, 1, 1),
+						   vec3(0.0, 0.0, 0.0), vec4(0, 0, 1, 1) };
 
 void Model::Initialize(Vertex3 pVertices[], int length, std::string vert, std::string frag) {
 	m_Shader.Init(vert, frag);
@@ -21,7 +21,7 @@ void Model::Initialize(Vertex3 pVertices[], int length, std::string vert, std::s
 
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices[0]) * length, vertices, GL_STATIC_DRAW);
 	glVertexAttribPointer(VertexIndex, 3, GL_FLOAT, GL_FALSE, sizeof(vertices[0]), 0);
-	glVertexAttribPointer(ColorIndex, 4, GL_FLOAT, GL_FALSE, sizeof(vertices[0]), (GLvoid*)sizeof(vertices[0].xyz));
+	glVertexAttribPointer(ColorIndex, 4, GL_FLOAT, GL_FALSE, sizeof(vertices[0]), (GLvoid*)sizeof(vertices[0].rgba));
 }
 
 void Model::Render() {
