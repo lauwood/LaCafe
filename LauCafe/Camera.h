@@ -12,6 +12,7 @@ public:
 	mat4 SetPerspective(float fov, float aspectRatio, float nearPlane, float farPlane);
 
 	mat4 GetRotationMatrix();
+	mat4 GetRotationYMatrix();
 
 	mat4 GetProjectionMatrix() { return ProjectionMatrix; }
 	mat4 GetViewMatrix();

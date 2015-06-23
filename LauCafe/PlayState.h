@@ -9,6 +9,7 @@
 #include "GameState.h"
 #include "Camera.h"
 #include "Model.h"
+#include "CubeMap.h"
 
 #define LEFT        1
 #define MIDDLE      2
@@ -34,6 +35,8 @@ private:
 	// Input
 	double MouseX, MouseY;
 	int MouseActiveButton;
+
+	CubeMap Skybox;
 	
 	Model g_Axis;
 	Model g_SampleSquare;

@@ -15,7 +15,7 @@
     </Filter>
     <Filter Include="Shaders">
       <UniqueIdentifier>{39d35e0e-fb3a-4434-a6b8-c4f29ea08290}</UniqueIdentifier>
-      <Extensions>fragment,vertex</Extensions>
+      <Extensions>glsl</Extensions>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -40,6 +40,15 @@
     <ClInclude Include="Shader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="CubeMap.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="stb_image.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Logger.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -60,12 +69,24 @@
     <ClCompile Include="Model.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="CubeMap.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Logger.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Shaders\Shader.fragment">
+    <None Include="Shaders\Shader_fs.glsl">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="Shaders\Shader.vertex">
+    <None Include="Shaders\Shader_vs.glsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\Skybox_fs.glsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\Skybox_vs.glsl">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>

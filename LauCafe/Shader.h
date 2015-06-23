@@ -7,13 +7,14 @@
 class Shader
 {
 public:
-	Shader()	{};
-	Shader(std::string vert, std::string frag);
-	~Shader();
+	Shader()	{}
+	~Shader()	{ Destroy(); }
 	void Destroy();
 
-	std::string LoadShaderFile(std::string filename);
-	int Init(std::string vert, std::string frag);
+	GLuint Initialize(std::string vert, std::string frag);
+	bool CreateShader(std::string file_name, GLuint* shader, GLenum type);
+	bool CreateProgram(GLuint vert, GLuint frag, GLuint* program);
+	std::string LoadFile(std::string file_name);
 	GLint GetVariable(std::string str);
 
 	void SetInt(GLint id, int newValue)											{ glUniform1i(id, newValue); }
@@ -30,8 +31,6 @@ public:
 	void Bind()			{ glUseProgram(ShaderId); }
 	void Unbind()		{ glUseProgram(0); }
 private:
-	GLuint VertexId;
-	GLuint FragmentId;
 	GLuint ShaderId;
 };
 

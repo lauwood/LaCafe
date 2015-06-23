@@ -15,15 +15,15 @@ Vertex3 Model::square[6] = { vec3( 0.0,  0.0,  0.0), vec4(1, 1, 0, 1),
 							 vec3( 0.0,  0.0,  0.0), vec4(1, 1, 0, 1) };
 
 Vertex3 Model::square2[6] = { vec3( 0.0,  0.0,  0.0), vec4(1, 1, 0, 1),
-							  vec3( 0.0,  0.0, -1.0), vec4(1, 1, 0, 1),
-							  vec3( 1.0,  0.0, -1.0), vec4(0, 0, 1, 1),
-							  vec3( 1.0,  0.0, -1.0), vec4(0, 0, 1, 1),
 							  vec3( 1.0,  0.0,  0.0), vec4(1, 1, 0, 1),
+							  vec3( 1.0,  0.0, -1.0), vec4(0, 0, 1, 1),
+							  vec3( 1.0,  0.0, -1.0), vec4(0, 0, 1, 1),
+							  vec3( 0.0,  0.0, -1.0), vec4(1, 1, 0, 1),
 							  vec3( 0.0,  0.0,  0.0), vec4(1, 1, 0, 1) };
 
 void Model::Initialize(Vertex3 pVertices[], int length, GLenum pFace, std::string vert, std::string frag) {
 	FaceMode = pFace;
-	m_Shader.Init(vert, frag);
+	m_Shader.Initialize(vert, frag);
 
 	vertices = pVertices;
 	verticesLength = length;
@@ -55,9 +55,9 @@ void Model::Render() {
 	GLint viewMatrixId = m_Shader.GetVariable("viewMatrix");
 	GLint projectionMatrixId = m_Shader.GetVariable("projectionMatrix");
 
-	m_Shader.SetMatrix4(modelMatrixId, 1, false, &modelMatrix[0][0]);
-	m_Shader.SetMatrix4(viewMatrixId, 1, false, &viewMatrix[0][0]);
-	m_Shader.SetMatrix4(projectionMatrixId, 1, false, &projectionMatrix[0][0]);
+	m_Shader.SetMatrix4(modelMatrixId, 1, GL_FALSE, &modelMatrix[0][0]);
+	m_Shader.SetMatrix4(viewMatrixId, 1, GL_FALSE, &viewMatrix[0][0]);
+	m_Shader.SetMatrix4(projectionMatrixId, 1, GL_FALSE, &projectionMatrix[0][0]);
 
 
 	glBindVertexArray(VAO);

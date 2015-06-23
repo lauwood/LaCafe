@@ -1,37 +1,72 @@
 #include "Shader.h"
+#include <assert.h>
+#include "Logger.h"
 
-Shader::Shader(std::string vert, std::string frag) {
-	Init(vert, frag);
-}
+#define MAX_SHADER_LENGTH 262144
 
-Shader::~Shader() {
-	Destroy();
+GLuint Shader::Initialize(std::string vert_file_name, std::string frag_file_name) {
+	GLuint vert_id, frag_id;
+	assert(CreateShader(vert_file_name, &vert_id, GL_VERTEX_SHADER));
+	assert(CreateShader(frag_file_name, &frag_id, GL_FRAGMENT_SHADER));
+	assert(CreateProgram(vert_id, frag_id, &ShaderId));
+	return ShaderId;
 }
 
 void Shader::Destroy() {
-	if (VertexId) {
-		glDetachShader(ShaderId, VertexId);
-		glDeleteShader(VertexId);
-		VertexId = 0;
-	}
-
-	if (FragmentId) {
-		glDetachShader(ShaderId, FragmentId);
-		glDeleteShader(FragmentId);
-		FragmentId = 0;
-	}
-
 	if (ShaderId) {
 		glDeleteShader(ShaderId);
 		ShaderId = 0;
 	}
 }
 
-std::string Shader::LoadShaderFile(std::string filename) {
+bool Shader::CreateShader(std::string file_name, GLuint* shader, GLenum type) {
+	Log("creating shader from %s...\n", file_name);
+	std::string text_data = LoadFile(file_name);
+	const char *text_data_cstr = text_data.c_str();
+	*shader = glCreateShader(type);
+	glShaderSource(*shader, 1, &text_data_cstr, NULL);
+	glCompileShader(*shader);
+
+	int params = -1;
+	glGetShaderiv(*shader, GL_COMPILE_STATUS, &params);
+	if (GL_TRUE != params) {
+		fprintf(stderr, "ERROR: GL shader index %i did not compile\n", *shader);
+		Print_Program_Info_Log(*shader);
+		return false;
+	}
+	Log("shader compiled. index %i\n", *shader);
+	return true;
+}
+
+bool Shader::CreateProgram(GLuint vert, GLuint frag, GLuint* program) {
+	*program = glCreateProgram();
+	Log("created programme %u. attaching shaders %u and %u...\n", *program, vert, frag);
+	glAttachShader(*program, vert);
+	glAttachShader(*program, frag);
+
+	glLinkProgram(*program);
+
+	GLint params = -1;
+	glGetProgramiv(*program, GL_LINK_STATUS, &params);
+	if (GL_TRUE != params) {
+		fprintf(stderr, "ERROR: could not link shader programme GL index %u\n", *program);
+		Print_Program_Info_Log(*program);
+		return false;
+	}
+
+	// delete shaders here to free memory
+	glDeleteShader(vert);
+	glDeleteShader(frag);
+	return true;
+}
+
+std::string Shader::LoadFile(std::string filename) {
 	std::ifstream fin(filename.c_str());
 
-	if (!fin)
+	if (!fin) {
+		Log("ERROR: opening file for reading: %s\n", filename);
 		return "";
+	}
 
 	std::string line = "";
 	std::string text = "";
@@ -44,46 +79,8 @@ std::string Shader::LoadShaderFile(std::string filename) {
 	return text;
 }
 
-int Shader::Init(std::string vert, std::string frag) {
-	if (!vert.length() || !frag.length())
-		return 0;
-
-	// If any of the shader pointers are already set, free them
-	if (VertexId || FragmentId || ShaderId)
-		Destroy();
-
-	VertexId = glCreateShader(GL_VERTEX_SHADER);
-	FragmentId = glCreateShader(GL_FRAGMENT_SHADER);
-
-	// Holds the shader's text file data
-	std::string vertStringData, fragStringData;
-
-	vertStringData = LoadShaderFile(vert.c_str());
-	fragStringData = LoadShaderFile(frag.c_str());
-
-	// switch to const char* to read
-	const char *vshader = vertStringData.c_str();
-	const char *fshader = fragStringData.c_str();
-
-	glShaderSource(VertexId, 1, &vshader, nullptr);
-	glShaderSource(FragmentId, 1, &fshader, nullptr);
-
-	glCompileShader(VertexId);
-	glCompileShader(FragmentId);
-
-	ShaderId = glCreateProgram();
-	glAttachShader(ShaderId, VertexId);
-	glAttachShader(ShaderId, FragmentId);
-
-	glLinkProgram(ShaderId);
-
-	return 1;
-}
 
 GLint Shader::GetVariable(std::string str) {
-	if (!ShaderId)
-		return -1;
-
 	return glGetUniformLocation(ShaderId, str.c_str());
 }
 
