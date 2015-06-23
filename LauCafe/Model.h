@@ -55,6 +55,8 @@ public:
 	Camera *GetCamera() { return m_Camera; }
 	void SetCamera(Camera *pCamera) { m_Camera = pCamera; }
 
+	void IsFound() { PathFound = true; }
+
 	// This cleans up the VBO and VAO's
 	void Destroy();
 
@@ -64,6 +66,8 @@ protected:
 	GLint verticesLength;								// The length of the vertices
 	GLuint VBO;											// The VertexBufferObject Id stored by the VAO
 	GLuint VAO;											// The VertexArrayObject Id to bind when drawing
+
+	bool PathFound;
 
 	glm::vec3 position;										// The model's position
 	glm::vec3 rotation;										// The model's rotation

@@ -156,7 +156,7 @@ void PlayState::Draw() {
 
 	for (int i = 0; i < v.size(); i++) {
 		if (v[i] == 7) {
-			g_SampleSquare3[i].Initialize(Model::square2, 6, GL_TRIANGLES, "Shaders/Shader.vertex", "Shaders/Shader.fragment");
+			g_SampleSquare3[i].IsFound(); // uses a shader to recolor found
 			g_SampleSquare3[i].SetCamera(m_Camera);
 			g_SampleSquare3[i].SetPosition(vec3(i % 10, i / 10, 0));
 			g_SampleSquare3[i].SetScale(vec3(0.5, 0.5, 0.5));

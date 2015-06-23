@@ -23,6 +23,7 @@ Vertex3 Model::square2[6] = { vec3( 0.0,  0.0,  0.0), vec4(1, 1, 0, 1),
 
 void Model::Initialize(Vertex3 pVertices[], int length, GLenum pFace, std::string vert, std::string frag) {
 	FaceMode = pFace;
+	PathFound = false;
 	m_Shader.Init(vert, frag);
 
 	vertices = pVertices;
@@ -54,11 +55,14 @@ void Model::Render() {
 	GLint modelMatrixId = m_Shader.GetVariable("modelMatrix");
 	GLint viewMatrixId = m_Shader.GetVariable("viewMatrix");
 	GLint projectionMatrixId = m_Shader.GetVariable("projectionMatrix");
+	GLint colorId = m_Shader.GetVariable("vertColor");
 
 	m_Shader.SetMatrix4(modelMatrixId, 1, false, &modelMatrix[0][0]);
 	m_Shader.SetMatrix4(viewMatrixId, 1, false, &viewMatrix[0][0]);
 	m_Shader.SetMatrix4(projectionMatrixId, 1, false, &projectionMatrix[0][0]);
-
+	if (PathFound) {
+		m_Shader.SetFloat4(colorId, 1, 0, 0, 1);
+	}
 
 	glBindVertexArray(VAO);
 	glEnableVertexAttribArray(VertexIndex);
