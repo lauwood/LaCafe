@@ -149,7 +149,7 @@ void PlayState::Draw() {
 	g_SampleSquare2.Render();
 	*/
 
-	Area a(10, 10, 1, 1);
+	Area a(10, 10, 0, 0);
 	a.fillPaths();
 	vector<int> v(100);
 	a.getPathMap(v);

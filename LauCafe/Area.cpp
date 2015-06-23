@@ -46,14 +46,14 @@ Area::Area(int z, int x, int sz, int sx, vector<int> v)
 
 Area::~Area()
 {
-	for (size_t i = 0; i < paths.size(); i++) {
+	/*for (size_t i = 0; i < paths.size(); i++) {
 		while (!paths[i]->empty()) {
 			Cell* c = paths[i]->top();
 			delete c;
 			paths[i]->pop();
 		}
 		delete paths[i];
-	}
+	}*/
 }
 
 
