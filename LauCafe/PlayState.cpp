@@ -3,42 +3,118 @@
 ////////////////////////////////////////
 
 #include "PlayState.h"
+#include <cstdio>
+
+#define LEFT        1	//0001
+#define MIDDLE      2	//0010
+#define RIGHT       4	//0100
+
+const int ScreenWidth = 1024;
+const int ScreenHeight = 768;
 
 ////////////////////////////////////////////////////////////////////////////////
 
 PlayState::PlayState(GLFWwindow* window) : GameState(window) {
-	InitGL();
 	Initialize();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
-int PlayState::InitGL() {
-	glewExperimental = GL_TRUE;
-	if (glewInit() != GLEW_OK) {
-		fprintf(stderr, "Failed to initialize GLEW\n");
-		return -1;
-	}
+int PlayState::Initialize() {
+	glEnable(GL_DEPTH_TEST);
+	glClearColor(1.0, 1.0, 1.0, 1.0);
 
-	glfwSwapInterval(0);	// no vsync
+	MouseActiveButton = 0;
 
-	glfwGetFramebufferSize(window, &WinX, &WinY);
-	ratio = WinX / (float)WinY;
+	m_Camera = new Camera(); 
+	m_Camera->SetPerspective(glm::radians(60.0f), ScreenWidth / (float)ScreenHeight, 0.01f, 1000);
+	//					     Position	  Yaw	 Pitch
+	m_Camera->PositionCamera(0, 0, 5,     0,     0);
 
-	return 0;
+	g_Axis.Initialize(Model::axis, 6, "Shaders/Shader.vertex", "Shaders/Shader.fragment");
+	g_Axis.SetCamera(m_Camera); 
+	g_Axis.SetPosition(vec3(0, 0, 0));
+
+	return 1; // OK
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
-int PlayState::Initialize() {
-	g_Camera = new Camera;
-	g_Camera->setEye(Vector3(-5, 2, 3));
-	g_Camera->setLookAt(Vector3(0, 0, 0));
-	g_Camera->setUp(Vector3(0, 1, 0));
-	g_Camera->setFOV(45);
-	return 0;
-}
+void PlayState::Input() {
+	// Keyboard
+	if (glfwGetKey(window, GLFW_KEY_ESCAPE)) {
+		glfwSetWindowShouldClose(window, GL_TRUE);
+	}
 
+	if (glfwGetKey(window, GLFW_KEY_W)) {
+		m_Camera->MoveForward(m_Camera->GetSpeed());
+	}
+	if (glfwGetKey(window, GLFW_KEY_A)) {
+		m_Camera->MoveLeft(m_Camera->GetSpeed());
+	}
+	if (glfwGetKey(window, GLFW_KEY_S)) {
+		m_Camera->MoveBackward(m_Camera->GetSpeed());
+	}
+	if (glfwGetKey(window, GLFW_KEY_D)) {
+		m_Camera->MoveRight(m_Camera->GetSpeed());
+	}
+	if (glfwGetKey(window, GLFW_KEY_UP)) {
+		m_Camera->MoveUp(m_Camera->GetSpeed());
+	}
+	if (glfwGetKey(window, GLFW_KEY_DOWN)) {
+		m_Camera->MoveDown(m_Camera->GetSpeed());
+	}
+
+	// Mouse buttons
+	int button = 0;
+	int action = glfwGetMouseButton(window, button);
+
+	int b;
+
+	switch (button)
+	{
+	case GLFW_MOUSE_BUTTON_LEFT:
+		b = LEFT;
+		break;
+
+	case GLFW_MOUSE_BUTTON_MIDDLE:
+		b = MIDDLE;
+		break;
+
+	case GLFW_MOUSE_BUTTON_RIGHT:
+		b = RIGHT;
+		break;
+
+	default:
+		b = 0;
+	}
+
+	if (action == GLFW_PRESS) {
+		MouseActiveButton |= b;
+	}
+	else {
+		MouseActiveButton &= ~b;
+	}
+
+	// Mouse motions
+
+	double nx, ny;
+	glfwGetCursorPos(window, &nx, &ny);
+	double dx = nx - MouseX;
+	double dy = ny - MouseY;
+
+	MouseX = nx;
+	MouseY = ny;
+
+	if (MouseActiveButton & LEFT) {
+		if (dx != 0 && dy != 0)
+		{
+			m_Camera->SetViewByMouse(dx, dy);
+		}
+	}
+
+	glfwPollEvents();
+}
 ////////////////////////////////////////////////////////////////////////////////
 
 void PlayState::Update() {
@@ -50,47 +126,10 @@ void PlayState::Draw() {
 	// Clear the screen
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	g_Camera->drawGL();
-
-	drawAxis(5);
+	g_Axis.Render();
 
 	glfwSwapBuffers(window);
 	glfwPollEvents();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-
-void PlayState::Input() {
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
-void PlayState::KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
-void PlayState::CharCallback(GLFWwindow* window, unsigned int code) {
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
-void PlayState::MouseButton(GLFWwindow* window, int button, int action, int mods) {
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
-void PlayState::MouseMotion(GLFWwindow* window, double xpos, double ypos) {
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
-void PlayState::MouseScroll(GLFWwindow* window, double xoffset, double yoffset) {
-	/*const float rate = 3.0f;
-	if (yoffset > 0) {
-		Cam.TranslateZ(1.0f*rate);
-	}
-	else if (yoffset < 0) {
-		Cam.TranslateZ(-1.0f*rate);
-	}*/
-}
