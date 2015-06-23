@@ -7,19 +7,19 @@ Vertex3 Model::axis[6] = { vec3(1.0, 0.0, 0.0), vec4(1, 0, 0, 1),
 						   vec3(0.0, 0.0, 1.0), vec4(0, 0, 1, 1),
 						   vec3(0.0, 0.0, 0.0), vec4(0, 0, 1, 1) };
 
-Vertex3 Model::square[6] = { vec3( 0.0,  0.0,  0.0), vec4(1, 1, 0, 1),
-							 vec3( 0.0, -1.0,  0.0), vec4(1, 1, 0, 1),
-							 vec3( 1.0, -1.0,  0.0), vec4(0, 0, 1, 1),
-							 vec3( 1.0, -1.0,  0.0), vec4(0, 0, 1, 1),
-							 vec3( 1.0,  0.0,  0.0), vec4(1, 1, 0, 1),
-							 vec3( 0.0,  0.0,  0.0), vec4(1, 1, 0, 1) };
+Vertex3 Model::square[6] = { vec3(-0.5,  0.5,  0.0), vec4(1, 1, 0, 1),
+							 vec3(-0.5, -0.5,  0.0), vec4(1, 1, 0, 1),
+							 vec3( 0.5, -0.5,  0.0), vec4(0, 0, 1, 1),
+							 vec3( 0.5, -0.5,  0.0), vec4(0, 0, 1, 1),
+							 vec3( 0.5,  0.5,  0.0), vec4(1, 1, 0, 1),
+							 vec3(-0.5,  0.5,  0.0), vec4(1, 1, 0, 1) };
 
-Vertex3 Model::square2[6] = { vec3( 0.0,  0.0,  0.0), vec4(1, 1, 0, 1),
-							  vec3( 1.0,  0.0,  0.0), vec4(1, 1, 0, 1),
-							  vec3( 1.0,  0.0, -1.0), vec4(0, 0, 1, 1),
-							  vec3( 1.0,  0.0, -1.0), vec4(0, 0, 1, 1),
-							  vec3( 0.0,  0.0, -1.0), vec4(1, 1, 0, 1),
-							  vec3( 0.0,  0.0,  0.0), vec4(1, 1, 0, 1) };
+Vertex3 Model::square2[6] = { vec3(-0.5,  0.0,  0.5), vec4(1, 1, 0, 1),
+							  vec3(-0.5,  0.0, -0.5), vec4(1, 1, 0, 1),
+							  vec3( 0.5,  0.0, -0.5), vec4(0, 0, 1, 1),
+							  vec3( 0.5,  0.0, -0.5), vec4(0, 0, 1, 1),
+							  vec3( 0.5,  0.0,  0.5), vec4(1, 1, 0, 1),
+							  vec3(-0.5,  0.0,  0.5), vec4(1, 1, 0, 1) };
 
 void Model::Initialize(Vertex3 pVertices[], int length, GLenum pFace, std::string vert, std::string frag) {
 	FaceMode = pFace;
@@ -37,6 +37,14 @@ void Model::Initialize(Vertex3 pVertices[], int length, GLenum pFace, std::strin
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices[0]) * length, vertices, GL_STATIC_DRAW);
 	glVertexAttribPointer(VertexIndex, 3, GL_FLOAT, GL_FALSE, sizeof(vertices[0]), 0);
 	glVertexAttribPointer(ColorIndex, 4, GL_FLOAT, GL_FALSE, sizeof(vertices[0]), (GLvoid*)sizeof(vertices[0].rgba));
+}
+
+void Model::Select() {
+	Selected = true;
+}
+
+void Model::Unselect() {
+	Selected = false;
 }
 
 void Model::Render() {
@@ -59,6 +67,13 @@ void Model::Render() {
 	m_Shader.SetMatrix4(viewMatrixId, 1, GL_FALSE, &viewMatrix[0][0]);
 	m_Shader.SetMatrix4(projectionMatrixId, 1, GL_FALSE, &projectionMatrix[0][0]);
 
+	GLint blueId = m_Shader.GetVariable("blue");
+	if (Selected) {
+		m_Shader.SetFloat(blueId, 1.0f);
+	}
+	else {
+		m_Shader.SetFloat(blueId, 0.0f);
+	}
 
 	glBindVertexArray(VAO);
 	glEnableVertexAttribArray(VertexIndex);

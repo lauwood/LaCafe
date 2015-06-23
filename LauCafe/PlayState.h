@@ -25,8 +25,10 @@ public:
 	void Input();
 	void Update();
 	void Draw();
-
 private:
+	bool RayIntersect(glm::vec3, glm::vec3, glm::vec3, float, float*);
+	glm::vec3 GetRayFromMouse(float, float);
+
 	// Window management
 	Camera* m_Camera;
 	float ratio;
@@ -39,8 +41,8 @@ private:
 	CubeMap Skybox;
 	
 	Model g_Axis;
-	Model g_SampleSquare;
-	Model g_SampleSquare2;
+
+	Model g_SampleSquares[5];
 };
 
 ////////////////////////////////////////////////////////////////////////////////
