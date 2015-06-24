@@ -49,6 +49,15 @@
     <ClInclude Include="Logger.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="AnimEvaluator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MeshLoader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SceneAnimator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -75,6 +84,15 @@
     <ClCompile Include="Logger.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="MeshLoader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SceneAnimator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="AnimEvaluator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\Shader_fs.glsl">
@@ -87,6 +105,12 @@
       <Filter>Shaders</Filter>
     </None>
     <None Include="Shaders\Skybox_vs.glsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\Banana_fs.glsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\Banana_vs.glsl">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>

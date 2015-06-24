@@ -3,6 +3,7 @@
 ////////////////////////////////////////
 
 #include "PlayState.h"
+#include "MeshLoader.h"
 #include <cstdio>
 
 #define LEFT        1	//0001
@@ -13,6 +14,8 @@ const int ScreenWidth = 1024;
 const int ScreenHeight = 768;
 
 #define NUM_OF_SQUARES 5
+
+Mesh banana;
 
 vec3 square_positions[] = {
 	vec3(-4.0, 0.0, 0.0),
@@ -62,6 +65,11 @@ int PlayState::Initialize() {
 		g_SampleSquares[i].SetCamera(m_Camera);
 		g_SampleSquares[i].SetPosition(square_positions[i]);
 	}
+
+	banana = Mesh("Models/banana.obj", "Shaders/Banana_vs.glsl", "Shaders/Banana_fs.glsl");
+	banana.SetCamera(m_Camera);
+	banana.SetPosition(vec3(0, 0, 0));
+	banana.SetScale(vec3(0.01, 0.01, 0.01));
 	
 	glEnable(GL_DEPTH_TEST); // enable depth-testing
 	glDepthFunc(GL_LESS); // depth-testing interprets a smaller value as "closer"
@@ -265,6 +273,7 @@ void PlayState::Draw() {
 
 	glDisable(GL_CULL_FACE);
 
+	banana.Render();
 	g_Axis.Render();
 
 	for (int i = 0; i < NUM_OF_SQUARES; i++) {
