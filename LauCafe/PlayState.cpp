@@ -3,7 +3,6 @@
 ////////////////////////////////////////
 
 #include "PlayState.h"
-#include "Area.h"
 #include <cstdio>
 
 #define LEFT        1	//0001
@@ -16,6 +15,10 @@ const int ScreenHeight = 768;
 ////////////////////////////////////////////////////////////////////////////////
 
 PlayState::PlayState(GLFWwindow* window) : GameState(window) {
+
+	a = Area(10, 10, 0, 0);
+	a.setTile(2, 2, 2);
+	a.fillPaths();
 	Initialize();
 }
 
@@ -149,13 +152,24 @@ void PlayState::Draw() {
 	g_SampleSquare2.Render();
 	*/
 
-	Area a(10, 10, 0, 0);
-	a.fillPaths();
-	vector<int> v(100);
-	a.getPathMap(v);
+	vector<int> floor = a.getFloor();
+	vector<int> pathMap(floor.size());
 
-	for (int i = 0; i < v.size(); i++) {
-		if (v[i] == 7) {
+	for (int z = 0; z < a.getHeight(); z++)
+		for (int x = 0; x < a.getWidth(); x++) {
+			if (floor[a.getIndex(z, x)] == 2) {
+				// If the cell is a potential destination, print the path
+				deque<Cell*> p = a.getPath(z, x);
+				for (size_t i = 0; i < p.size(); i++) {
+					Cell* top = a.getPath(z, x).at(i);
+					// 7 is just a visual symbol to represent the path
+					pathMap[a.getIndex(top->z, top->x)] = 7;
+				}
+			}
+		}
+
+	for (int i = 0; i < pathMap.size(); i++) {
+		if (pathMap[i] == 7) {
 			g_SampleSquare3[i].IsFound(); // uses a shader to recolor found
 			g_SampleSquare3[i].SetCamera(m_Camera);
 			g_SampleSquare3[i].SetPosition(vec3(i % 10, i / 10, 0));

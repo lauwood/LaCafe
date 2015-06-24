@@ -17,14 +17,13 @@ Area::Area(int z, int x, int sz, int sx)
 	// Dynamically allocate the vectors
 	floor = vector<int>(x*z);
 	// Need to have pointers to Slots because of scope
-	paths = vector<stack<struct Cell*>*>(x * z);
+	paths = vector<deque<Cell*>>(x * z);
 
 	this->start.x = sx;
 	this->start.z = sz;
 
 	// Mark the start
 	setTile(sz, sx, 1);
-	setTile(2, 2, 2);
 }
 
 Area::Area(int z, int x, int sz, int sx, vector<int> v)
@@ -35,7 +34,7 @@ Area::Area(int z, int x, int sz, int sx, vector<int> v)
 	// Dynamically allocate the vectors
 	floor = vector<int>(v);
 	// Need to have pointers to Slots because of scope
-	paths = vector<stack<Cell*>*>(x * z);
+	paths = vector<deque<Cell*>>(x * z);
 
 	this->start.x = sx;
 	this->start.z = sz;
@@ -46,14 +45,15 @@ Area::Area(int z, int x, int sz, int sx, vector<int> v)
 
 Area::~Area()
 {
-	/*for (size_t i = 0; i < paths.size(); i++) {
-		while (!paths[i]->empty()) {
-			Cell* c = paths[i]->top();
+	int count = 0;
+	for (size_t i = 0; i < paths.size(); i++) {
+		while (!paths.at(i).empty()) {
+			Cell* c = paths.at(i).front();
 			delete c;
-			paths[i]->pop();
+			paths.at(i).pop_front();
+			count++;
 		}
-		delete paths[i];
-	}*/
+	}
 }
 
 
@@ -93,8 +93,8 @@ void Area::setTile(int z, int x, int t)
 
 void Area::getPathLengthGrid(vector<int>& pathLengthGrid)
 {
-	stack<struct Cell> current, next;
-	current.push(this->start);
+	deque<struct Cell> current, next;
+	current.push_back(this->start);
 
 	// Clear the array just in case
 	fill(pathLengthGrid.begin(), pathLengthGrid.end(), 0);
@@ -104,11 +104,11 @@ void Area::getPathLengthGrid(vector<int>& pathLengthGrid)
 
 	do {
 		// Have to set next to empty after while comparison
-		stack<struct Cell> emptyStack;
-		next = emptyStack;
+		deque<struct Cell> emptyDeque;
+		next = emptyDeque;
 
 		while (!current.empty()) {
-			Cell c = current.top();
+			Cell c = current.back();
 
 			// Mark the distance to adjacent cells (if they're walkable) and push onto next stack
 			if (isWalkable(c.z, c.x - 1) && pathLengthGrid[getIndex(c.z, c.x - 1)] == 0) {
@@ -116,7 +116,7 @@ void Area::getPathLengthGrid(vector<int>& pathLengthGrid)
 				Cell newSlot;
 				newSlot.x = c.x - 1;
 				newSlot.z = c.z;
-				next.push(newSlot);
+				next.push_back(newSlot);
 			}
 
 			if (isWalkable(c.z, c.x + 1) && pathLengthGrid[getIndex(c.z, c.x + 1)] == 0) {
@@ -124,7 +124,7 @@ void Area::getPathLengthGrid(vector<int>& pathLengthGrid)
 				Cell newSlot;
 				newSlot.x = c.x + 1;
 				newSlot.z = c.z;
-				next.push(newSlot);
+				next.push_back(newSlot);
 			}
 
 			if (isWalkable(c.z - 1, c.x) && pathLengthGrid[getIndex(c.z - 1, c.x)] == 0) {
@@ -132,7 +132,7 @@ void Area::getPathLengthGrid(vector<int>& pathLengthGrid)
 				Cell newSlot;
 				newSlot.x = c.x;
 				newSlot.z = c.z - 1;
-				next.push(newSlot);
+				next.push_back(newSlot);
 			}
 
 			if (isWalkable(c.z + 1, c.x) && pathLengthGrid[getIndex(c.z + 1, c.x)] == 0) {
@@ -140,11 +140,11 @@ void Area::getPathLengthGrid(vector<int>& pathLengthGrid)
 				Cell newSlot;
 				newSlot.x = c.x;
 				newSlot.z = c.z + 1;
-				next.push(newSlot);
+				next.push_back(newSlot);
 			}
 
 			// Pop the current cell, as we're done looking at its neighbors
-			current.pop();
+			current.pop_back();
 		}
 
 		// The current stack is emptied
@@ -174,7 +174,7 @@ void Area::fillPaths()
 	*	2. For all the destinations (represented by "2") find the minimum number adjacent
 	*	   to it (arbitrarily break ties).
 	*	3. Update the current cell to that cell.
-	*	4. Push the cell onto the stack, and look for an adjacent cell that has the
+	*	4. Push the cell onto the deque, and look for an adjacent cell that has the
 	*	   current cell's distance -1.
 	*	5. Go to step 3 until the current distance is 0.
 	*/
@@ -190,19 +190,17 @@ void Area::fillPaths()
 				int minLength = min(minLength1, minLength2);
 				int totalLength = minLength + 1;
 
-				// Create a new stack for the path onto which to push cells
-				stack<Cell*>* currentStack = new stack<Cell*>;
 				// Current coordinates
 				int xx = x;
 				int zz = z;
 
 				while (totalLength-- > 0) {
 					if (isInBounds(zz, xx - 1) && pathLengths[getIndex(zz, xx - 1)] == totalLength) {
-						// Push a new cell onto the stack
+						// Push a new cell onto the deque for later use
 						Cell* c = new Cell;
 						c->x = --xx;
 						c->z = zz;
-						currentStack->push(c);
+						paths.at(getIndex(z, x)).push_back(c);
 
 						continue;
 					}
@@ -211,7 +209,7 @@ void Area::fillPaths()
 						Cell* c = new Cell;
 						c->x = ++xx;
 						c->z = zz;
-						currentStack->push(c);
+						paths.at(getIndex(z, x)).push_back(c);
 
 						continue;
 					}
@@ -220,7 +218,7 @@ void Area::fillPaths()
 						Cell* c = new Cell;
 						c->x = xx;
 						c->z = --zz;
-						currentStack->push(c);
+						paths.at(getIndex(z, x)).push_back(c);
 
 						continue;
 					}
@@ -229,14 +227,11 @@ void Area::fillPaths()
 						Cell* c = new Cell;
 						c->x = xx;
 						c->z = ++zz;
-						currentStack->push(c);
+						paths.at(getIndex(z, x)).push_back(c);
 
 						continue;
 					}
 				}
-
-				// The stack is complete, put it in the destination cell
-				paths[getIndex(z, x)] = currentStack;
 			}
 		}
 }
@@ -263,24 +258,19 @@ void Area::printPaths()
 	cout << "Possible paths taken" << endl;
 	vector<int> pathMap(m_width * m_height);
 
-	// Pull the stack from the cell and pop
 	for (int z = 0; z < m_height; z++)
 		for (int x = 0; x < m_width; x++) {
 			if (floor[getIndex(z, x)] == 2) {
-				// Copy the stack, we might need it later
-				stack<Cell*>* path(paths[getIndex(z, x)]);
-
-				// Don't delete the pointers in the copied stack
-				while (!path->empty()) {
-					Cell* top = path->top();
+				// If the cell is a potential destination, print the path
+				for (size_t i = 0; i < paths[getIndex(z, x)].size(); i++) {
+					Cell* top = paths[getIndex(z, x)].at(i);
 					// 7 is just a visual symbol to represent the path
 					pathMap[getIndex(top->z, top->x)] = 7;
-					path->pop();
 				}
 			}
 		}
 
-	// Print the "8" paths
+	// Print the "7" paths
 	for (int z = 0; z < this->m_height; z++) {
 		cout << "|";
 		for (int x = 0; x < this->m_width; x++) {
@@ -290,25 +280,4 @@ void Area::printPaths()
 	}
 	cout << endl;
 	return;
-}
-
-// Prints all paths that customers take
-void Area::getPathMap(vector<int>& pathMap)
-{
-	// Pull the stack from the cell and pop
-	for (int z = 0; z < m_height; z++)
-		for (int x = 0; x < m_width; x++) {
-			if (floor[getIndex(z, x)] == 2) {
-				// Copy the stack, we might need it later
-				stack<Cell*>* path(paths[getIndex(z, x)]);
-
-				// Don't delete the pointers in the copied stack
-				while (!path->empty()) {
-					Cell* top = path->top();
-					// 7 is just a visual symbol to represent the path
-					pathMap[getIndex(top->z, top->x)] = 7;
-					path->pop();
-				}
-			}
-		}
 }
