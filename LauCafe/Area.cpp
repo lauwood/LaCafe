@@ -178,6 +178,16 @@ void Area::fillPaths()
 	*	   current cell's distance -1.
 	*	5. Go to step 3 until the current distance is 0.
 	*/
+	
+	// Clear the previous path matrix
+	for (size_t i = 0; i < paths.size(); i++) {
+		while (!paths.at(i).empty()) {
+			Cell* c = paths.at(i).front();
+			delete c;
+			paths.at(i).pop_front();
+		}
+	}
+
 	vector<int> pathLengths(m_height * m_width);
 	getPathLengthGrid(pathLengths);
 

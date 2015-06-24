@@ -13,17 +13,10 @@
 const int ScreenWidth = 1024;
 const int ScreenHeight = 768;
 
-#define NUM_OF_SQUARES 5
+#define NUM_OF_SQUARES 100
+#define Y_OFFSET 0.5
 
 Mesh banana;
-
-vec3 square_positions[] = {
-	vec3(-4.0, 2.0, 5.0),
-	vec3(-2.0, 2.0, 5.0),
-	vec3(0.0, 2.0, 5.0),
-	vec3(2.0, 2.0, 5.0),
-	vec3(4.0, 2.0, 5.0)
-};
 
 const float square_radius = 1.0f;
 int g_selected_square = -1;
@@ -33,7 +26,7 @@ int g_selected_square = -1;
 PlayState::PlayState(GLFWwindow* window) : GameState(window) {
 
 	a = Area(10, 10, 0, 0);
-	a.setTile(2, 2, 2);
+	a.setTile(1, 0, 2);
 	a.fillPaths();
 	Initialize();
 }
@@ -48,7 +41,7 @@ int PlayState::Initialize() {
 	m_Camera = new Camera(); 
 	m_Camera->SetPerspective(glm::radians(60.0f), ScreenWidth / (float)ScreenHeight, 0.01f, 1000);
 	//					     Position	  Yaw	 Pitch
-	m_Camera->PositionCamera(0, 1, 5,     0,     0);
+	m_Camera->PositionCamera(0, 5, 5,     0,     0);
 
 	Skybox.Initialize();
 	std::string cmRelPath = "CubeMap/Yokohama3/";
@@ -67,12 +60,6 @@ int PlayState::Initialize() {
 	g_Axis.SetCamera(m_Camera); 
 	g_Axis.SetPosition(vec3(0, 0, 0));
 
-	for (int i = 0; i < NUM_OF_SQUARES; i++) {
-		g_SampleSquares[i].Initialize(Model::square, 6, GL_TRIANGLES, "Shaders/Shader_vs.glsl", "Shaders/Shader_fs.glsl");
-		g_SampleSquares[i].SetCamera(m_Camera);
-		g_SampleSquares[i].SetPosition(square_positions[i]);
-	}
-
 	banana = Mesh("Models/banana.obj", "Shaders/Banana_vs.glsl", "Shaders/Banana_fs.glsl");
 	banana.SetCamera(m_Camera);
 	banana.SetPosition(vec3(0, 0, 0));
@@ -85,11 +72,11 @@ int PlayState::Initialize() {
 	glFrontFace(GL_CCW); // set counter-clock-wise vertex order to mean the front
 	glClearColor(0.2, 0.2, 0.2, 1.0); // grey background to help spot mistakes
 
-	g_SquarePath = std::vector<Model>(100);
-	for (int i = 0; i < g_SquarePath.size(); i++) {
-		g_SquarePath[i].Initialize(Model::square, 6, GL_TRIANGLES, "Shaders/Shader_vs.glsl", "Shaders/Shader_fs.glsl");
+	g_SquarePath = std::vector<Model>(NUM_OF_SQUARES);
+	for (int i = 0; i < NUM_OF_SQUARES; i++) {
+		g_SquarePath[i].Initialize(Model::square2, 6, GL_TRIANGLES, "Shaders/Shader_vs.glsl", "Shaders/Shader_fs.glsl");
 		g_SquarePath[i].SetCamera(m_Camera);
-		g_SquarePath[i].SetPosition(vec3(i % 10, i / 10, 0));
+		g_SquarePath[i].SetPosition(vec3(i % 10, Y_OFFSET, (i / 10)));
 		g_SquarePath[i].SetScale(vec3(0.5, 0.5, 0.5));
 	}
 	
@@ -199,6 +186,10 @@ void PlayState::Input() {
 		m_Camera->SetYaw(m_Camera->GetYaw() + m_Camera->GetSpeed());
 	}
 
+	if (glfwGetKey(window, GLFW_KEY_R)) {
+		a.setTile(1, 0, 2);
+		a.fillPaths();
+	}
 	// Mouse buttons
 	int button = 0;
 	int action = glfwGetMouseButton(window, button);
@@ -254,15 +245,19 @@ void PlayState::Input() {
 		float closest_intersection = 0.0f;
 		for (int i = 0; i < NUM_OF_SQUARES; i++) {
 			float t_dist = 0.0f;
-			if (RayIntersect(m_Camera->GetPosition(), ray_wor, square_positions[i], square_radius, &t_dist
+			if (RayIntersect(m_Camera->GetPosition(), ray_wor, g_SquarePath[i].GetPosition(), square_radius, &t_dist
 				)) {
 				// if more than one sphere is in path of ray, only use the closest one
 				if (-1 == closest_square_clicked || t_dist < closest_intersection) {
 					closest_square_clicked = i;
 					closest_intersection = t_dist;
+					a.setTile(closest_square_clicked / 10, closest_square_clicked % 10, 2);
+					a.fillPaths();
 				}
 			}
 		} // endfor
+		fprintf(stdout, "%d square selected\n", closest_square_clicked);
+		fprintf(stdout, "%d z, %d x\n", closest_square_clicked / 10, closest_square_clicked % 10);
 		g_selected_square = closest_square_clicked;
 	}
 
@@ -293,15 +288,6 @@ void PlayState::Draw() {
 	banana.Render();
 	g_Axis.Render();
 
-	for (int i = 0; i < NUM_OF_SQUARES; i++) {
-		if (g_selected_square == i) {
-			g_SampleSquares[i].Select();
-		} else {
-			g_SampleSquares[i].Unselect();
-		}
-		g_SampleSquares[i].Render();
-	}
-
 	vector<int> floor = a.getFloor();
 	vector<int> pathMap(floor.size());
 
@@ -320,15 +306,22 @@ void PlayState::Draw() {
 
 	for (int i = 0; i < pathMap.size(); i++) {
 		if (pathMap[i] == 7) {
-			g_SquarePath[i].Select(); // uses a shader to recolor found
-			g_SquarePath[i].SetCamera(m_Camera);
-			g_SquarePath[i].SetPosition(vec3(i % 10, i / 10, 0));
-			g_SquarePath[i].SetScale(vec3(0.5, 0.5, 0.5));
+			g_SquarePath[i].Path(); // uses a shader to recolor found
+		}
+		else {
+			g_SquarePath[i].Unpath();
 		}
 	}
 		
-	for (int i = 0; i < g_SquarePath.size(); i++)
+	for (int i = 0; i < NUM_OF_SQUARES; i++) {
+		if (g_selected_square == i) {
+			g_SquarePath[i].Select();
+		}
+		else {
+			g_SquarePath[i].Unselect();
+		}
 		g_SquarePath[i].Render();
+	}
 
 	glfwSwapBuffers(window);
 	glfwPollEvents();

@@ -25,6 +25,7 @@ void Model::Initialize(Vertex3 pVertices[], int length, GLenum pFace, std::strin
 	FaceMode = pFace;
 	m_Shader.Initialize(vert, frag);
 	Selected = false;
+	Pathed = false;
 
 	vertices = pVertices;
 	verticesLength = length;
@@ -38,14 +39,6 @@ void Model::Initialize(Vertex3 pVertices[], int length, GLenum pFace, std::strin
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices[0]) * length, vertices, GL_STATIC_DRAW);
 	glVertexAttribPointer(VertexIndex, 3, GL_FLOAT, GL_FALSE, sizeof(vertices[0]), 0);
 	glVertexAttribPointer(ColorIndex, 4, GL_FLOAT, GL_FALSE, sizeof(vertices[0]), (GLvoid*)sizeof(vertices[0].rgba));
-}
-
-void Model::Select() {
-	Selected = true;
-}
-
-void Model::Unselect() {
-	Selected = false;
 }
 
 void Model::Render() {
@@ -72,7 +65,9 @@ void Model::Render() {
 	if (Selected) {
 		m_Shader.SetFloat(blueId, 1.0f);
 	}
-	else {
+	else if (Pathed) {
+		m_Shader.SetFloat(blueId, 0.8f);
+	} else {
 		m_Shader.SetFloat(blueId, 0.0f);
 	}
 

@@ -44,8 +44,6 @@ private:
 	CubeMap Skybox;
 	
 	Model g_Axis;
-
-	Model g_SampleSquares[5];
 	Floor g_Floor;
 	
 	std::vector<Model> g_SquarePath;
