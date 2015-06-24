@@ -9,6 +9,7 @@
 #include "GameState.h"
 #include "Camera.h"
 #include "Model.h"
+#include "Floor.h"
 #include "CubeMap.h"
 
 #define LEFT        1
@@ -43,6 +44,8 @@ private:
 	Model g_Axis;
 
 	Model g_SampleSquares[5];
+	Floor g_Floor;
+	
 };
 
 ////////////////////////////////////////////////////////////////////////////////

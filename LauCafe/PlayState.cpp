@@ -18,11 +18,11 @@ const int ScreenHeight = 768;
 Mesh banana;
 
 vec3 square_positions[] = {
-	vec3(-4.0, 0.0, 0.0),
-	vec3(-2.0, 0.0, 0.0),
-	vec3(0.0, 0.0, 0.0),
-	vec3(2.0, 0.0, 0.0),
-	vec3(4.0, 0.0, 0.0)
+	vec3(-4.0, 2.0, 0.0),
+	vec3(-2.0, 2.0, 0.0),
+	vec3(0.0, 2.0, 0.0),
+	vec3(2.0, 2.0, 0.0),
+	vec3(4.0, 2.0, 0.0)
 };
 
 const float square_radius = 1.0f;
@@ -55,6 +55,9 @@ int PlayState::Initialize() {
 						 (cmRelPath + "negx.jpg").c_str(),  // left
 						 (cmRelPath + "posx.jpg").c_str()); // right
 	Skybox.SetCamera(m_Camera);
+
+	g_Floor.SetCamera(m_Camera);
+	g_Floor.SetPosition(vec3(0, 0, 0));
 
 	g_Axis.Initialize(Model::axis, 6, GL_LINES, "Shaders/Shader_vs.glsl", "Shaders/Shader_fs.glsl");
 	g_Axis.SetCamera(m_Camera); 
@@ -272,6 +275,7 @@ void PlayState::Draw() {
 	Skybox.Render();
 
 	glDisable(GL_CULL_FACE);
+	g_Floor.Render();
 
 	banana.Render();
 	g_Axis.Render();
