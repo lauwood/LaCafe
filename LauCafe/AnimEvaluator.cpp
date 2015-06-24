@@ -6,7 +6,7 @@ AnimEvaluator::AnimEvaluator(const aiAnimation* pAnim)
 {
 	mAnim = pAnim;
 	mLastTime = 0.0;
-	mLastPositions.resize(pAnim->mNumChannels, tuple(0, 0, 0));
+	mLastPositions.resize(pAnim->mNumChannels, anim_tuple(0, 0, 0));
 }
 
 // ------------------------------------------------------------------------------------------------

@@ -18,11 +18,11 @@ const int ScreenHeight = 768;
 Mesh banana;
 
 vec3 square_positions[] = {
-	vec3(-4.0, 2.0, 0.0),
-	vec3(-2.0, 2.0, 0.0),
-	vec3(0.0, 2.0, 0.0),
-	vec3(2.0, 2.0, 0.0),
-	vec3(4.0, 2.0, 0.0)
+	vec3(-4.0, 2.0, 5.0),
+	vec3(-2.0, 2.0, 5.0),
+	vec3(0.0, 2.0, 5.0),
+	vec3(2.0, 2.0, 5.0),
+	vec3(4.0, 2.0, 5.0)
 };
 
 const float square_radius = 1.0f;
@@ -31,6 +31,10 @@ int g_selected_square = -1;
 ////////////////////////////////////////////////////////////////////////////////
 
 PlayState::PlayState(GLFWwindow* window) : GameState(window) {
+
+	a = Area(10, 10, 0, 0);
+	a.setTile(2, 2, 2);
+	a.fillPaths();
 	Initialize();
 }
 
@@ -80,6 +84,15 @@ int PlayState::Initialize() {
 	glCullFace(GL_BACK); // cull back face
 	glFrontFace(GL_CCW); // set counter-clock-wise vertex order to mean the front
 	glClearColor(0.2, 0.2, 0.2, 1.0); // grey background to help spot mistakes
+
+	g_SquarePath = std::vector<Model>(100);
+	for (int i = 0; i < g_SquarePath.size(); i++) {
+		g_SquarePath[i].Initialize(Model::square, 6, GL_TRIANGLES, "Shaders/Shader_vs.glsl", "Shaders/Shader_fs.glsl");
+		g_SquarePath[i].SetCamera(m_Camera);
+		g_SquarePath[i].SetPosition(vec3(i % 10, i / 10, 0));
+		g_SquarePath[i].SetScale(vec3(0.5, 0.5, 0.5));
+	}
+	
 	return 1; // OK
 }
 
@@ -288,6 +301,34 @@ void PlayState::Draw() {
 		}
 		g_SampleSquares[i].Render();
 	}
+
+	vector<int> floor = a.getFloor();
+	vector<int> pathMap(floor.size());
+
+	for (int z = 0; z < a.getHeight(); z++)
+		for (int x = 0; x < a.getWidth(); x++) {
+			if (floor[a.getIndex(z, x)] == 2) {
+				// If the cell is a potential destination, print the path
+				deque<Cell*> p = a.getPath(z, x);
+				for (size_t i = 0; i < p.size(); i++) {
+					Cell* top = a.getPath(z, x).at(i);
+					// 7 is just a visual symbol to represent the path
+					pathMap[a.getIndex(top->z, top->x)] = 7;
+				}
+			}
+		}
+
+	for (int i = 0; i < pathMap.size(); i++) {
+		if (pathMap[i] == 7) {
+			g_SquarePath[i].Select(); // uses a shader to recolor found
+			g_SquarePath[i].SetCamera(m_Camera);
+			g_SquarePath[i].SetPosition(vec3(i % 10, i / 10, 0));
+			g_SquarePath[i].SetScale(vec3(0.5, 0.5, 0.5));
+		}
+	}
+		
+	for (int i = 0; i < g_SquarePath.size(); i++)
+		g_SquarePath[i].Render();
 
 	glfwSwapBuffers(window);
 	glfwPollEvents();

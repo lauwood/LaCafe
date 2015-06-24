@@ -11,6 +11,8 @@
 #include "Model.h"
 #include "Floor.h"
 #include "CubeMap.h"
+#include <vector>
+#include "Area.h"
 
 #define LEFT        1
 #define MIDDLE      2
@@ -46,6 +48,9 @@ private:
 	Model g_SampleSquares[5];
 	Floor g_Floor;
 	
+	std::vector<Model> g_SquarePath;
+
+	Area a;
 };
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -5,7 +5,7 @@ layout(location=1) in vec4 in_Color;
 
 uniform mat4 projectionMatrix;  
 uniform mat4 viewMatrix;  
-uniform mat4 modelMatrix;  
+uniform mat4 modelMatrix;
 
 out vec4 frag_Color;
 

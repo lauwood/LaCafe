@@ -5,10 +5,10 @@
 #include <vector>
 #include <map>
 
-struct tuple {
+struct anim_tuple {
 	unsigned int i[3];
 
-	tuple(unsigned int i0, unsigned int i1, unsigned int i2) { i[0] = i0; i[1] = i1; i[2] = i2; }
+	anim_tuple(unsigned int i0, unsigned int i1, unsigned int i2) { i[0] = i0; i[1] = i1; i[2] = i2; }
 	unsigned int get(int index) { return i[index]; }
 	void set(int index, unsigned int val) { i[index] = val; }
 };
@@ -45,7 +45,7 @@ protected:
 	* Useful to quickly find the corresponding frame for slightly increased time stamps
 	*/
 	double mLastTime;
-	std::vector<tuple> mLastPositions;
+	std::vector<anim_tuple> mLastPositions;
 
 	/** The array to store the transformations results of the evaluation */
 	std::vector<aiMatrix4x4> mTransforms;
