@@ -26,7 +26,6 @@ int g_selected_square = -1;
 PlayState::PlayState(GLFWwindow* window) : GameState(window) {
 
 	a = Area(10, 10, 0, 0);
-	a.setTile(1, 0, 2);
 	a.fillPaths();
 	Initialize();
 }
@@ -193,14 +192,6 @@ void PlayState::Input() {
 		m_Camera->SetYaw(m_Camera->GetYaw() + m_Camera->GetSpeed());
 	}
 
-	if (glfwGetKey(window, GLFW_KEY_R)) { // hacky way of resetting everything
-		vector<int> pathMap(a.getHeight() * a.getWidth());
-
-		for (int i = 0; i < pathMap.size(); i++) {
-			g_SquarePath[i].Unpath();
-			pathMap[i] = 0;
-		}
-	}
 	// Mouse buttons
 	int button = 0;
 	int action = glfwGetMouseButton(window, button);
@@ -259,6 +250,9 @@ void PlayState::Input() {
 			if (RayIntersect(m_Camera->GetPosition(), ray_wor, g_SquarePath[i].GetPosition(), square_radius, &t_dist)) {
 				// if more than one sphere is in path of ray, only use the closest one
 				if (-1 == closest_square_clicked || t_dist < closest_intersection) {
+
+					a = Area(10, 10, 0, 0);
+					a.fillPaths();
 					vector<int> pathMap(a.getHeight() * a.getWidth());
 
 					// Clear drawn path
@@ -278,8 +272,8 @@ void PlayState::Input() {
 							if (a.getTileType(z, x) == 2) {
 								// If the cell is a potential destination, print the path
 								deque<Cell*> p = a.getCellPath(z, x);
-								for (size_t i = 0; i < p.size(); i++) {
-									Cell* top = a.getCellPath(z, x).at(i);
+								for (size_t j = 0; j < p.size(); j++) {
+									Cell* top = a.getCellPath(z, x).at(j);
 									// 7 is just a visual symbol to represent the path
 									pathMap.at(top->x + a.getHeight() * top->z) = 7;
 								}
