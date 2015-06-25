@@ -258,7 +258,7 @@ void PlayState::Input() {
 				if (-1 == closest_square_clicked || t_dist < closest_intersection) {
 					closest_square_clicked = i;
 					closest_intersection = t_dist;
-					a.setTile(closest_square_clicked / 10-1, closest_square_clicked % 10-1, 2);
+					a.setTile(closest_square_clicked / 10, closest_square_clicked % 10, 2);
 					a.fillPaths();
 
 					vector<int> pathMap(a.getHeight() * a.getWidth());
@@ -272,7 +272,6 @@ void PlayState::Input() {
 									Cell* top = a.getCellPath(z, x).at(i);
 									// 7 is just a visual symbol to represent the path
 									pathMap.at(top->x + a.getHeight() * top->z) = 7;
-									//cout << "x" << top->x << " z" << top->z << endl;
 								}
 							}
 						}
