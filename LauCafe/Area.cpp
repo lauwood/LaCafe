@@ -9,15 +9,18 @@ using namespace std;
 * This is to keep from hopping through arrays
 */
 
-Area::Area(int z, int x, int sz, int sx)
+Area::Area(int height, int width, int sz, int sx)
 {
-	this->m_width = x;
-	this->m_height = z;
+	this->m_width = width;
+	this->m_height = height;
 
 	// Dynamically allocate the vectors
-	floor = vector<int>(x*z);
+	floor = vector<int>(width * height);
+	// Set the default values of the path length to INT_MAX
+	pathLength = vector<int>(width * height);
+	fill(pathLength.begin(), pathLength.end(), INT_MAX);
 	// Need to have pointers to Slots because of scope
-	paths = vector<deque<Cell*>>(x * z);
+	paths = vector<deque<Cell*>>(width * height);
 
 	this->start.x = sx;
 	this->start.z = sz;
@@ -26,15 +29,18 @@ Area::Area(int z, int x, int sz, int sx)
 	setTile(sz, sx, 1);
 }
 
-Area::Area(int z, int x, int sz, int sx, vector<int> v)
+Area::Area(int height, int width, int sz, int sx, vector<int> existingVector)
 {
-	this->m_width = x;
-	this->m_height = z;
+	this->m_width = width;
+	this->m_height = height;
 
 	// Dynamically allocate the vectors
-	floor = vector<int>(v);
+	floor = vector<int>(existingVector);
+	// Set the default values of the path length to INT_MAX
+	pathLength = vector<int>(width * height);
+	fill(pathLength.begin(), pathLength.end(), INT_MAX);
 	// Need to have pointers to Slots because of scope
-	paths = vector<deque<Cell*>>(x * z);
+	paths = vector<deque<Cell*>>(width * height);
 
 	this->start.x = sx;
 	this->start.z = sz;
@@ -45,15 +51,7 @@ Area::Area(int z, int x, int sz, int sx, vector<int> v)
 
 Area::~Area()
 {
-	int count = 0;
-	for (size_t i = 0; i < paths.size(); i++) {
-		while (!paths.at(i).empty()) {
-			Cell* c = paths.at(i).front();
-			delete c;
-			paths.at(i).pop_front();
-			count++;
-		}
-	}
+	clearPaths();
 }
 
 
@@ -74,32 +72,49 @@ bool Area::isWalkable(int z, int x)
 	return false;
 }
 
-// Because we are using a vector to represent a 2D array, there must be a bit of math
-// to translate from two numbers to one
-int Area::getIndex(int z, int x)
+int Area::getTileType(int z, int x)
 {
-	return x + m_height * z;
+	if (!isInBounds(z, x))
+		return -1;
+	else
+		return floor.at(getIndex(z, x));
+}
+
+// Used primarily in pathfinding
+int Area::getCellPathLength(int z, int x)
+{
+	// Only used in a min comparison, use INT_MAX to use other option
+	if (!isInBounds(z, x) || !isWalkable(z, x))
+		return INT_MAX;
+	else
+		return pathLength.at(getIndex(z, x));
+}
+
+deque<Cell*> Area::getCellPath(int z, int x)
+{
+	deque<Cell*> d;
+	if (!isInBounds(z, x))
+		return d;
+	else
+		return paths.at(getIndex(z, x));
 }
 
 /*==============================
 ===========MUTATORS=============
 ==============================*/
 
-void Area::setTile(int z, int x, int t)
+void Area::setTile(int z, int x, int tileType)
 {
 	if (isInBounds(z, x))
-		this->floor[getIndex(z, x)] = t;
+		this->floor[getIndex(z, x)] = tileType;
 }
 
-void Area::getPathLengthGrid(vector<int>& pathLengthGrid)
+void Area::fillPathLength()
 {
 	deque<struct Cell> current, next;
 	current.push_back(this->start);
 
-	// Clear the array just in case
-	fill(pathLengthGrid.begin(), pathLengthGrid.end(), 0);
-
-	int pathLength = 1;
+	int length = 1;
 	int size = this->floor.size();
 
 	do {
@@ -111,32 +126,32 @@ void Area::getPathLengthGrid(vector<int>& pathLengthGrid)
 			Cell c = current.back();
 
 			// Mark the distance to adjacent cells (if they're walkable) and push onto next stack
-			if (isWalkable(c.z, c.x - 1) && pathLengthGrid[getIndex(c.z, c.x - 1)] == 0) {
-				pathLengthGrid[getIndex(c.z, c.x - 1)] = pathLength;
+			if (isWalkable(c.z, c.x - 1) && getTileType(c.z, c.x - 1) == 0 && getCellPathLength(c.z, c.x - 1) == INT_MAX) {
+				pathLength.at(getIndex(c.z, c.x - 1)) = length;
 				Cell newSlot;
 				newSlot.x = c.x - 1;
 				newSlot.z = c.z;
 				next.push_back(newSlot);
 			}
 
-			if (isWalkable(c.z, c.x + 1) && pathLengthGrid[getIndex(c.z, c.x + 1)] == 0) {
-				pathLengthGrid[getIndex(c.z, c.x + 1)] = pathLength;
+			if (isWalkable(c.z, c.x + 1) && getTileType(c.z, c.x + 1) == 0 && getCellPathLength(c.z, c.x + 1) == INT_MAX) {
+				pathLength.at(getIndex(c.z, c.x + 1)) = length;
 				Cell newSlot;
 				newSlot.x = c.x + 1;
 				newSlot.z = c.z;
 				next.push_back(newSlot);
 			}
 
-			if (isWalkable(c.z - 1, c.x) && pathLengthGrid[getIndex(c.z - 1, c.x)] == 0) {
-				pathLengthGrid[getIndex(c.z - 1, c.x)] = pathLength;
+			if (isWalkable(c.z - 1, c.x) && getTileType(c.z - 1, c.x) == 0 && getCellPathLength(c.z - 1, c.x) == INT_MAX) {
+				pathLength.at(getIndex(c.z - 1, c.x)) = length;
 				Cell newSlot;
 				newSlot.x = c.x;
 				newSlot.z = c.z - 1;
 				next.push_back(newSlot);
 			}
 
-			if (isWalkable(c.z + 1, c.x) && pathLengthGrid[getIndex(c.z + 1, c.x)] == 0) {
-				pathLengthGrid[getIndex(c.z + 1, c.x)] = pathLength;
+			if (isWalkable(c.z + 1, c.x) && getTileType(c.z + 1, c.x) == 0 && getCellPathLength(c.z + 1, c.x) == INT_MAX) {
+				pathLength.at(getIndex(c.z + 1, c.x)) = length;
 				Cell newSlot;
 				newSlot.x = c.x;
 				newSlot.z = c.z + 1;
@@ -148,26 +163,16 @@ void Area::getPathLengthGrid(vector<int>& pathLengthGrid)
 		}
 
 		// The current stack is emptied
-		pathLength++;
+		length++;
 		current = next;
 	} while (!next.empty());
-
-	// Print out the distance matrix
-	/*
-	for (int i = 0; i < this->m_height; i++) {
-	cout << "|";
-	for (int j = 0; j < this->m_width; j++) {
-	cout << pathLengthGrid[getIndex(i, j)] << "|";
-	}
-	cout << endl;
-	}
-	cout << endl;
-	*/
-
 }
 
 void Area::fillPaths()
 {
+	// Clear the previously generated path matrix
+	clearPaths();
+	fillPathLength();
 	/*
 	* Pseudocode:
 	*	1. "Flood" the walkable matrix with shortest distance from the start point.
@@ -178,25 +183,13 @@ void Area::fillPaths()
 	*	   current cell's distance -1.
 	*	5. Go to step 3 until the current distance is 0.
 	*/
-	
-	// Clear the previous path matrix
-	for (size_t i = 0; i < paths.size(); i++) {
-		while (!paths.at(i).empty()) {
-			Cell* c = paths.at(i).front();
-			delete c;
-			paths.at(i).pop_front();
-		}
-	}
-
-	vector<int> pathLengths(m_height * m_width);
-	getPathLengthGrid(pathLengths);
 
 	for (int z = 0; z < m_height; z++)
 		for (int x = 0; x < m_width; x++) {
 			if (floor[getIndex(z, x)] == 2) {
 				// The path matrix doesn't have the distance on the destination cell. Need surrounding minimum
-				int minLength1 = min(pathLengths[getIndex(z, x + 1)], pathLengths[getIndex(z, x - 1)]);
-				int minLength2 = min(pathLengths[getIndex(z + 1, x)], pathLengths[getIndex(z - 1, x)]);
+				int minLength1 = min(getCellPathLength(z, x + 1), getCellPathLength(z, x - 1));
+				int minLength2 = min(getCellPathLength(z + 1, x), getCellPathLength(z - 1, x));
 				int minLength = min(minLength1, minLength2);
 				int totalLength = minLength + 1;
 
@@ -205,7 +198,7 @@ void Area::fillPaths()
 				int zz = z;
 
 				while (totalLength-- > 0) {
-					if (isInBounds(zz, xx - 1) && pathLengths[getIndex(zz, xx - 1)] == totalLength) {
+					if (isInBounds(zz, xx - 1) && getCellPathLength(zz, xx - 1) == totalLength) {
 						// Push a new cell onto the deque for later use
 						Cell* c = new Cell;
 						c->x = --xx;
@@ -215,7 +208,7 @@ void Area::fillPaths()
 						continue;
 					}
 
-					if (isInBounds(zz, xx + 1) && pathLengths[getIndex(zz, xx + 1)] == totalLength) {
+					if (isInBounds(zz, xx + 1) && getCellPathLength(zz, xx + 1) == totalLength) {
 						Cell* c = new Cell;
 						c->x = ++xx;
 						c->z = zz;
@@ -224,7 +217,7 @@ void Area::fillPaths()
 						continue;
 					}
 
-					if (isInBounds(zz - 1, xx) && pathLengths[getIndex(zz - 1, xx)] == totalLength) {
+					if (isInBounds(zz - 1, xx) && getCellPathLength(zz - 1, xx) == totalLength) {
 						Cell* c = new Cell;
 						c->x = xx;
 						c->z = --zz;
@@ -233,7 +226,7 @@ void Area::fillPaths()
 						continue;
 					}
 
-					if (isInBounds(zz + 1, xx) && pathLengths[getIndex(zz + 1, xx)] == totalLength) {
+					if (isInBounds(zz + 1, xx) && getCellPathLength(zz + 1, xx) == totalLength) {
 						Cell* c = new Cell;
 						c->x = xx;
 						c->z = ++zz;
@@ -244,6 +237,16 @@ void Area::fillPaths()
 				}
 			}
 		}
+}
+
+void Area::clearPaths() {
+	for (size_t i = 0; i < paths.size(); i++) {
+		while (!paths.at(i).empty()) {
+			Cell* c = paths.at(i).front();
+			delete c;
+			paths.at(i).pop_front();
+		}
+	}
 }
 
 /*==============================

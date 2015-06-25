@@ -258,8 +258,8 @@ void PlayState::Input() {
 				if (-1 == closest_square_clicked || t_dist < closest_intersection) {
 					closest_square_clicked = i;
 					closest_intersection = t_dist;
-					//a.setTile(closest_square_clicked / 10-1, closest_square_clicked % 10-1, 2);
-					//a.fillPaths();
+					a.setTile(closest_square_clicked / 10-1, closest_square_clicked % 10-1, 2);
+					a.fillPaths();
 				}
 			}
 		} // endfor
@@ -295,18 +295,18 @@ void PlayState::Draw() {
 	//banana.Render();
 	g_Axis.Render();
 
-	vector<int> floor = a.getFloor();
-	vector<int> pathMap(floor.size());
+	vector<int> pathMap(a.getHeight() * a.getWidth());
 
 	for (int z = 0; z < a.getHeight(); z++)
 		for (int x = 0; x < a.getWidth(); x++) {
-			if (floor[a.getIndex(z, x)] == 2) {
+			if (a.getTileType(z, x) == 2) {
 				// If the cell is a potential destination, print the path
-				deque<Cell*> p = a.getPath(z, x);
+				deque<Cell*> p = a.getCellPath(z, x);
 				for (size_t i = 0; i < p.size(); i++) {
-					Cell* top = a.getPath(z, x).at(i);
+					Cell* top = a.getCellPath(z, x).at(i);
 					// 7 is just a visual symbol to represent the path
-					pathMap[a.getIndex(top->z, top->x)] = 7;
+					pathMap.at(top->x + a.getHeight() * top->z) = 7;
+					//cout << "x" << top->x << " z" << top->z << endl;
 				}
 			}
 		}
