@@ -193,9 +193,13 @@ void PlayState::Input() {
 		m_Camera->SetYaw(m_Camera->GetYaw() + m_Camera->GetSpeed());
 	}
 
-	if (glfwGetKey(window, GLFW_KEY_R)) {
-		a.setTile(1, 0, 2);
-		a.fillPaths();
+	if (glfwGetKey(window, GLFW_KEY_R)) { // hacky way of resetting everything
+		vector<int> pathMap(a.getHeight() * a.getWidth());
+
+		for (int i = 0; i < pathMap.size(); i++) {
+			g_SquarePath[i].Unpath();
+			pathMap[i] = 0;
+		}
 	}
 	// Mouse buttons
 	int button = 0;
@@ -250,18 +254,24 @@ void PlayState::Input() {
 		vec3 ray_wor = GetRayFromMouse((float)nx, (float)ny);
 		int closest_square_clicked = -1;
 		float closest_intersection = 0.0f;
-		for (int i = 0; i < NUM_OF_SQUARES; i++) {
+		for (int i = 0; i < NUM_OF_SQUARES; i++) { 
 			float t_dist = 0.0f;
-			if (RayIntersect(m_Camera->GetPosition(), ray_wor, g_SquarePath[i].GetPosition(), square_radius, &t_dist
-				)) {
+			if (RayIntersect(m_Camera->GetPosition(), ray_wor, g_SquarePath[i].GetPosition(), square_radius, &t_dist)) {
 				// if more than one sphere is in path of ray, only use the closest one
 				if (-1 == closest_square_clicked || t_dist < closest_intersection) {
+					vector<int> pathMap(a.getHeight() * a.getWidth());
+
+					// Clear drawn path
+					for (int i = 0; i < pathMap.size(); i++) {
+						g_SquarePath[i].Unpath();
+					}
+
 					closest_square_clicked = i;
 					closest_intersection = t_dist;
+
 					a.setTile(closest_square_clicked / 10, closest_square_clicked % 10, 2);
 					a.fillPaths();
 
-					vector<int> pathMap(a.getHeight() * a.getWidth());
 					fprintf(stdout, "raycast path checking\n", i);
 					for (int z = 0; z < a.getHeight(); z++)
 						for (int x = 0; x < a.getWidth(); x++) {
@@ -288,8 +298,6 @@ void PlayState::Input() {
 				}
 			}
 		} // endfor
-		fprintf(stdout, "%d square selected\n", closest_square_clicked);
-		fprintf(stdout, "%d z, %d x\n", closest_square_clicked / 10, closest_square_clicked % 10);
 		g_selected_square = closest_square_clicked;
 	}
 
