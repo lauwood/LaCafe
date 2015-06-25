@@ -260,6 +260,32 @@ void PlayState::Input() {
 					closest_intersection = t_dist;
 					a.setTile(closest_square_clicked / 10-1, closest_square_clicked % 10-1, 2);
 					a.fillPaths();
+
+					vector<int> pathMap(a.getHeight() * a.getWidth());
+					fprintf(stdout, "raycast path checking\n", i);
+					for (int z = 0; z < a.getHeight(); z++)
+						for (int x = 0; x < a.getWidth(); x++) {
+							if (a.getTileType(z, x) == 2) {
+								// If the cell is a potential destination, print the path
+								deque<Cell*> p = a.getCellPath(z, x);
+								for (size_t i = 0; i < p.size(); i++) {
+									Cell* top = a.getCellPath(z, x).at(i);
+									// 7 is just a visual symbol to represent the path
+									pathMap.at(top->x + a.getHeight() * top->z) = 7;
+									//cout << "x" << top->x << " z" << top->z << endl;
+								}
+							}
+						}
+
+					for (int i = 0; i < pathMap.size(); i++) {
+						if (pathMap[i] == 7) {
+							fprintf(stdout, "%d is in path\n", i);
+							g_SquarePath[i].Path(); // uses a shader to recolor found
+						}
+						else {
+							g_SquarePath[i].Unpath();
+						}
+					}
 				}
 			}
 		} // endfor
@@ -294,31 +320,6 @@ void PlayState::Draw() {
 
 	//banana.Render();
 	g_Axis.Render();
-
-	vector<int> pathMap(a.getHeight() * a.getWidth());
-
-	for (int z = 0; z < a.getHeight(); z++)
-		for (int x = 0; x < a.getWidth(); x++) {
-			if (a.getTileType(z, x) == 2) {
-				// If the cell is a potential destination, print the path
-				deque<Cell*> p = a.getCellPath(z, x);
-				for (size_t i = 0; i < p.size(); i++) {
-					Cell* top = a.getCellPath(z, x).at(i);
-					// 7 is just a visual symbol to represent the path
-					pathMap.at(top->x + a.getHeight() * top->z) = 7;
-					//cout << "x" << top->x << " z" << top->z << endl;
-				}
-			}
-		}
-
-	for (int i = 0; i < pathMap.size(); i++) {
-		if (pathMap[i] == 7) {
-			g_SquarePath[i].Path(); // uses a shader to recolor found
-		}
-		else {
-			g_SquarePath[i].Unpath();
-		}
-	}
 		
 	for (int i = 0; i < NUM_OF_SQUARES; i++) {
 		if (g_selected_square == i) {
