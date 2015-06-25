@@ -41,7 +41,7 @@ int PlayState::Initialize() {
 	m_Camera = new Camera(); 
 	m_Camera->SetPerspective(glm::radians(60.0f), ScreenWidth / (float)ScreenHeight, 0.01f, 1000);
 	//					     Position	  Yaw	 Pitch
-	m_Camera->PositionCamera(0, 5, 5,     0,     0);
+	m_Camera->PositionCamera(1.06, 8, 4.41,     1.57,     1.25);
 
 	Skybox.Initialize();
 	std::string cmRelPath = "CubeMap/Yokohama3/";
@@ -60,10 +60,10 @@ int PlayState::Initialize() {
 	g_Axis.SetCamera(m_Camera); 
 	g_Axis.SetPosition(vec3(0, 0, 0));
 
-	banana = Mesh("Models/banana.obj", "Shaders/Banana_vs.glsl", "Shaders/Banana_fs.glsl");
+	/*banana = Mesh("Models/banana.obj", "Shaders/Banana_vs.glsl", "Shaders/Banana_fs.glsl");
 	banana.SetCamera(m_Camera);
 	banana.SetPosition(vec3(0, 0, 0));
-	banana.SetScale(vec3(0.01, 0.01, 0.01));
+	banana.SetScale(vec3(0.01, 0.01, 0.01));*/
 	
 	glEnable(GL_DEPTH_TEST); // enable depth-testing
 	glDepthFunc(GL_LESS); // depth-testing interprets a smaller value as "closer"
@@ -76,7 +76,7 @@ int PlayState::Initialize() {
 	for (int i = 0; i < NUM_OF_SQUARES; i++) {
 		g_SquarePath[i].Initialize(Model::square2, 6, GL_TRIANGLES, "Shaders/Shader_vs.glsl", "Shaders/Shader_fs.glsl");
 		g_SquarePath[i].SetCamera(m_Camera);
-		g_SquarePath[i].SetPosition(vec3(i % 10, Y_OFFSET, (i / 10)));
+		g_SquarePath[i].SetPosition(vec3(i /10, Y_OFFSET, i % 10));
 		g_SquarePath[i].SetScale(vec3(0.5, 0.5, 0.5));
 	}
 	
@@ -150,6 +150,13 @@ glm::vec3 PlayState::GetRayFromMouse(float mouse_x, float mouse_y) {
 ////////////////////////////////////////////////////////////////////////////////
 
 void PlayState::Input() {
+	// Camera output
+	/*fprintf(stdout, "Camera POSITION: (%.2f, %.2f, %.2f), YAW: %.2f, PITCH: %.2f\n",
+		m_Camera->GetPosition().x,
+		m_Camera->GetPosition().y,
+		m_Camera->GetPosition().z, 
+		m_Camera->GetYaw(),
+		m_Camera->GetPitch());*/
 	// Keyboard
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE)) {
 		glfwSetWindowShouldClose(window, GL_TRUE);
@@ -251,8 +258,8 @@ void PlayState::Input() {
 				if (-1 == closest_square_clicked || t_dist < closest_intersection) {
 					closest_square_clicked = i;
 					closest_intersection = t_dist;
-					a.setTile(closest_square_clicked / 10, closest_square_clicked % 10, 2);
-					a.fillPaths();
+					//a.setTile(closest_square_clicked / 10-1, closest_square_clicked % 10-1, 2);
+					//a.fillPaths();
 				}
 			}
 		} // endfor
@@ -285,7 +292,7 @@ void PlayState::Draw() {
 	glDisable(GL_CULL_FACE);
 	g_Floor.Render();
 
-	banana.Render();
+	//banana.Render();
 	g_Axis.Render();
 
 	vector<int> floor = a.getFloor();
