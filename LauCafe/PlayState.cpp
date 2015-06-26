@@ -4,27 +4,20 @@
 
 #include "PlayState.h"
 #include "MeshLoader.h"
+#include "StateManager.h"
 #include <cstdio>
 
 #define LEFT        1	//0001
 #define MIDDLE      2	//0010
 #define RIGHT       4	//0100
 
-const int ScreenWidth = 1024;
-const int ScreenHeight = 768;
-
-#define NUM_OF_SQUARES 100
 #define Y_OFFSET 0.5
 
 Mesh banana;
 
-const float square_radius = 1.0f;
-int g_selected_square = -1;
-
 ////////////////////////////////////////////////////////////////////////////////
 
 PlayState::PlayState(GLFWwindow* window) : GameState(window) {
-
 	a = Area(10, 10, 0, 0);
 	a.fillPaths();
 	Initialize();
@@ -38,7 +31,7 @@ int PlayState::Initialize() {
 	MouseActiveButton = 0;
 
 	m_Camera = new Camera(); 
-	m_Camera->SetPerspective(glm::radians(60.0f), ScreenWidth / (float)ScreenHeight, 0.01f, 1000);
+	m_Camera->SetPerspective(radians(60.0f), WinX / (float)WinY, 0.01f, 1000);
 	//					     Position	  Yaw	 Pitch
 	m_Camera->PositionCamera(1.06, 8, 4.41,     1.57,     1.25);
 
@@ -71,79 +64,15 @@ int PlayState::Initialize() {
 	glFrontFace(GL_CCW); // set counter-clock-wise vertex order to mean the front
 	glClearColor(0.2, 0.2, 0.2, 1.0); // grey background to help spot mistakes
 
-	g_SquarePath = std::vector<Model>(NUM_OF_SQUARES);
+	g_SquarePath = new std::vector<Model>(NUM_OF_SQUARES);
 	for (int i = 0; i < NUM_OF_SQUARES; i++) {
-		g_SquarePath[i].Initialize(Model::square2, 6, GL_TRIANGLES, "Shaders/Shader_vs.glsl", "Shaders/Shader_fs.glsl");
-		g_SquarePath[i].SetCamera(m_Camera);
-		g_SquarePath[i].SetPosition(vec3(i /10, Y_OFFSET, i % 10));
-		g_SquarePath[i].SetScale(vec3(0.5, 0.5, 0.5));
+		g_SquarePath->at(i).Initialize(Model::square2, 6, GL_TRIANGLES, "Shaders/Shader_vs.glsl", "Shaders/Shader_fs.glsl");
+		g_SquarePath->at(i).SetCamera(m_Camera);
+		g_SquarePath->at(i).SetPosition(vec3(i / 10, Y_OFFSET, i % 10));
+		g_SquarePath->at(i).SetScale(vec3(0.5, 0.5, 0.5));
 	}
-	
-	return 1; // OK
-}
 
-////////////////////////////////////////////////////////////////////////////////
-
-bool PlayState::RayIntersect(glm::vec3 ray_origin_wor, glm::vec3 ray_direction_wor, glm::vec3 object_center_wor, float object_radius, float* intersection_distance) {
-	glm::vec3 distance_to_object = ray_origin_wor - object_center_wor;
-	float b = glm::dot(ray_direction_wor, distance_to_object);
-	float c = glm::dot(distance_to_object, distance_to_object) - object_radius * object_radius;
-	float b_squared_minus_c = b * b - c;
-	if (b_squared_minus_c < 0.0f) {
-		return false;
-	}
-	// check for ray hitting twice (in and out of the sphere)
-	if (b_squared_minus_c > 0.0f) {
-		// get the 2 intersection distances along ray
-		float t_a = -b + sqrt(b_squared_minus_c);
-		float t_b = -b - sqrt(b_squared_minus_c);
-		*intersection_distance = t_b;
-		// if behind viewer, throw one or both away
-		if (t_a < 0.0) {
-			if (t_b < 0.0) {
-				return false;
-			}
-		}
-		else if (t_b < 0.0) {
-			*intersection_distance = t_a;
-		}
-
-		return true;
-	}
-	// check for ray hitting once (skimming the surface)
-	if (0.0f == b_squared_minus_c) {
-		// if behind viewer, throw away
-		float t = -b + sqrt(b_squared_minus_c);
-		if (t < 0.0f) {
-			return false;
-		}
-		*intersection_distance = t;
-		return true;
-	}
-	// note: could also check if ray origin is inside sphere radius
-	return false;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
-/* takes mouse position on screen and return ray in world coords */
-glm::vec3 PlayState::GetRayFromMouse(float mouse_x, float mouse_y) {
-	// screen space (viewport coordinates)
-	float x = (2.0f * mouse_x) / ScreenWidth - 1.0f;
-	float y = 1.0f - (2.0f * mouse_y) / ScreenHeight;
-	float z = 1.0f;
-	// normalised device space
-	vec3 ray_nds = vec3(x, y, z);
-	// clip space
-	vec4 ray_clip = vec4(ray_nds.x, ray_nds.y, -1.0, 1.0);
-	// eye space
-	vec4 ray_eye = inverse(m_Camera->GetProjectionMatrix()) * ray_clip;
-	ray_eye = vec4(ray_eye.x, ray_eye.y, -1.0, 0.0);
-	// world space
-	vec3 ray_wor = vec3(inverse(m_Camera->GetViewMatrix()) * ray_eye);
-	// don't forget to normalise the vector at some point
-	ray_wor = normalize(ray_wor);
-	return ray_wor;
+	return INIT_OK; // OK
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -242,12 +171,13 @@ void PlayState::Input() {
 
 	// Raycast
 	if (action == GLFW_PRESS) {
-		vec3 ray_wor = GetRayFromMouse((float)nx, (float)ny);
+		vec3 ray_wor = GetRayFromMouse((float)nx, (float)ny, WinX, WinY, m_Camera);
+
 		int closest_square_clicked = -1;
 		float closest_intersection = 0.0f;
-		for (int i = 0; i < NUM_OF_SQUARES; i++) { 
+		for (int i = 0; i < NUM_OF_SQUARES; i++) {
 			float t_dist = 0.0f;
-			if (RayIntersect(m_Camera->GetPosition(), ray_wor, g_SquarePath[i].GetPosition(), square_radius, &t_dist)) {
+			if (RayIntersect(m_Camera->GetPosition(), ray_wor, g_SquarePath->at(i).GetPosition(), SquareRadius, &t_dist)) {
 				// if more than one sphere is in path of ray, only use the closest one
 				if (-1 == closest_square_clicked || t_dist < closest_intersection) {
 
@@ -255,18 +185,12 @@ void PlayState::Input() {
 					a.fillPaths();
 					vector<int> pathMap(a.getHeight() * a.getWidth());
 
-					// Clear drawn path
-					for (int i = 0; i < pathMap.size(); i++) {
-						g_SquarePath[i].Unpath();
-					}
-
 					closest_square_clicked = i;
 					closest_intersection = t_dist;
 
 					a.setTile(closest_square_clicked / 10, closest_square_clicked % 10, 2);
 					a.fillPaths();
 
-					fprintf(stdout, "raycast path checking\n", i);
 					for (int z = 0; z < a.getHeight(); z++)
 						for (int x = 0; x < a.getWidth(); x++) {
 							if (a.getTileType(z, x) == 2) {
@@ -282,17 +206,16 @@ void PlayState::Input() {
 
 					for (int i = 0; i < pathMap.size(); i++) {
 						if (pathMap[i] == 7) {
-							fprintf(stdout, "%d is in path\n", i);
-							g_SquarePath[i].Path(); // uses a shader to recolor found
+							g_SquarePath->at(i).Path(); // uses a shader to recolor found
 						}
 						else {
-							g_SquarePath[i].Unpath();
+							g_SquarePath->at(i).Unpath();
 						}
 					}
 				}
 			}
 		} // endfor
-		g_selected_square = closest_square_clicked;
+		SelectedSquare = closest_square_clicked;
 	}
 
 	glfwPollEvents();
@@ -306,10 +229,6 @@ void PlayState::Update() {
 
 void PlayState::Draw() {
 	// timers
-	static double previous_seconds = glfwGetTime();
-	double current_seconds = glfwGetTime();
-	double elapsed_seconds = current_seconds - previous_seconds;
-	previous_seconds = current_seconds;
 	UpdateFPSCounter(window);
 
 	// Clear the screen
@@ -323,17 +242,16 @@ void PlayState::Draw() {
 	g_Axis.Render();
 		
 	for (int i = 0; i < NUM_OF_SQUARES; i++) {
-		if (g_selected_square == i) {
-			g_SquarePath[i].Select();
+		if (SelectedSquare == i) {
+			g_SquarePath->at(i).Select();
 		}
 		else {
-			g_SquarePath[i].Unselect();
+			g_SquarePath->at(i).Unselect();
 		}
-		g_SquarePath[i].Render();
+		g_SquarePath->at(i).Render();
 	}
 
 	glfwSwapBuffers(window);
-	glfwPollEvents();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

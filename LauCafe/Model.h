@@ -55,10 +55,12 @@ public:
 	Camera *GetCamera() { return m_Camera; }
 	void SetCamera(Camera *pCamera) { m_Camera = pCamera; }
 
-	void Select()	{ Selected = true; }
-	void Path()		{ Pathed = true; }
-	void Unselect() { Selected = false; }
-	void Unpath()	{ Pathed = false; }
+	void Select()		{ isSelect = true; }
+	void Unselect()		{ isSelect = false; }
+	void Path()			{ isPath = true; }
+	void Unpath()		{ isPath = false; }
+	void Obstacle()		{ isObstacle = true; }
+	void Unobstacle()	{ isObstacle = false; }
 
 	// This cleans up the VBO and VAO's
 	void Destroy();
@@ -70,8 +72,9 @@ protected:
 	GLuint VBO;											// The VertexBufferObject Id stored by the VAO
 	GLuint VAO;											// The VertexArrayObject Id to bind when drawing
 
-	bool Selected;
-	bool Pathed;
+	bool isSelect;
+	bool isPath;
+	bool isObstacle;
 
 	glm::vec3 position;										// The model's position
 	glm::vec3 rotation;										// The model's rotation

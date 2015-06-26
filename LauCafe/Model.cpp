@@ -24,8 +24,9 @@ Vertex3 Model::square2[6] = { vec3(-0.5,  0.0,  0.5), vec4(1, 1, 0, 1),
 void Model::Initialize(Vertex3 pVertices[], int length, GLenum pFace, std::string vert, std::string frag) {
 	FaceMode = pFace;
 	m_Shader.Initialize(vert, frag);
-	Selected = false;
-	Pathed = false;
+	isSelect = false;
+	isPath = false;
+	isObstacle = false;
 
 	vertices = pVertices;
 	verticesLength = length;
@@ -62,13 +63,20 @@ void Model::Render() {
 	m_Shader.SetMatrix4(projectionMatrixId, 1, GL_FALSE, &projectionMatrix[0][0]);
 
 	GLint blueId = m_Shader.GetVariable("blue");
-	if (Selected) {
+	if (isSelect) {
 		m_Shader.SetFloat(blueId, 1.0f);
 	}
-	else if (Pathed) {
+	else if (isPath) {
 		m_Shader.SetFloat(blueId, 0.8f);
 	} else {
 		m_Shader.SetFloat(blueId, 0.0f);
+	}
+
+	GLint redId = m_Shader.GetVariable("red");
+	if (isObstacle) {
+		m_Shader.SetFloat(redId, 1.0f);
+	} else {
+		m_Shader.SetFloat(redId, 0.0f);
 	}
 
 	glBindVertexArray(VAO);

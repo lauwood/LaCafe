@@ -8,6 +8,7 @@
 #include "Main.h"
 #include "GameState.h"
 #include "PlayState.h"
+#include "EditState.h"
 #include <stack>
 
 class StateManager {
@@ -31,7 +32,10 @@ public:
 	GLFWwindow* GetWindow()					{ return window; }
 	void SetWindow(GLFWwindow* pWindow)		{ window = pWindow; }
 
+	void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
+	bool b_EditMode;
 private:
+
 	GLFWwindow* window;
 	bool m_running;
 	std::stack<GameState*> states;

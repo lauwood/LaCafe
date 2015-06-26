@@ -7,16 +7,14 @@
 
 #include "Main.h"
 #include "GameState.h"
+#include "EditState.h"
 #include "Camera.h"
 #include "Model.h"
 #include "Floor.h"
 #include "CubeMap.h"
+#include "Raycast.h"
 #include <vector>
 #include "Area.h"
-
-#define LEFT        1
-#define MIDDLE      2
-#define RIGHT       3
 
 class PlayState : public GameState
 {
@@ -25,17 +23,19 @@ public:
 	
 	int Initialize();
 
+	void Pause()		{ StateRunning = false; }
+	void Resume()		{ StateRunning = true; }
+
 	void Input();
 	void Update();
 	void Draw();
-private:
-	bool RayIntersect(glm::vec3, glm::vec3, glm::vec3, float, float*);
-	glm::vec3 GetRayFromMouse(float, float);
 
-	// Window management
-	Camera* m_Camera;
-	float ratio;
-	int WinX, WinY;
+	std::vector<Model>* GetSquarePath() { return g_SquarePath; }
+	void SetSquarePath(std::vector<Model> *pSquarePath) { g_SquarePath = pSquarePath; }
+private:
+	bool StateRunning;
+
+	int SelectedSquare = -1;
 
 	// Input
 	double MouseX, MouseY;
@@ -46,7 +46,7 @@ private:
 	Model g_Axis;
 	Floor g_Floor;
 	
-	std::vector<Model> g_SquarePath;
+	std::vector<Model> *g_SquarePath;
 
 	Area a;
 };

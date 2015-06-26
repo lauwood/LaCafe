@@ -11,9 +11,16 @@
 
 #define WINDOWTITLE	"LauCafe"
 
+#define INIT_OK 1;
+#define INIT_FAIL 0;
+
 #define PI	3.14159f
-#define SCREEN_WIDTH	1024
-#define SCREEN_HEIGHT	768
+
+const int WinX = 1024;
+const int WinY = 768;
+
+#define NUM_OF_SQUARES 100
+const float SquareRadius = 1.0f;
 
 void UpdateFPSCounter(GLFWwindow* window);
 

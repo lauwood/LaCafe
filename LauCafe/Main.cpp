@@ -17,7 +17,7 @@ GLFWwindow* InitGL() {
 		return NULL;
 	}
 
-	GLFWwindow* window = glfwCreateWindow(SCREEN_WIDTH, SCREEN_HEIGHT, WINDOWTITLE, NULL, NULL);
+	GLFWwindow* window = glfwCreateWindow(WinX, WinY, WINDOWTITLE, NULL, NULL);
 	if (!window)
 	{
 		glfwTerminate();
@@ -66,7 +66,7 @@ int main(int argc, char **argv) {
 		exit(EXIT_FAILURE);
 	}
 
-	StateManager* m_StateManager = new StateManager(Window);	
+	StateManager* m_StateManager = new StateManager(Window);
 
 	m_StateManager->GameLoop();
 
