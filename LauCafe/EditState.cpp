@@ -5,7 +5,8 @@
 #include "EditState.h"
 #include "StateManager.h"
 
-EditState::EditState(GLFWwindow* window) : GameState(window) {
+EditState::EditState(GLFWwindow* window, Area* area) : GameState(window) {
+	a = area;
 	Initialize();
 }
 
@@ -34,12 +35,16 @@ void EditState::Input() {
 		} // endfor
 		SelectedSquare = closest_square_clicked;
 		if (MouseActiveButton & MOUSE_LEFT) {
-			if (SelectedSquare != -1)
+			if (SelectedSquare != -1) {
 				g_SquarePath->at(SelectedSquare).Obstacle();
+				a->setTile(closest_square_clicked / 10, closest_square_clicked % 10, 3);
+			}
 		}
 		else if (MouseActiveButton & MOUSE_RIGHT) {
-			if (SelectedSquare != -1)
+			if (SelectedSquare != -1) {
 				g_SquarePath->at(SelectedSquare).Unobstacle();
+				a->setTile(closest_square_clicked / 10, closest_square_clicked % 10, 0);
+			}
 		}
 	}
 	glfwPollEvents();

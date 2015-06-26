@@ -25,7 +25,7 @@ void StateManager::KeyCallback(GLFWwindow* window, int key, int scancode, int ac
 				b_EditMode = false;
 			} else {
 				PeekState()->Pause();
-				EditState *State_EditMode= new EditState(window);
+				EditState *State_EditMode= new EditState(window, a);
 				State_EditMode->SetSquarePath(((PlayState*)PeekState())->GetSquarePath());
 				State_EditMode->SetCamera(PeekState()->GetCamera());
 				PushState(State_EditMode);
@@ -71,6 +71,7 @@ void StateManager::MouseButtonCallback(GLFWwindow* window, int button, int actio
 }
 
 StateManager::StateManager(GLFWwindow* window) {
+	a = new Area(10, 10, 0, 0);
 	b_EditMode = false;
 
 	glfwSetInputMode(window, GLFW_STICKY_MOUSE_BUTTONS, GL_TRUE);
@@ -78,7 +79,7 @@ StateManager::StateManager(GLFWwindow* window) {
 	glfwSetMouseButtonCallback(window, mouse_callback);
 
 	SetWindow(window);
-	PlayState *state = new PlayState(GetWindow());
+	PlayState *state = new PlayState(GetWindow(), a);
 	PushState(state);
 	StateMan = this;
 }

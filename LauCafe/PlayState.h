@@ -19,7 +19,7 @@
 class PlayState : public GameState
 {
 public:
-	PlayState(GLFWwindow* window);
+	PlayState(GLFWwindow* window, Area* area);
 	
 	int Initialize();
 
@@ -47,7 +47,7 @@ private:
 	
 	std::vector<Model> *g_SquarePath;
 
-	Area a;
+	Area* a;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
