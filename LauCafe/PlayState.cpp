@@ -7,10 +7,6 @@
 #include "StateManager.h"
 #include <cstdio>
 
-#define LEFT        1	//0001
-#define MIDDLE      2	//0010
-#define RIGHT       4	//0100
-
 #define Y_OFFSET 0.5
 
 Mesh banana;
@@ -121,56 +117,20 @@ void PlayState::Input() {
 		m_Camera->SetYaw(m_Camera->GetYaw() + m_Camera->GetSpeed());
 	}
 
-	// Mouse buttons
-	int button = 0;
-	int action = glfwGetMouseButton(window, button);
-
-	int b;
-
-	switch (button)
-	{
-	case GLFW_MOUSE_BUTTON_LEFT:
-		b = LEFT;
-		break;
-
-	case GLFW_MOUSE_BUTTON_MIDDLE:
-		b = MIDDLE;
-		break;
-
-	case GLFW_MOUSE_BUTTON_RIGHT:
-		b = RIGHT;
-		break;
-
-	default:
-		b = 0;
-	}
-
-	if (action == GLFW_PRESS) {
-		MouseActiveButton |= b;
-	}
-	else {
-		MouseActiveButton &= ~b;
-	}
-
 	// Mouse motions
 
-	double nx, ny;
-	glfwGetCursorPos(window, &nx, &ny);
-	double dx = nx - MouseX;
-	double dy = ny - MouseY;
-
+	/* Find mouse displacement
 	MouseX = nx;
 	MouseY = ny;
-
-	if (MouseActiveButton & LEFT) {
-		if (dx != 0 && dy != 0)
-		{
-			//m_Camera->SetViewByMouse(dx, dy); this method sucks
-		}
-	}
+	double dx = nx - MouseX;
+	double dy = ny - MouseY;*/
 
 	// Raycast
-	if (action == GLFW_PRESS) {
+	if (MouseActiveButton & MOUSE_LEFT) {
+		double nx, ny;
+
+		glfwGetCursorPos(window, &nx, &ny);
+
 		vec3 ray_wor = GetRayFromMouse((float)nx, (float)ny, WinX, WinY, m_Camera);
 
 		int closest_square_clicked = -1;

@@ -16,6 +16,10 @@
 
 #define PI	3.14159f
 
+#define MOUSE_LEFT        1	//0001
+#define MOUSE_MIDDLE      2	//0010
+#define MOUSE_RIGHT       4	//0100
+
 const int WinX = 1024;
 const int WinY = 768;
 

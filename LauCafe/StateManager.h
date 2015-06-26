@@ -32,10 +32,11 @@ public:
 	GLFWwindow* GetWindow()					{ return window; }
 	void SetWindow(GLFWwindow* pWindow)		{ window = pWindow; }
 
+	void MouseButtonCallback(GLFWwindow*, int button, int action, int mods);
 	void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
 	bool b_EditMode;
 private:
-
+	int MouseActiveButton = 0;
 	GLFWwindow* window;
 	bool m_running;
 	std::stack<GameState*> states;

@@ -23,7 +23,10 @@ public:
 
 	Camera* GetCamera() { return m_Camera; }
 	void SetCamera(Camera *pCamera) { m_Camera = pCamera; }
+	
+	void SetMouseActiveButton(int pMouseActiveButton) { MouseActiveButton = pMouseActiveButton; }
 protected:
+	int MouseActiveButton = 0;
 	GameState(GLFWwindow* w) { window = w; }
 	GLFWwindow* window;
 

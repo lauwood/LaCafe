@@ -10,6 +10,7 @@ static StateManager* StateMan;
 
 static void framebuffer_size_callback(GLFWwindow* window, int width, int height)				{ glViewport(0, 0, width, height); }
 static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)		{ StateMan->KeyCallback(window, key, scancode, action, mods); }
+static void mouse_callback(GLFWwindow* window, int button, int action, int mods)				{ StateMan->MouseButtonCallback(window, button, action, mods); }
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -39,11 +40,42 @@ void StateManager::KeyCallback(GLFWwindow* window, int key, int scancode, int ac
 	}
 }
 
+void StateManager::MouseButtonCallback(GLFWwindow* window, int button, int action, int mods) {
+	int b;
+	switch (button)
+	{
+	case GLFW_MOUSE_BUTTON_LEFT:
+		b = MOUSE_LEFT;
+		break;
+
+	case GLFW_MOUSE_BUTTON_MIDDLE:
+		b = MOUSE_MIDDLE;
+		break;
+
+	case GLFW_MOUSE_BUTTON_RIGHT:
+		b = MOUSE_RIGHT;
+		break;
+
+	default:
+		b = 0;
+	}
+
+	if (action == GLFW_PRESS) {
+		MouseActiveButton |= b;
+	}
+	else {
+		MouseActiveButton &= ~b;
+	}
+
+	PeekState()->SetMouseActiveButton(MouseActiveButton);
+}
+
 StateManager::StateManager(GLFWwindow* window) {
 	b_EditMode = false;
 
 	glfwSetInputMode(window, GLFW_STICKY_MOUSE_BUTTONS, GL_TRUE);
 	glfwSetKeyCallback(window, key_callback);
+	glfwSetMouseButtonCallback(window, mouse_callback);
 
 	SetWindow(window);
 	PlayState *state = new PlayState(GetWindow());

@@ -39,7 +39,6 @@ private:
 
 	// Input
 	double MouseX, MouseY;
-	int MouseActiveButton;
 
 	CubeMap Skybox;
 	

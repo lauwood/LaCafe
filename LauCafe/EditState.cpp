@@ -14,13 +14,11 @@ int EditState::Initialize() {
 }
 
 void EditState::Input() {
-	int button = 0;
-	int action = glfwGetMouseButton(window, button);
-
-	double nx, ny;
-	glfwGetCursorPos(window, &nx, &ny);
 	// Raycast
-	if (action == GLFW_PRESS) {
+	if (MouseActiveButton) {
+		double nx, ny;
+		glfwGetCursorPos(window, &nx, &ny);
+
 		vec3 ray_wor = GetRayFromMouse((float)nx, (float)ny, WinX, WinY, m_Camera);
 		int closest_square_clicked = -1;
 		float closest_intersection = 0.0f;
@@ -35,11 +33,11 @@ void EditState::Input() {
 			}
 		} // endfor
 		SelectedSquare = closest_square_clicked;
-		if (button == GLFW_MOUSE_BUTTON_LEFT) {
+		if (MouseActiveButton & MOUSE_LEFT) {
 			if (SelectedSquare != -1)
 				g_SquarePath->at(SelectedSquare).Obstacle();
 		}
-		else {
+		else if (MouseActiveButton & MOUSE_RIGHT) {
 			if (SelectedSquare != -1)
 				g_SquarePath->at(SelectedSquare).Unobstacle();
 		}
