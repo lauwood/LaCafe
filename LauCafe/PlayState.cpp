@@ -13,9 +13,9 @@ Mesh banana;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-PlayState::PlayState(GLFWwindow* window) : GameState(window) {
-	a = Area(10, 10, 0, 0);
-	a.fillPaths();
+PlayState::PlayState(GLFWwindow* window, Area* area) : GameState(window) {
+	a = area;
+	a->fillPaths();
 	Initialize();
 }
 
@@ -140,38 +140,36 @@ void PlayState::Input() {
 			if (RayIntersect(m_Camera->GetPosition(), ray_wor, g_SquarePath->at(i).GetPosition(), SquareRadius, &t_dist)) {
 				// if more than one sphere is in path of ray, only use the closest one
 				if (-1 == closest_square_clicked || t_dist < closest_intersection) {
-
-					a = Area(10, 10, 0, 0);
-					a.fillPaths();
-					vector<int> pathMap(a.getHeight() * a.getWidth());
-
 					closest_square_clicked = i;
 					closest_intersection = t_dist;
 
-					a.setTile(closest_square_clicked / 10, closest_square_clicked % 10, 2);
-					a.fillPaths();
+					// Clear the previous paths
+					for (int k = 0; k < a->getHeight(); k++)
+						for (int l = 0; l < a->getWidth(); l++) {
+							if (a->getTileType(k, l) == 2)
+								a->setTile(k, l, 0);
+							g_SquarePath->at(l + a->getHeight() * k).Unpath();
+						}
 
-					for (int z = 0; z < a.getHeight(); z++)
-						for (int x = 0; x < a.getWidth(); x++) {
-							if (a.getTileType(z, x) == 2) {
+					// To only allow one destination
+					if (a->getTileType(closest_square_clicked / 10, closest_square_clicked % 10) == 0)
+						a->setTile(closest_square_clicked / 10, closest_square_clicked % 10, 2);
+
+					a->fillPaths();
+
+					for (int z = 0; z < a->getHeight(); z++)
+						for (int x = 0; x < a->getWidth(); x++) {
+							if (a->getTileType(z, x) == 2) {
 								// If the cell is a potential destination, print the path
-								deque<Cell*> p = a.getCellPath(z, x);
+								deque<Cell*> p = a->getCellPath(z, x);
 								for (size_t j = 0; j < p.size(); j++) {
-									Cell* top = a.getCellPath(z, x).at(j);
+									Cell* top = a->getCellPath(z, x).at(j);
 									// 7 is just a visual symbol to represent the path
-									pathMap.at(top->x + a.getHeight() * top->z) = 7;
+									//pathMap.at(top->x + a.getHeight() * top->z) = 7;
+									g_SquarePath->at(top->x + a->getHeight() * top->z).Path();
 								}
 							}
 						}
-
-					for (int i = 0; i < pathMap.size(); i++) {
-						if (pathMap[i] == 7) {
-							g_SquarePath->at(i).Path(); // uses a shader to recolor found
-						}
-						else {
-							g_SquarePath->at(i).Unpath();
-						}
-					}
 				}
 			}
 		} // endfor

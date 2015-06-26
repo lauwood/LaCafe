@@ -111,6 +111,9 @@ void Area::setTile(int z, int x, int tileType)
 
 void Area::fillPathLength()
 {
+	// Reset the length grid so it doesn't use old values
+	fill(pathLength.begin(), pathLength.end(), INT_MAX);
+
 	deque<struct Cell> current, next;
 	current.push_back(this->start);
 
