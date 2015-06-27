@@ -37,13 +37,13 @@ void EditState::Input() {
 		if (MouseActiveButton & MOUSE_LEFT) {
 			if (SelectedSquare != -1) {
 				g_SquarePath->at(SelectedSquare).Obstacle();
-				a->setTile(closest_square_clicked / 10, closest_square_clicked % 10, 3);
+				a->setTile(closest_square_clicked / 10, closest_square_clicked % 10, OBSTACLE);
 			}
 		}
 		else if (MouseActiveButton & MOUSE_RIGHT) {
 			if (SelectedSquare != -1) {
 				g_SquarePath->at(SelectedSquare).Unobstacle();
-				a->setTile(closest_square_clicked / 10, closest_square_clicked % 10, 0);
+				a->setTile(closest_square_clicked / 10, closest_square_clicked % 10, WALKABLE);
 			}
 		}
 	}
