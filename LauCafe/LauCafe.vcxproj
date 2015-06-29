@@ -93,6 +93,7 @@
     <ClInclude Include="Main.h" />
     <ClInclude Include="MeshLoader.h" />
     <ClInclude Include="Model.h" />
+    <ClInclude Include="Patron.h" />
     <ClInclude Include="Person.h" />
     <ClInclude Include="Raycast.h" />
     <ClInclude Include="SceneAnimator.h" />
@@ -112,6 +113,7 @@
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="MeshLoader.cpp" />
     <ClCompile Include="Model.cpp" />
+    <ClCompile Include="Patron.cpp" />
     <ClCompile Include="Person.cpp" />
     <ClCompile Include="Raycast.cpp" />
     <ClCompile Include="SceneAnimator.cpp" />

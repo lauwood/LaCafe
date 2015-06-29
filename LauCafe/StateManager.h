@@ -22,8 +22,8 @@ public:
 	GameState* PeekState()					{ return states.top(); }
 
 	void GameLoop();
-	void Input()							{ PeekState()->Input(); }
-	void Update()							{ PeekState()->Update(); }
+	void Input(double delta)				{ PeekState()->Input(delta); }
+	void Update(double delta)				{ PeekState()->Update(delta); }
 	void Draw()								{ PeekState()->Draw(); }
 
 	bool Running()							{ return m_running; }

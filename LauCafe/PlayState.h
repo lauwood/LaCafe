@@ -15,6 +15,7 @@
 #include "Raycast.h"
 #include <vector>
 #include "Area.h"
+#include "Patron.h"
 
 class PlayState : public GameState
 {
@@ -26,8 +27,8 @@ public:
 	void Pause()		{ StateRunning = false; }
 	void Resume()		{ StateRunning = true; }
 
-	void Input();
-	void Update();
+	void Input(double alpha);
+	void Update(double alpha);
 	void Draw();
 
 	std::vector<Model>* GetSquarePath() { return g_SquarePath; }
@@ -46,6 +47,7 @@ private:
 	Floor g_Floor;
 	
 	std::vector<Model> *g_SquarePath;
+	Patron g_Patron;
 
 	Area* a;
 };

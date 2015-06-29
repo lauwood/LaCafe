@@ -14,12 +14,12 @@ Vertex3 Model::square[6] = { vec3(-0.5,  0.5,  0.0), vec4(1, 1, 0, 1),
 							 vec3( 0.5,  0.5,  0.0), vec4(1, 1, 0, 1),
 							 vec3(-0.5,  0.5,  0.0), vec4(1, 1, 0, 1) };
 
-Vertex3 Model::square2[6] = { vec3(-0.5,  0.0,  0.5), vec4(1, 1, 0, 1),
-							  vec3(-0.5,  0.0, -0.5), vec4(1, 1, 0, 1),
-							  vec3( 0.5,  0.0, -0.5), vec4(0, 0, 1, 1),
-							  vec3( 0.5,  0.0, -0.5), vec4(0, 0, 1, 1),
-							  vec3( 0.5,  0.0,  0.5), vec4(1, 1, 0, 1),
-							  vec3(-0.5,  0.0,  0.5), vec4(1, 1, 0, 1) };
+Vertex3 Model::square2[6] = { vec3(-1.0,  0.0,  1.0), vec4(1, 1, 0, 1),
+							  vec3(-1.0,  0.0, -1.0), vec4(1, 1, 0, 1),
+							  vec3( 1.0,  0.0, -1.0), vec4(0, 0, 1, 1),
+							  vec3( 1.0,  0.0, -1.0), vec4(0, 0, 1, 1),
+							  vec3( 1.0,  0.0,  1.0), vec4(1, 1, 0, 1),
+							  vec3(-1.0,  0.0,  1.0), vec4(1, 1, 0, 1) };
 
 void Model::Initialize(Vertex3 pVertices[], int length, GLenum pFace, std::string vert, std::string frag) {
 	FaceMode = pFace;

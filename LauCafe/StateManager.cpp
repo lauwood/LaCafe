@@ -88,9 +88,30 @@ StateManager::StateManager(GLFWwindow* window) {
 ////////////////////////////////////////////////////////////////////////////////
 
 void StateManager::GameLoop() {
+	double t = 0.0;
+	double dt = 0.1;
+
+	double currentTime = glfwGetTime();
+	double accumulator = 0.0;
+
 	while (!glfwWindowShouldClose(GetWindow())) {
-		Input();
-		Update();
+		double newTime = glfwGetTime();
+		double frameTime = newTime - currentTime;
+		if (frameTime > 0.25)
+			frameTime = 0.25;
+		currentTime = newTime;
+
+		accumulator += frameTime;
+		while (accumulator >= dt) {
+			t += dt;
+			accumulator -= dt;
+		}
+
+		const double alpha = accumulator / dt;
+		cout << alpha << endl;
+
+		Input(frameTime);
+		Update(frameTime);
 		Draw();
 	}
 }

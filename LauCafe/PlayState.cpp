@@ -9,8 +9,6 @@
 
 #define Y_OFFSET 0.5
 
-Mesh banana;
-
 ////////////////////////////////////////////////////////////////////////////////
 
 PlayState::PlayState(GLFWwindow* window, Area* area) : GameState(window) {
@@ -47,18 +45,16 @@ int PlayState::Initialize() {
 	g_Axis.Initialize(Model::axis, 6, GL_LINES, "Shaders/Shader_vs.glsl", "Shaders/Shader_fs.glsl");
 	g_Axis.SetCamera(m_Camera); 
 	g_Axis.SetPosition(vec3(0, 0, 0));
-
-	/*banana = Mesh("Models/banana.obj", "Shaders/Banana_vs.glsl", "Shaders/Banana_fs.glsl");
-	banana.SetCamera(m_Camera);
-	banana.SetPosition(vec3(0, 0, 0));
-	banana.SetScale(vec3(0.01, 0.01, 0.01));*/
 	
+	g_Patron = Patron(a, m_Camera);
+	g_Patron.findNextDestination();
+
 	glEnable(GL_DEPTH_TEST); // enable depth-testing
 	glDepthFunc(GL_LESS); // depth-testing interprets a smaller value as "closer"
 	glEnable(GL_CULL_FACE); // cull face
 	glCullFace(GL_BACK); // cull back face
 	glFrontFace(GL_CCW); // set counter-clock-wise vertex order to mean the front
-	glClearColor(0.2, 0.2, 0.2, 1.0); // grey background to help spot mistakes
+	glClearColor(1.0, 1.0, 1.0, 1.0); // grey background to help spot mistakes
 
 	g_SquarePath = new std::vector<Model>(NUM_OF_SQUARES);
 	for (int i = 0; i < NUM_OF_SQUARES; i++) {
@@ -73,7 +69,7 @@ int PlayState::Initialize() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void PlayState::Input() {
+void PlayState::Input(double delta) {
 	// Camera output
 	/*fprintf(stdout, "Camera POSITION: (%.2f, %.2f, %.2f), YAW: %.2f, PITCH: %.2f\n",
 		m_Camera->GetPosition().x,
@@ -87,34 +83,34 @@ void PlayState::Input() {
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_W)) {
-		m_Camera->MoveForward(m_Camera->GetSpeed());
+		m_Camera->MoveForward(m_Camera->GetSpeed() * delta);
 	}
 	if (glfwGetKey(window, GLFW_KEY_A)) {
-		m_Camera->MoveLeft(m_Camera->GetSpeed());
+		m_Camera->MoveLeft(m_Camera->GetSpeed() * delta);
 	}
 	if (glfwGetKey(window, GLFW_KEY_S)) {
-		m_Camera->MoveBackward(m_Camera->GetSpeed());
+		m_Camera->MoveBackward(m_Camera->GetSpeed() * delta);
 	}
 	if (glfwGetKey(window, GLFW_KEY_D)) {
-		m_Camera->MoveRight(m_Camera->GetSpeed());
+		m_Camera->MoveRight(m_Camera->GetSpeed() * delta);
 	}
 	if (glfwGetKey(window, GLFW_KEY_R)) {
-		m_Camera->MoveUp(m_Camera->GetSpeed());
+		m_Camera->MoveUp(m_Camera->GetSpeed() * delta);
 	}
 	if (glfwGetKey(window, GLFW_KEY_F)) {
-		m_Camera->MoveDown(m_Camera->GetSpeed());
+		m_Camera->MoveDown(m_Camera->GetSpeed() * delta);
 	}
 	if (glfwGetKey(window, GLFW_KEY_UP)) {
-		m_Camera->SetPitch(m_Camera->GetPitch() + m_Camera->GetSpeed() * -1);
+		m_Camera->SetPitch(m_Camera->GetPitch() + m_Camera->GetSpeed() * -1 * delta);
 	}
 	if (glfwGetKey(window, GLFW_KEY_DOWN)) {
-		m_Camera->SetPitch(m_Camera->GetPitch() + m_Camera->GetSpeed());
+		m_Camera->SetPitch(m_Camera->GetPitch() + m_Camera->GetSpeed() * delta);
 	}
 	if (glfwGetKey(window, GLFW_KEY_LEFT)) {
-		m_Camera->SetYaw(m_Camera->GetYaw() + m_Camera->GetSpeed() * -1);
+		m_Camera->SetYaw(m_Camera->GetYaw() + m_Camera->GetSpeed() * -1 * delta);
 	}
 	if (glfwGetKey(window, GLFW_KEY_RIGHT)) {
-		m_Camera->SetYaw(m_Camera->GetYaw() + m_Camera->GetSpeed());
+		m_Camera->SetYaw(m_Camera->GetYaw() + m_Camera->GetSpeed() * delta);
 	}
 
 	// Mouse motions
@@ -186,13 +182,16 @@ void PlayState::Input() {
 			}
 		} // endfor
 		SelectedSquare = closest_square_clicked;
+		g_Patron.findNextDestination();
+		fprintf(stdout, "center of square: x: %.2f, z: %.2f", g_SquarePath->at(SelectedSquare).GetPosition().x, g_SquarePath->at(SelectedSquare).GetPosition().z);
 	}
 
 	glfwPollEvents();
 }
 ////////////////////////////////////////////////////////////////////////////////
 
-void PlayState::Update() {
+void PlayState::Update(double alpha) {
+	g_Patron.walkToCells();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -203,14 +202,13 @@ void PlayState::Draw() {
 
 	// Clear the screen
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	Skybox.Render();
+	//Skybox.Render();
 
 	glDisable(GL_CULL_FACE);
 	g_Floor.Render();
 
-	//banana.Render();
+	g_Patron.Render();
 	g_Axis.Render();
-		
 	for (int i = 0; i < NUM_OF_SQUARES; i++) {
 		if (SelectedSquare == i) {
 			g_SquarePath->at(i).Select();

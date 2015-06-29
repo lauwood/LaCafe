@@ -262,7 +262,7 @@ void Area::fillPaths()
 								Cell* c = new Cell;
 								c->x = --xx;
 								c->z = zz;
-								paths.at(getIndex(z, x)).at(getIndex(i, j)).push_back(c);
+								paths.at(getIndex(z, x)).at(getIndex(i, j)).push_front(c);
 
 								continue;
 							}
@@ -271,7 +271,7 @@ void Area::fillPaths()
 								Cell* c = new Cell;
 								c->x = ++xx;
 								c->z = zz;
-								paths.at(getIndex(z, x)).at(getIndex(i, j)).push_back(c);
+								paths.at(getIndex(z, x)).at(getIndex(i, j)).push_front(c);
 
 								continue;
 							}
@@ -280,7 +280,7 @@ void Area::fillPaths()
 								Cell* c = new Cell;
 								c->x = xx;
 								c->z = --zz;
-								paths.at(getIndex(z, x)).at(getIndex(i, j)).push_back(c);
+								paths.at(getIndex(z, x)).at(getIndex(i, j)).push_front(c);
 
 								continue;
 							}
@@ -289,7 +289,7 @@ void Area::fillPaths()
 								Cell* c = new Cell;
 								c->x = xx;
 								c->z = ++zz;
-								paths.at(getIndex(z, x)).at(getIndex(i, j)).push_back(c);
+								paths.at(getIndex(z, x)).at(getIndex(i, j)).push_front(c);
 
 								continue;
 							}

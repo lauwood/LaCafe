@@ -5,7 +5,7 @@ Person::Person(Area* area)
 {
 	m_isBusy = false;
 	m_time = 0;
-	a = area;
+	p_Area = area;
 }
 
 
@@ -26,7 +26,7 @@ void Person::finishWalking()
 }
 
 // Default assume tick is 100 ms (recalculation 10 times per second)
-void Person::decrementTimer(int decrementValue = 100)
+void Person::decrementTimer(int decrementValue)
 {
 	if (m_isBusy)
 		if (m_time > decrementValue) {

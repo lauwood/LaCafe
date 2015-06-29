@@ -17,8 +17,8 @@ public:
 	virtual void Pause() = 0;
 	virtual void Resume() = 0;
 
-	virtual void Input() = 0;
-	virtual void Update() = 0;
+	virtual void Input(double) = 0;
+	virtual void Update(double) = 0;
 	virtual void Draw() = 0;
 
 	Camera* GetCamera() { return m_Camera; }
