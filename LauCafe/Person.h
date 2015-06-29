@@ -2,6 +2,8 @@
 #include "Model.h"
 #include "Area.h"
 
+enum Direction {LEFT, RIGHT, UP, DOWN};
+
 class Person
 {
 public:
@@ -11,6 +13,7 @@ public:
 
 	virtual void findNextDestination() = 0;
 	virtual void finishCurrentTask() = 0;
+	Direction getDirection(Cell* c1, Cell* c2);
 	void startWalking();
 	void finishWalking();
 	void move();
@@ -26,5 +29,8 @@ protected:
 	deque<Cell*> path;	// Path to next destination
 	Cell m_currentPosition;
 	Cell m_destination;
+
+	int m_direction;
+	float m_distance = 0;
 };
 

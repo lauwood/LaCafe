@@ -101,15 +101,6 @@ void StateManager::GameLoop() {
 			frameTime = 0.25;
 		currentTime = newTime;
 
-		accumulator += frameTime;
-		while (accumulator >= dt) {
-			t += dt;
-			accumulator -= dt;
-		}
-
-		const double alpha = accumulator / dt;
-		cout << alpha << endl;
-
 		Input(frameTime);
 		Update(frameTime);
 		Draw();

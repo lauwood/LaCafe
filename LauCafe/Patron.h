@@ -12,7 +12,7 @@ public:
 	Patron(Area* area, Camera *m_Camera);
 	~Patron();
 
-	void walkToCells();
+	void walkToCells(double);
 	void findNextDestination();
 	void finishCurrentTask();
 

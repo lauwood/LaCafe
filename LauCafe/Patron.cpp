@@ -30,10 +30,48 @@ void Patron::findNextDestination() {
 	pathIndex = 0;
 }
 
-void Patron::walkToCells() {
-	for (; pathIndex < path.size(); pathIndex++) {
+void Patron::walkToCells(double delta) {
+	for (; pathIndex < path.size();) {
+		double d = delta / (double)10000;
+		double dx, dz;
+		dx = dz = 0;
+
 		Cell* c = path.at(pathIndex);
-		dude.SetPosition(vec3(c->z, 0.5, c->x));
+		Direction currentDirection = getDirection(&m_currentPosition, c);
+		if (m_distance + d < 1) {
+			m_distance += d;
+		}
+		else {
+			m_distance = m_distance + d - 1;
+
+			m_currentPosition = *c;
+			if (++pathIndex < path.size()) {
+				c = path.at(pathIndex);
+			}
+			else {
+				m_distance = 0;
+				currentDirection = LEFT; // Arbitrary
+			}
+			
+		}
+		
+		currentDirection = getDirection(&m_currentPosition, c);
+		switch (currentDirection) {
+		case LEFT:
+			dx = -m_distance;
+			break;
+		case RIGHT:
+			dx = m_distance;
+			break;
+		case UP:
+			dz = m_distance;
+			break;
+		case DOWN:
+			dz = -m_distance;
+			break;
+		}
+
+		dude.SetPosition(vec3(m_currentPosition.z + dz, 0.5, m_currentPosition.x + dx));
 	}
 }
 

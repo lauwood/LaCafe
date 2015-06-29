@@ -14,6 +14,21 @@ Person::~Person()
 	// DO NOT DELETE AREA
 }
 
+Direction Person::getDirection(Cell* c1, Cell *c2) {
+	if (c1->x < c2->x) {
+		return RIGHT;
+	}
+	else if (c1->z < c2->z) {
+		return UP;
+	}
+	else if (c1-> x > c2->x) {
+		return LEFT;
+	}
+	else {
+		return DOWN;
+	}
+}
+
 void Person::startWalking()
 {
 	m_isBusy = false;
