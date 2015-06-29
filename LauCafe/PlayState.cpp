@@ -5,6 +5,7 @@
 #include "PlayState.h"
 #include "MeshLoader.h"
 #include "StateManager.h"
+#include "TimeManager.h"
 #include <cstdio>
 
 #define Y_OFFSET 0.5
@@ -69,7 +70,7 @@ int PlayState::Initialize() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void PlayState::Input(double delta) {
+void PlayState::Input() {
 	// Camera output
 	/*fprintf(stdout, "Camera POSITION: (%.2f, %.2f, %.2f), YAW: %.2f, PITCH: %.2f\n",
 		m_Camera->GetPosition().x,
@@ -83,34 +84,34 @@ void PlayState::Input(double delta) {
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_W)) {
-		m_Camera->MoveForward(m_Camera->GetSpeed() * delta);
+		m_Camera->MoveForward(m_Camera->GetSpeed() *  TimeManager::Instance().DeltaTime);
 	}
 	if (glfwGetKey(window, GLFW_KEY_A)) {
-		m_Camera->MoveLeft(m_Camera->GetSpeed() * delta);
+		m_Camera->MoveLeft(m_Camera->GetSpeed() *  TimeManager::Instance().DeltaTime);
 	}
 	if (glfwGetKey(window, GLFW_KEY_S)) {
-		m_Camera->MoveBackward(m_Camera->GetSpeed() * delta);
+		m_Camera->MoveBackward(m_Camera->GetSpeed() *  TimeManager::Instance().DeltaTime);
 	}
 	if (glfwGetKey(window, GLFW_KEY_D)) {
-		m_Camera->MoveRight(m_Camera->GetSpeed() * delta);
+		m_Camera->MoveRight(m_Camera->GetSpeed() *  TimeManager::Instance().DeltaTime);
 	}
 	if (glfwGetKey(window, GLFW_KEY_R)) {
-		m_Camera->MoveUp(m_Camera->GetSpeed() * delta);
+		m_Camera->MoveUp(m_Camera->GetSpeed() *  TimeManager::Instance().DeltaTime);
 	}
 	if (glfwGetKey(window, GLFW_KEY_F)) {
-		m_Camera->MoveDown(m_Camera->GetSpeed() * delta);
+		m_Camera->MoveDown(m_Camera->GetSpeed() *  TimeManager::Instance().DeltaTime);
 	}
 	if (glfwGetKey(window, GLFW_KEY_UP)) {
-		m_Camera->SetPitch(m_Camera->GetPitch() + m_Camera->GetSpeed() * -1 * delta);
+		m_Camera->SetPitch(m_Camera->GetPitch() + m_Camera->GetSpeed() * -1 *  TimeManager::Instance().DeltaTime);
 	}
 	if (glfwGetKey(window, GLFW_KEY_DOWN)) {
-		m_Camera->SetPitch(m_Camera->GetPitch() + m_Camera->GetSpeed() * delta);
+		m_Camera->SetPitch(m_Camera->GetPitch() + m_Camera->GetSpeed() *  TimeManager::Instance().DeltaTime);
 	}
 	if (glfwGetKey(window, GLFW_KEY_LEFT)) {
-		m_Camera->SetYaw(m_Camera->GetYaw() + m_Camera->GetSpeed() * -1 * delta);
+		m_Camera->SetYaw(m_Camera->GetYaw() + m_Camera->GetSpeed() * -1 *  TimeManager::Instance().DeltaTime);
 	}
 	if (glfwGetKey(window, GLFW_KEY_RIGHT)) {
-		m_Camera->SetYaw(m_Camera->GetYaw() + m_Camera->GetSpeed() * delta);
+		m_Camera->SetYaw(m_Camera->GetYaw() + m_Camera->GetSpeed() *  TimeManager::Instance().DeltaTime);
 	}
 
 	// Mouse motions
@@ -190,8 +191,8 @@ void PlayState::Input(double delta) {
 }
 ////////////////////////////////////////////////////////////////////////////////
 
-void PlayState::Update(double delta) { 
-	g_Patron.walkToCells(delta);
+void PlayState::Update() { 
+	g_Patron.walkToCells();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

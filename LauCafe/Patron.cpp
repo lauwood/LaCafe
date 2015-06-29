@@ -1,4 +1,5 @@
 #include "Patron.h"
+#include "TimeManager.h"
 
 Patron::Patron(Area* area, Camera *m_Camera) : Person(area) {
 	p_Area = area;
@@ -30,7 +31,8 @@ void Patron::findNextDestination() {
 	pathIndex = 0;
 }
 
-void Patron::walkToCells(double delta) {
+void Patron::walkToCells() {
+	double delta = TimeManager::Instance().DeltaTime;
 	if(pathIndex < path.size()) {
 		double dx, dz;
 		dx = dz = 0;

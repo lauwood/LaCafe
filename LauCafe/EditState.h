@@ -22,8 +22,8 @@ public:
 	void Pause()	{} // Empty
 	void Resume()	{} // because edit doesn't pause or resume
 
-	void Input(double delta);
-	void Update(double delta);
+	void Input();
+	void Update();
 	void Draw();
 
 	std::vector<Model>* GetSquarePath() { return g_SquarePath; }

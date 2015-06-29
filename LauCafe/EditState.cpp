@@ -14,7 +14,7 @@ int EditState::Initialize() {
 	return INIT_OK;
 }
 
-void EditState::Input(double delta) {
+void EditState::Input() {
 	// Raycast
 	if (MouseActiveButton) {
 		double nx, ny;
@@ -50,7 +50,7 @@ void EditState::Input(double delta) {
 	glfwPollEvents();
 }
 
-void EditState::Update(double alpha) {
+void EditState::Update() {
 
 }
 

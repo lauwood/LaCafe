@@ -3,6 +3,7 @@
 ////////////////////////////////////////
 
 #include "StateManager.h"
+#include "TimeManager.h"
 
 static StateManager* StateMan;
 
@@ -88,21 +89,11 @@ StateManager::StateManager(GLFWwindow* window) {
 ////////////////////////////////////////////////////////////////////////////////
 
 void StateManager::GameLoop() {
-	double t = 0.0;
-	double dt = 0.1;
-
-	double currentTime = glfwGetTime();
-	double accumulator = 0.0;
-
 	while (!glfwWindowShouldClose(GetWindow())) {
-		double newTime = glfwGetTime();
-		double frameTime = newTime - currentTime;
-		/*if (frameTime > 0.25)
-			frameTime = 0.25;*/
-		currentTime = newTime;
+		TimeManager::Instance().CalculateFrameRate(true);
 
-		Input(frameTime);
-		Update(frameTime);
+		Input();
+		Update();
 		Draw();
 	}
 }

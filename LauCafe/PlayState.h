@@ -27,8 +27,8 @@ public:
 	void Pause()		{ StateRunning = false; }
 	void Resume()		{ StateRunning = true; }
 
-	void Input(double alpha);
-	void Update(double alpha);
+	void Input();
+	void Update();
 	void Draw();
 
 	std::vector<Model>* GetSquarePath() { return g_SquarePath; }
