@@ -97,8 +97,8 @@ void StateManager::GameLoop() {
 	while (!glfwWindowShouldClose(GetWindow())) {
 		double newTime = glfwGetTime();
 		double frameTime = newTime - currentTime;
-		if (frameTime > 0.25)
-			frameTime = 0.25;
+		/*if (frameTime > 0.25)
+			frameTime = 0.25;*/
 		currentTime = newTime;
 
 		Input(frameTime);

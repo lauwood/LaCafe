@@ -183,7 +183,7 @@ void PlayState::Input(double delta) {
 		} // endfor
 		SelectedSquare = closest_square_clicked;
 		g_Patron.findNextDestination();
-		fprintf(stdout, "center of square: x: %.2f, z: %.2f", g_SquarePath->at(SelectedSquare).GetPosition().x, g_SquarePath->at(SelectedSquare).GetPosition().z);
+		//fprintf(stdout, "center of square: x: %.2f, z: %.2f", g_SquarePath->at(SelectedSquare).GetPosition().x, g_SquarePath->at(SelectedSquare).GetPosition().z);
 	}
 
 	glfwPollEvents();
@@ -206,7 +206,6 @@ void PlayState::Draw() {
 
 	glDisable(GL_CULL_FACE);
 	g_Floor.Render();
-
 	g_Patron.Render();
 	g_Axis.Render();
 	for (int i = 0; i < NUM_OF_SQUARES; i++) {

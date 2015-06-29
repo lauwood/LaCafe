@@ -31,18 +31,16 @@ void Patron::findNextDestination() {
 }
 
 void Patron::walkToCells(double delta) {
-	for (; pathIndex < path.size();) {
-		double d = delta / (double)10000;
+	if(pathIndex < path.size()) {
 		double dx, dz;
 		dx = dz = 0;
 
+		m_distance += delta;
+
 		Cell* c = path.at(pathIndex);
 		Direction currentDirection = getDirection(&m_currentPosition, c);
-		if (m_distance + d < 1) {
-			m_distance += d;
-		}
-		else {
-			m_distance = m_distance + d - 1;
+		while (m_distance >= 1) {
+			m_distance = m_distance + delta - 1;
 
 			m_currentPosition = *c;
 			if (++pathIndex < path.size()) {
@@ -52,7 +50,6 @@ void Patron::walkToCells(double delta) {
 				m_distance = 0;
 				currentDirection = LEFT; // Arbitrary
 			}
-			
 		}
 		
 		currentDirection = getDirection(&m_currentPosition, c);
