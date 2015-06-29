@@ -44,6 +44,7 @@ public:
 	~Area();
 
 	// Accessors
+	Cell getStart() { return start; }
 	int getHeight() { return m_height; }
 	int getWidth() { return m_width; }
 	bool isInBounds(int z, int x);
@@ -66,6 +67,7 @@ private:
 	int getIndex(int z, int x);
 	void fillPathLength();
 
+	Cell start;
 	int m_width;
 	int m_height;
 

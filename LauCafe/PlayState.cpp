@@ -45,9 +45,6 @@ int PlayState::Initialize() {
 	g_Axis.Initialize(Model::axis, 6, GL_LINES, "Shaders/Shader_vs.glsl", "Shaders/Shader_fs.glsl");
 	g_Axis.SetCamera(m_Camera); 
 	g_Axis.SetPosition(vec3(0, 0, 0));
-	
-	g_Patron = Patron(a, m_Camera);
-	g_Patron.findNextDestination();
 
 	glEnable(GL_DEPTH_TEST); // enable depth-testing
 	glDepthFunc(GL_LESS); // depth-testing interprets a smaller value as "closer"
@@ -182,7 +179,8 @@ void PlayState::Input(double delta) {
 			}
 		} // endfor
 		SelectedSquare = closest_square_clicked;
-		g_Patron.findNextDestination();
+
+		g_Patron.push_back(new Patron(a, m_Camera));
 		//fprintf(stdout, "center of square: x: %.2f, z: %.2f", g_SquarePath->at(SelectedSquare).GetPosition().x, g_SquarePath->at(SelectedSquare).GetPosition().z);
 	}
 
@@ -191,7 +189,17 @@ void PlayState::Input(double delta) {
 ////////////////////////////////////////////////////////////////////////////////
 
 void PlayState::Update(double delta) { 
-	g_Patron.walkToCells(delta);
+	for (int i = 0; i < g_Patron.size(); i++) {
+		if (g_Patron.at(i)->isFinished()) {
+			// Delete the patron now that it's done eating/waiting
+			delete g_Patron.at(i);
+			g_Patron.erase(g_Patron.begin() + i);
+		}
+		else {
+			g_Patron.at(i)->update(delta);
+		}
+	}
+	
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -206,7 +214,8 @@ void PlayState::Draw() {
 
 	glDisable(GL_CULL_FACE);
 	g_Floor.Render();
-	g_Patron.Render();
+	for (int i = 0; i < g_Patron.size(); i++)
+		g_Patron.at(i)->Render();
 	g_Axis.Render();
 	for (int i = 0; i < NUM_OF_SQUARES; i++) {
 		if (SelectedSquare == i) {

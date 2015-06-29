@@ -1,6 +1,11 @@
 #pragma once
 #include "Model.h"
 #include "Area.h"
+#include <stdlib.h>
+#include <time.h>
+
+#define MIN_TIME 5000
+#define MAX_TIME 10000
 
 enum Direction {LEFT, RIGHT, UP, DOWN};
 
@@ -13,11 +18,14 @@ public:
 
 	virtual void findNextDestination() = 0;
 	virtual void finishCurrentTask() = 0;
+	virtual void arrive() = 0;
+	virtual void update(double) = 0;
 	Direction getDirection(Cell* c1, Cell* c2);
-	void startWalking();
+	void setWalking();
 	void finishWalking();
 	void move();
 	void decrementTimer(int decrementValue = 100);
+	void setTimer();
 
 protected:
 	bool m_isBusy;		// Cooking, cleaning, eating, toilet, etc.

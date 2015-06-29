@@ -47,7 +47,7 @@ private:
 	Floor g_Floor;
 	
 	std::vector<Model> *g_SquarePath;
-	Patron g_Patron;
+	std::vector<Patron*> g_Patron;
 
 	Area* a;
 };

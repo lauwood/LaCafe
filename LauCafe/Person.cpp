@@ -29,11 +29,13 @@ Direction Person::getDirection(Cell* c1, Cell *c2) {
 	}
 }
 
-void Person::startWalking()
+void Person::setWalking()
 {
+	m_isWaiting = false;
 	m_isBusy = false;
 	m_isWalking = true;
 }
+
 void Person::finishWalking()
 {
 	m_isWalking = false;
@@ -51,7 +53,12 @@ void Person::decrementTimer(int decrementValue)
 			// Person may "do nothing" for a few frames
 			m_time = 0;
 			findNextDestination();
-			startWalking();
+			setWalking();
 		}
 
+}
+
+void Person::setTimer() {
+	srand(time(NULL));
+	m_time = (rand() % (MAX_TIME - MIN_TIME + 1)) + MIN_TIME;
 }

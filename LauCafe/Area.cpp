@@ -11,8 +11,11 @@ using namespace std;
 
 Area::Area(int height, int width, int sz, int sx)
 {
-	this->m_width = width;
-	this->m_height = height;
+	m_width = width;
+	m_height = height;
+
+	start.x = sx;
+	start.z = sz;
 
 	// Dynamically allocate the vectors
 	floor = vector<int>(width * height);
@@ -36,8 +39,11 @@ Area::Area(int height, int width, int sz, int sx)
 
 Area::Area(int height, int width, int sz, int sx, vector<int> existingVector)
 {
-	this->m_width = width;
-	this->m_height = height;
+	m_width = width;
+	m_height = height;
+
+	start.x = sx;
+	start.z = sz;
 
 	// Dynamically allocate the vectors
 	floor = vector<int>(existingVector);
@@ -255,6 +261,11 @@ void Area::fillPaths()
 						// Current coordinates
 						int xx = j;
 						int zz = i;
+
+						Cell* cell = new Cell;
+						cell->x = xx;
+						cell->z = zz;
+						paths.at(getIndex(z, x)).at(getIndex(i, j)).push_front(cell);
 
 						while (totalLength-- > 0) {
 							if (isInBounds(zz, xx - 1) && getCellPathLength(z, x, zz, xx - 1) == totalLength) {
