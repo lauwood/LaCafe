@@ -19,12 +19,12 @@ public:
 	virtual void findNextDestination() = 0;
 	virtual void finishCurrentTask() = 0;
 	virtual void arrive() = 0;
-	virtual void update(double) = 0;
+	virtual void update() = 0;
 	Direction getDirection(Cell* c1, Cell* c2);
 	void setWalking();
 	void finishWalking();
 	void move();
-	void decrementTimer(int decrementValue = 100);
+	void decrementTimer();
 	void setTimer();
 
 protected:

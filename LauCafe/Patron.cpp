@@ -1,4 +1,5 @@
 #include "Patron.h"
+#include "TimeManager.h"
 
 Patron::Patron(Area* area, Camera *m_Camera) : Person(area) {
 	p_Area = area;
@@ -24,10 +25,10 @@ Patron::~Patron() {
 void Patron::findNextDestination() {
 	for (int z = 0; z < p_Area->getHeight(); z++)
 		for (int x = 0; x < p_Area->getWidth(); x++) {
-			if (p_Area->getTileType(z, x) == TABLE) {
-				m_destination.x = x;
-				m_destination.z = z;
-			}
+		if (p_Area->getTileType(z, x) == TABLE) {
+			m_destination.x = x;
+			m_destination.z = z;
+		}
 	}
 	std::deque<Cell*> DequeOfCells = p_Area->getCellPath(m_currentPosition.z, 
 		m_currentPosition.x, m_destination.z, m_destination.x);
@@ -36,8 +37,9 @@ void Patron::findNextDestination() {
 	pathIndex = 0;
 }
 
-void Patron::walkToCells(double delta) {
-	if((size_t) pathIndex < path.size()) {
+void Patron::walkToCells() {
+	double delta = TimeManager::Instance().DeltaTime;
+	if(pathIndex < path.size()) {
 		double dx, dz;
 		dx = dz = 0;
 
@@ -100,12 +102,12 @@ void Patron::arrive() {
 	}
 }
 
-void Patron::update(double delta) {
+void Patron::update() {
 	if (m_isWalking)
-		walkToCells(delta);
+		walkToCells();
 	else if (m_isBusy)
-		decrementTimer(delta);
+		decrementTimer();
 	else if (m_isWaiting)
-		decrementTimer(delta);
+		decrementTimer();
 	return;
 }

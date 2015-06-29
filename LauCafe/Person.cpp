@@ -1,5 +1,5 @@
 #include "Person.h"
-
+#include "TimeManager.h"
 
 Person::Person(Area* area)
 {
@@ -43,8 +43,9 @@ void Person::finishWalking()
 }
 
 // Default assume tick is 100 ms (recalculation 10 times per second)
-void Person::decrementTimer(int decrementValue)
+void Person::decrementTimer()
 {
+	int decrementValue = TimeManager::Instance().DeltaTime;
 	if (m_isBusy)
 		if (m_time > decrementValue) {
 			m_time -= decrementValue;
