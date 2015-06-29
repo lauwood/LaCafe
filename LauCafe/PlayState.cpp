@@ -81,34 +81,34 @@ void PlayState::Input() {
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_W)) {
-		m_Camera->MoveForward(m_Camera->GetSpeed() *  TimeManager::Instance().DeltaTime);
+		m_Camera->MoveForward(m_Camera->GetSpeed());
 	}
 	if (glfwGetKey(window, GLFW_KEY_A)) {
-		m_Camera->MoveLeft(m_Camera->GetSpeed() *  TimeManager::Instance().DeltaTime);
+		m_Camera->MoveLeft(m_Camera->GetSpeed());
 	}
 	if (glfwGetKey(window, GLFW_KEY_S)) {
-		m_Camera->MoveBackward(m_Camera->GetSpeed() *  TimeManager::Instance().DeltaTime);
+		m_Camera->MoveBackward(m_Camera->GetSpeed());
 	}
 	if (glfwGetKey(window, GLFW_KEY_D)) {
-		m_Camera->MoveRight(m_Camera->GetSpeed() *  TimeManager::Instance().DeltaTime);
+		m_Camera->MoveRight(m_Camera->GetSpeed());
 	}
 	if (glfwGetKey(window, GLFW_KEY_R)) {
-		m_Camera->MoveUp(m_Camera->GetSpeed() *  TimeManager::Instance().DeltaTime);
+		m_Camera->MoveUp(m_Camera->GetSpeed());
 	}
 	if (glfwGetKey(window, GLFW_KEY_F)) {
-		m_Camera->MoveDown(m_Camera->GetSpeed() *  TimeManager::Instance().DeltaTime);
+		m_Camera->MoveDown(m_Camera->GetSpeed());
 	}
 	if (glfwGetKey(window, GLFW_KEY_UP)) {
-		m_Camera->SetPitch(m_Camera->GetPitch() + m_Camera->GetSpeed() * -1 *  TimeManager::Instance().DeltaTime);
+		m_Camera->SetPitch(m_Camera->GetPitch() + m_Camera->GetSpeed() * -1/1000);
 	}
 	if (glfwGetKey(window, GLFW_KEY_DOWN)) {
-		m_Camera->SetPitch(m_Camera->GetPitch() + m_Camera->GetSpeed() *  TimeManager::Instance().DeltaTime);
+		m_Camera->SetPitch(m_Camera->GetPitch() + m_Camera->GetSpeed() * 1/1000);
 	}
 	if (glfwGetKey(window, GLFW_KEY_LEFT)) {
-		m_Camera->SetYaw(m_Camera->GetYaw() + m_Camera->GetSpeed() * -1 *  TimeManager::Instance().DeltaTime);
+		m_Camera->SetYaw(m_Camera->GetYaw() + m_Camera->GetSpeed() * -1/1000);
 	}
 	if (glfwGetKey(window, GLFW_KEY_RIGHT)) {
-		m_Camera->SetYaw(m_Camera->GetYaw() + m_Camera->GetSpeed() * TimeManager::Instance().DeltaTime);
+		m_Camera->SetYaw(m_Camera->GetYaw() + m_Camera->GetSpeed() * 1/1000);
 	}
 
 	// Mouse motions

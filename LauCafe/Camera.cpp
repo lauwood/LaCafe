@@ -1,4 +1,5 @@
 #include "Camera.h"
+#include "TimeManager.h"
 
 Camera::Camera()
 {
@@ -93,6 +94,7 @@ vec3 Camera::GetRight()
 // This will move the camera forward or backward depending on the speed
 void Camera::MoveForward(float speed)
 {
+	speed *= TimeManager::Instance().DeltaTime;
 	// Get our normalized view vector (The direction we are facing)
 	vec3 viewVector = GetView();
 
@@ -103,6 +105,7 @@ void Camera::MoveForward(float speed)
 
 void Camera::MoveBackward(float speed)
 {
+	speed *= TimeManager::Instance().DeltaTime;
 	// Get our normalized view vector (The direction we are facing)
 	vec3 viewVector = GetView();
 
@@ -114,6 +117,7 @@ void Camera::MoveBackward(float speed)
 // This will strafe the camera left or right depending on the speed
 void Camera::MoveLeft(float speed)
 {
+	speed *= TimeManager::Instance().DeltaTime;
 	// Get our normalized right vector (The direction perpendicular to our view)
 	vec3 rightVector = GetRight();
 
@@ -124,6 +128,7 @@ void Camera::MoveLeft(float speed)
 
 void Camera::MoveRight(float speed)
 {
+	speed *= TimeManager::Instance().DeltaTime;
 	// Get our normalized right vector (The direction perpendicular to our view)
 	vec3 rightVector = GetRight();
 
@@ -134,6 +139,7 @@ void Camera::MoveRight(float speed)
 
 void Camera::MoveUp(float speed)
 {
+	speed *= TimeManager::Instance().DeltaTime;
 	vec3 upVector = GetUp();
 
 	// Move our camera position up or down along the right vector
@@ -142,6 +148,7 @@ void Camera::MoveUp(float speed)
 
 void Camera::MoveDown(float speed)
 {
+	speed *= TimeManager::Instance().DeltaTime;
 	vec3 upVector = GetUp();
 
 	// Move our camera position up or down along the right vector

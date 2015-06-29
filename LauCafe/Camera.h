@@ -56,7 +56,7 @@ protected:
 	mat4 ProjectionMatrix;								// The camera's projection matrix
 	vec3 Position;										// The camera's position
 
-	float Speed = 7;									// The camera's speed that is used with a time slice
+	float Speed = 10;									// The camera's speed that is used with a time slice
 	float RotationSpeed = 2;							// The rotation speed for the camera
 	double MouseSpeed = 0.05;							// The speed for the mouse rotations
 	float Yaw = 0;										// The horizontal rotation angle (in radians), y-axis
