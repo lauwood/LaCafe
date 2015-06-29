@@ -90,7 +90,7 @@ StateManager::StateManager(GLFWwindow* window) {
 
 void StateManager::GameLoop() {
 	while (!glfwWindowShouldClose(GetWindow())) {
-		TimeManager::Instance().CalculateFrameRate(true);
+		TimeManager::Instance().CalculateFrameRate(false);
 
 		Input();
 		Update();

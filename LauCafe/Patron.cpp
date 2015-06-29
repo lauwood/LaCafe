@@ -23,17 +23,18 @@ Patron::~Patron() {
 }
 
 void Patron::findNextDestination() {
+	TileType currentTileType = p_Area->getTileType(m_currentPosition.z, m_currentPosition.x);
+	TileType destinationType = p_Area->getDestinationType(currentTileType);
+
 	for (int z = 0; z < p_Area->getHeight(); z++)
 		for (int x = 0; x < p_Area->getWidth(); x++) {
-		if (p_Area->getTileType(z, x) == TABLE) {
-			m_destination.x = x;
-			m_destination.z = z;
-		}
+			if (p_Area->getTileType(z, x) == destinationType) {
+				m_destination.x = x;
+				m_destination.z = z;
+			}
 	}
-	std::deque<Cell*> DequeOfCells = p_Area->getCellPath(m_currentPosition.z, 
-		m_currentPosition.x, m_destination.z, m_destination.x);
+	path = p_Area->getCellPath(m_currentPosition.z, m_currentPosition.x, m_destination.z, m_destination.x);
 
-	path = DequeOfCells;
 	pathIndex = 0;
 }
 
@@ -58,6 +59,7 @@ void Patron::walkToCells() {
 				m_distance = 0;
 				currentDirection = LEFT; // Arbitrary
 				finishWalking();
+				arrive();
 			}
 		}
 		
@@ -91,6 +93,7 @@ void Patron::finishCurrentTask() {
 }
 
 void Patron::arrive() {
+	pathIndex = 0;
 	Cell start = p_Area->getStart();
 	if (m_currentPosition.x == start.x && m_currentPosition.z == start.z) {
 		// Customer is done and we can mark this for deletion
@@ -102,12 +105,41 @@ void Patron::arrive() {
 	}
 }
 
+void Patron::act() {
+	int decrementValue = TimeManager::Instance().DeltaTime * 1000;
+	if (m_isBusy)
+		if (m_time > decrementValue) {
+			m_time -= decrementValue;
+		}
+		else {
+			// Person may "do nothing" for a frame
+			m_time = 0;
+			findNextDestination();
+			setWalking();
+			walkToCells();
+		}
+}
+
+void Patron::wait() {
+	int decrementValue = TimeManager::Instance().DeltaTime;
+
+	if (m_isWaiting)
+		if (m_time > decrementValue) {
+			m_time -= decrementValue;
+		}
+		else {
+			// Mark for deletion, waiting too long
+			m_time = 0;
+			finished = true;
+		}
+}
+
 void Patron::update() {
 	if (m_isWalking)
 		walkToCells();
 	else if (m_isBusy)
-		decrementTimer();
+		act();
 	else if (m_isWaiting)
-		decrementTimer();
+		wait();
 	return;
 }

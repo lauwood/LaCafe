@@ -141,7 +141,7 @@ void PlayState::Input() {
 					for (int k = 0; k < a->getHeight(); k++)
 						for (int l = 0; l < a->getWidth(); l++) {
 							if (a->getTileType(k, l) == TABLE)
-								a->setTile(k, l, 0);
+								a->setTile(k, l, WALKABLE);
 							g_SquarePath->at(l + a->getHeight() * k).Unpath();
 						}
 

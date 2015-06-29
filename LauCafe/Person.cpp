@@ -42,23 +42,6 @@ void Person::finishWalking()
 	m_isBusy = true;
 }
 
-// Default assume tick is 100 ms (recalculation 10 times per second)
-void Person::decrementTimer()
-{
-	int decrementValue = TimeManager::Instance().DeltaTime;
-	if (m_isBusy)
-		if (m_time > decrementValue) {
-			m_time -= decrementValue;
-		}
-		else {
-			// Person may "do nothing" for a few frames
-			m_time = 0;
-			findNextDestination();
-			setWalking();
-		}
-
-}
-
 void Person::setTimer() {
 	srand(time(NULL));
 	m_time = (rand() % (MAX_TIME - MIN_TIME + 1)) + MIN_TIME;

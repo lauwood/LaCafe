@@ -17,6 +17,8 @@ public:
 	void finishCurrentTask();
 	void arrive();
 	void update();
+	void act();
+	void wait();
 
 	bool isFinished() { return finished; }
 

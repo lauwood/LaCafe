@@ -24,7 +24,7 @@ public:
 	void setWalking();
 	void finishWalking();
 	void move();
-	void decrementTimer();
+	virtual void act() = 0;
 	void setTimer();
 
 protected:
