@@ -15,11 +15,18 @@ public:
 	void walkToCells();
 	void findNextDestination();
 	void finishCurrentTask();
+	void arrive();
+	void update();
+	void act();
+	void wait();
+
+	bool isFinished() { return finished; }
 
 	void Render();
 private:
 	Mesh dude;
 	int pathIndex;
+	bool finished;
 };
 
 #endif

@@ -47,9 +47,6 @@ int PlayState::Initialize() {
 	g_Axis.SetCamera(m_Camera); 
 	g_Axis.SetPosition(vec3(0, 0, 0));
 	
-	g_Patron = Patron(a, m_Camera);
-	g_Patron.findNextDestination();
-
 	glEnable(GL_DEPTH_TEST); // enable depth-testing
 	glDepthFunc(GL_LESS); // depth-testing interprets a smaller value as "closer"
 	glEnable(GL_CULL_FACE); // cull face
@@ -148,7 +145,7 @@ void PlayState::Input() {
 						for (int k = 0; k < a->getHeight(); k++)
 							for (int l = 0; l < a->getWidth(); l++) {
 							if (a->getTileType(k, l) == TABLE)
-								a->setTile(k, l, 0);
+								a->setTile(k, l, WALKABLE);
 							g_SquarePath->at(l + a->getHeight() * k).Unpath();
 							}
 
@@ -185,19 +182,31 @@ void PlayState::Input() {
 						}
 					}
 				}
-			} // endfor
+			}
 			SelectedSquare = closest_square_clicked;
-			g_Patron.findNextDestination();
+
+			g_Patron.push_back(new Patron(a, m_Camera));
 			//fprintf(stdout, "center of square: x: %.2f, z: %.2f", g_SquarePath->at(SelectedSquare).GetPosition().x, g_SquarePath->at(SelectedSquare).GetPosition().z);
 		}
 	}
 
 	glfwPollEvents();
 }
+
 ////////////////////////////////////////////////////////////////////////////////
 
 void PlayState::Update() { 
-	g_Patron.walkToCells();
+	for (int i = 0; i < g_Patron.size(); i++) {
+		if (g_Patron.at(i)->isFinished()) {
+			// Delete the patron now that it's done eating/waiting
+			delete g_Patron.at(i);
+			g_Patron.erase(g_Patron.begin() + i);
+		}
+		else {
+			g_Patron.at(i)->update();
+		}
+	}
+	
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -212,7 +221,8 @@ void PlayState::Draw() {
 
 	glDisable(GL_CULL_FACE);
 	g_Floor.Render();
-	g_Patron.Render();
+	for (int i = 0; i < g_Patron.size(); i++)
+		g_Patron.at(i)->Render();
 	g_Axis.Render();
 	for (int i = 0; i < NUM_OF_SQUARES; i++) {
 		if (SelectedSquare == i) {

@@ -11,11 +11,14 @@ using namespace std;
 
 Area::Area(int height, int width, int sz, int sx)
 {
-	this->m_width = width;
-	this->m_height = height;
+	m_width = width;
+	m_height = height;
+
+	start.x = sx;
+	start.z = sz;
 
 	// Dynamically allocate the vectors
-	floor = vector<int>(width * height);
+	floor = vector<TileType>(width * height);
 
 	// Set the default values of the path length to INT_MAX
 	pathLength = vector<vector<int>>(width * height);
@@ -34,13 +37,16 @@ Area::Area(int height, int width, int sz, int sx)
 	setTile(sz, sx, START);
 }
 
-Area::Area(int height, int width, int sz, int sx, vector<int> existingVector)
+Area::Area(int height, int width, int sz, int sx, vector<TileType> existingVector)
 {
-	this->m_width = width;
-	this->m_height = height;
+	m_width = width;
+	m_height = height;
+
+	start.x = sx;
+	start.z = sz;
 
 	// Dynamically allocate the vectors
-	floor = vector<int>(existingVector);
+	floor = vector<TileType>(existingVector);
 
 	// Set the default values of the path length to INT_MAX
 	pathLength = vector<vector<int>>(width * height);
@@ -84,12 +90,28 @@ bool Area::isWalkable(int z, int x)
 	return false;
 }
 
-int Area::getTileType(int z, int x)
+TileType Area::getTileType(int z, int x)
 {
 	if (!isInBounds(z, x))
-		return -1;
+		return INVALID;
 	else
 		return floor.at(getIndex(z, x));
+}
+
+
+TileType Area::getDestinationType(TileType origin) {
+	switch (origin) {
+	case START:
+	case LOBBYCHAIR:
+	case STOVE:
+	case BAR:
+		return TABLE;
+	case TOILET:
+	case TABLE:
+		return START;
+	}
+
+	return INVALID;
 }
 
 // Used primarily in pathfinding
@@ -123,7 +145,7 @@ int Area::getIndex(int z, int x)
 ===========MUTATORS=============
 ==============================*/
 
-void Area::setTile(int z, int x, int tileType)
+void Area::setTile(int z, int x, TileType tileType)
 {
 	if (isInBounds(z, x))
 		this->floor[getIndex(z, x)] = tileType;
@@ -224,22 +246,8 @@ void Area::fillPaths()
 
 	for (int z = 0; z < m_height; z++)
 		for (int x = 0; x < m_width; x++) {
-			int tileType = floor[getIndex(z, x)];
-
-			int destinationType = -1;
-			switch (tileType) {
-			case START:
-			case LOBBYCHAIR:
-			case STOVE:
-			case BAR:
-				destinationType = TABLE;
-				break;
-			case TOILET:
-				destinationType = START;
-				break;
-			DEFAULT:
-				break;
-			}
+			TileType tileType = floor[getIndex(z, x)];
+			TileType destinationType = getDestinationType(tileType);
 
 			for (int i = 0; i < m_height; i++)
 				for (int j = 0; j < m_width; j++) {
@@ -255,6 +263,11 @@ void Area::fillPaths()
 						// Current coordinates
 						int xx = j;
 						int zz = i;
+
+						Cell* cell = new Cell;
+						cell->x = xx;
+						cell->z = zz;
+						paths.at(getIndex(z, x)).at(getIndex(i, j)).push_front(cell);
 
 						while (totalLength-- > 0) {
 							if (isInBounds(zz, xx - 1) && getCellPathLength(z, x, zz, xx - 1) == totalLength) {

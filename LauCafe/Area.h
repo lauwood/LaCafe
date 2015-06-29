@@ -5,17 +5,7 @@
 
 using namespace std;
 
-#define WALKABLE	0
-#define START		1
-#define OBSTACLE	2
-
-#define TABLE		10
-#define LOBBYCHAIR	11
-
-#define STOVE		20
-#define BAR			21
-
-#define TOILET		30
+enum TileType { WALKABLE, START, OBSTACLE, TABLE, LOBBYCHAIR, STOVE, BAR, TOILET, INVALID};
 
 // Represents a single tile in the array
 struct Cell {
@@ -40,20 +30,22 @@ public:
 
 	Area() {}; // Used for avoiding a compile-time error
 	Area(int height, int width, int sz, int sx);
-	Area(int height, int width, int sz, int sx, vector<int> existingVector);
+	Area(int height, int width, int sz, int sx, vector<TileType> existingVector);
 	~Area();
 
 	// Accessors
+	Cell getStart() { return start; }
 	int getHeight() { return m_height; }
 	int getWidth() { return m_width; }
 	bool isInBounds(int z, int x);
 	bool isWalkable(int z, int x);
-	int getTileType(int z, int x);
+	TileType getTileType(int z, int x);
+	TileType getDestinationType(TileType);
 	int getCellPathLength(int sz, int sx, int dz, int dx);
 	deque<Cell*> getCellPath(int sz, int sx, int dz, int dx);
 
 	// Mutators
-	void setTile(int z, int x, int tileType);
+	void setTile(int z, int x, TileType tileType);
 	void fillPaths();
 	void clearPaths();
 
@@ -66,11 +58,12 @@ private:
 	int getIndex(int z, int x);
 	void fillPathLength();
 
+	Cell start;
 	int m_width;
 	int m_height;
 
 	// Dynamic arrays for expandable restaurants
-	vector<int> floor;					// Represents the actual floor of the restaurant
+	vector<TileType> floor;					// Represents the actual floor of the restaurant
 	vector<vector<int>> pathLength;		// Represents the path lengths to the appropriate destinations
 	vector<vector<deque<Cell*>>> paths;			// Holds the shortest distance path for tables only
 };
