@@ -12,21 +12,23 @@ public:
 	Patron(Area* area, Camera *m_Camera);
 	~Patron();
 
-	void walkToCells();
+	// Implement virtual functions
 	void findNextDestination();
 	void finishCurrentTask();
+	void act();
 	void arrive();
 	void update();
-	void act();
+
+	void walk();
 	void wait();
 
-	bool isFinished() { return finished; }
+	bool canDelete() { return m_canDelete; }
 
 	void Render();
 private:
-	Mesh dude;
-	int pathIndex;
-	bool finished;
+	Mesh m_mesh;
+	int m_pathIndex;
+	bool m_canDelete;
 };
 
 #endif

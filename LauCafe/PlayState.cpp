@@ -197,7 +197,7 @@ void PlayState::Input() {
 
 void PlayState::Update() { 
 	for (int i = 0; i < g_Patron.size(); i++) {
-		if (g_Patron.at(i)->isFinished()) {
+		if (g_Patron.at(i)->canDelete()) {
 			// Delete the patron now that it's done eating/waiting
 			delete g_Patron.at(i);
 			g_Patron.erase(g_Patron.begin() + i);

@@ -2,69 +2,88 @@
 #include "TimeManager.h"
 
 Patron::Patron(Area* area, Camera *m_Camera) : Person(area) {
-	p_Area = area;
-	finished = false;
-	m_isWalking = true;
+	// Initialize model and shader
+	m_mesh = Mesh("Models/Dude.fbx", "Shaders/Banana_vs.glsl", "Shaders/Banana_fs.glsl");
+	m_mesh.SetCamera(m_Camera);
+	m_mesh.SetPosition(vec3(0, 0.5, 0));
+	m_mesh.SetScale(vec3(0.5, 0.5, 0.5));
 
-	dude = Mesh("Models/Dude.fbx", "Shaders/Banana_vs.glsl", "Shaders/Banana_fs.glsl");
-	dude.SetCamera(m_Camera);
-	dude.SetPosition(vec3(0, 0.5, 0));
-	dude.SetScale(vec3(0.5, 0.5, 0.5));
+	// Initialize status variables
+	m_canDelete = false;
+	m_isWalking = true; // May need to change this
 
 	Cell entrance = area->getStart();
 	m_currentPosition.x = entrance.x;
 	m_currentPosition.z = entrance.z;
 
+	// Immediately find the next destination so it can start walking right away
 	findNextDestination();
+
+	// Set initial direction to reduce calls in walk
+	Cell* c = m_pathToNextDestination.at(m_pathIndex);
+	m_direction = getDirection(&m_currentPosition, c);
 }
 
 Patron::~Patron() {
-
+	// Nothing dynamically allocated
 }
 
+// Set the path to the next available destination
 void Patron::findNextDestination() {
-	TileType currentTileType = p_Area->getTileType(m_currentPosition.z, m_currentPosition.x);
-	TileType destinationType = p_Area->getDestinationType(currentTileType);
+	bool foundDestination = false;
+	TileType currentTileType = m_area->getTileType(m_currentPosition.z, m_currentPosition.x);
+	TileType destinationType = m_area->getDestinationType(currentTileType);
 
-	for (int z = 0; z < p_Area->getHeight(); z++)
-		for (int x = 0; x < p_Area->getWidth(); x++) {
-			if (p_Area->getTileType(z, x) == destinationType) {
+	// Find the next available destination (not necessarily closest)
+	for (int z = 0; z < m_area->getHeight() && !foundDestination; z++)
+		for (int x = 0; x < m_area->getWidth() && !foundDestination; x++) {
+			if (m_area->getTileType(z, x) == destinationType && !m_area->isReserved(z, x)) {
 				m_destination.x = x;
 				m_destination.z = z;
+				foundDestination = true;
 			}
 	}
-	path = p_Area->getCellPath(m_currentPosition.z, m_currentPosition.x, m_destination.z, m_destination.x);
 
-	pathIndex = 0;
+	// Set the path of the patron to that of the path array
+	m_pathToNextDestination = m_area->getCellPath(m_currentPosition.z, m_currentPosition.x,
+		m_destination.z, m_destination.x);
+	// Reserve the tile so that no two patrons can take the same tile (even when walking to it)
+	m_area->reserveTile(m_destination.z, m_destination.x);
+
+	// Clear variable if path was found before
+	m_pathIndex = 0;
 }
 
-void Patron::walkToCells() {
+// Translate the model across the appropriate axis and speed
+// Calls arrival function when path is exhausted
+void Patron::walk() {
 	double delta = TimeManager::Instance().DeltaTime;
-	if(pathIndex < path.size()) {
+	if(m_pathIndex < m_pathToNextDestination.size()) {
 		double dx, dz;
 		dx = dz = 0;
 
 		m_distance += delta;
 
-		Cell* c = path.at(pathIndex);
-		Direction currentDirection = getDirection(&m_currentPosition, c);
+		Cell* c = m_pathToNextDestination.at(m_pathIndex);
+		// While loop is for in case of major lag and < 1 fps instead of if
 		while (m_distance >= 1) {
-			m_distance = m_distance + delta - 1;
-
+			m_distance -= 1;
+			// Advance a cell
 			m_currentPosition = *c;
-			if (++pathIndex < path.size()) {
-				c = path.at(pathIndex);
+			if (++m_pathIndex < m_pathToNextDestination.size()) {
+				c = m_pathToNextDestination.at(m_pathIndex);
+				m_direction = getDirection(&m_currentPosition, c);
 			}
 			else {
+				// Hit the end already
 				m_distance = 0;
-				currentDirection = LEFT; // Arbitrary
+				m_direction = LEFT; // Arbitrary
 				finishWalking();
 				arrive();
 			}
 		}
 		
-		currentDirection = getDirection(&m_currentPosition, c);
-		switch (currentDirection) {
+		switch (m_direction) {
 		case LEFT:
 			dx = -m_distance;
 			break;
@@ -79,30 +98,13 @@ void Patron::walkToCells() {
 			break;
 		}
 
-		dude.SetPosition(vec3(m_currentPosition.z + dz, 0.5, m_currentPosition.x + dx));
+		m_mesh.SetPosition(vec3(m_currentPosition.z + dz, 0.5, m_currentPosition.x + dx));
 	}
-}
-
-void Patron::Render() {
-	dude.Render();
 }
 
 void Patron::finishCurrentTask() {
 	findNextDestination();
 	setWalking();
-}
-
-void Patron::arrive() {
-	pathIndex = 0;
-	Cell start = p_Area->getStart();
-	if (m_currentPosition.x == start.x && m_currentPosition.z == start.z) {
-		// Customer is done and we can mark this for deletion
-		finished = true;
-	}
-	else {
-		// Set a timer for the next activity
-		setTimer();
-	}
 }
 
 void Patron::act() {
@@ -116,8 +118,31 @@ void Patron::act() {
 			m_time = 0;
 			findNextDestination();
 			setWalking();
-			walkToCells();
+			walk();
 		}
+}
+
+void Patron::arrive() {
+	m_pathIndex = 0;
+	Cell start = m_area->getStart();
+	if (m_currentPosition.x == start.x && m_currentPosition.z == start.z) {
+		// Customer is done and we can mark this for deletion
+		m_canDelete = true;
+	}
+	else {
+		// Set a timer for the next activity
+		setTimer();
+	}
+}
+
+void Patron::update() {
+	if (m_isWalking)
+		walk();
+	else if (m_isBusy)
+		act();
+	else if (m_isWaiting)
+		wait();
+	return;
 }
 
 void Patron::wait() {
@@ -130,16 +155,10 @@ void Patron::wait() {
 		else {
 			// Mark for deletion, waiting too long
 			m_time = 0;
-			finished = true;
+			m_canDelete = true;
 		}
 }
 
-void Patron::update() {
-	if (m_isWalking)
-		walkToCells();
-	else if (m_isBusy)
-		act();
-	else if (m_isWaiting)
-		wait();
-	return;
+void Patron::Render() {
+	m_mesh.Render();
 }

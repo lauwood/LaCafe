@@ -4,8 +4,8 @@
 #include <stdlib.h>
 #include <time.h>
 
-#define MIN_TIME 5000
-#define MAX_TIME 10000
+#define MAX_TIME 20000
+#define MIN_TIME 10000
 
 enum Direction {LEFT, RIGHT, UP, DOWN};
 
@@ -16,29 +16,34 @@ public:
 	Person(Area* area);
 	~Person();
 
+	// Virtual functions for all people
 	virtual void findNextDestination() = 0;
 	virtual void finishCurrentTask() = 0;
+	virtual void act() = 0;
 	virtual void arrive() = 0;
 	virtual void update() = 0;
+	virtual void wait() = 0;
+
 	Direction getDirection(Cell* c1, Cell* c2);
+
+	// Status update
 	void setWalking();
 	void finishWalking();
-	void move();
-	virtual void act() = 0;
+
 	void setTimer();
 
 protected:
-	bool m_isBusy;		// Cooking, cleaning, eating, toilet, etc.
-	bool m_isWaiting;	// For a seat, for food to cook, for food to arrive
+	bool m_isBusy;			// Cooking, cleaning, eating, toilet, etc.
+	bool m_isWaiting;		// For a seat, for food to cook, for food to arrive
 	bool m_isWalking;
-	int m_time;			// Time left for current task
+	int m_time;				// Time left for current task
+	Direction m_direction;	// Used to determine which way the model moves every tick
+	float m_distance = 0;	// 0 - 1, used to determine when direction has to be recalculated
 
-	Area* p_Area;			// For pathfinding
-	deque<Cell*> path;	// Path to next destination
+	Area* m_area;							// For pathfinding
+	deque<Cell*> m_pathToNextDestination;	// Path to next destination
 	Cell m_currentPosition;
 	Cell m_destination;
 
-	int m_direction;
-	float m_distance = 0;
 };
 
