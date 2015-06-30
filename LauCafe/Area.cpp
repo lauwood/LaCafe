@@ -14,23 +14,23 @@ Area::Area(int height, int width, int sz, int sx)
 	m_width = width;
 	m_height = height;
 
-	start.x = sx;
-	start.z = sz;
+	m_start.x = sx;
+	m_start.z = sz;
 
 	// Dynamically allocate the vectors
-	floor = vector<TileType>(width * height);
+	v_typeVector = vector<TileType>(width * height);
 
 	// Set the default values of the path length to INT_MAX
-	pathLength = vector<vector<int>>(width * height);
-	for (size_t i = 0; i < pathLength.size(); i++) {
-		pathLength.at(i) = vector<int>(width * height);
-		fill(pathLength.at(i).begin(), pathLength.at(i).end(), INT_MAX);
+	v_pathLengthVector = vector<vector<int>>(width * height);
+	for (size_t i = 0; i < v_pathLengthVector.size(); i++) {
+		v_pathLengthVector.at(i) = vector<int>(width * height);
+		fill(v_pathLengthVector.at(i).begin(), v_pathLengthVector.at(i).end(), INT_MAX);
 	}
 
 	// Need to have pointers to Slots because of scope
-	paths = vector<vector<deque<Cell*>>>(width * height);
-	for (size_t i = 0; i < paths.size(); i++) {
-		paths.at(i) = vector<deque<Cell*>>(width * height);
+	v_pathVector = vector<vector<deque<Cell*>>>(width * height);
+	for (size_t i = 0; i < v_pathVector.size(); i++) {
+		v_pathVector.at(i) = vector<deque<Cell*>>(width * height);
 	}
 
 	// Mark the start
@@ -42,25 +42,25 @@ Area::Area(int height, int width, int sz, int sx, vector<TileType> existingVecto
 	m_width = width;
 	m_height = height;
 
-	start.x = sx;
-	start.z = sz;
+	m_start.x = sx;
+	m_start.z = sz;
 
 	// Dynamically allocate the vectors
-	floor = vector<TileType>(existingVector);
+	v_typeVector = vector<TileType>(existingVector);
 
 	// Set the default values of the path length to INT_MAX
-	pathLength = vector<vector<int>>(width * height);
-	for (size_t i = 0; i < pathLength.size(); i++) {
-		pathLength.at(i) = vector<int>(width * height);
-		fill(pathLength.at(i).begin(), pathLength.at(i).end(), INT_MAX);
+	v_pathLengthVector = vector<vector<int>>(width * height);
+	for (size_t i = 0; i < v_pathLengthVector.size(); i++) {
+		v_pathLengthVector.at(i) = vector<int>(width * height);
+		fill(v_pathLengthVector.at(i).begin(), v_pathLengthVector.at(i).end(), INT_MAX);
 	}
 
 	fillPaths();
 
 	// Need to have pointers to Slots because of scope
-	paths = vector<vector<deque<Cell*>>>(width * height);
-	for (size_t i = 0; i < paths.size(); i++) {
-		paths.at(i) = vector<deque<Cell*>>(width * height);
+	v_pathVector = vector<vector<deque<Cell*>>>(width * height);
+	for (size_t i = 0; i < v_pathVector.size(); i++) {
+		v_pathVector.at(i) = vector<deque<Cell*>>(width * height);
 	}
 
 	// Mark the start
@@ -76,28 +76,14 @@ Area::~Area()
 /*==============================
 ==========ACCESSORS=============
 ==============================*/
-bool Area::isInBounds(int z, int x)
-{
-	return x < m_width && z < m_height && x >= 0 && z >= 0;
-}
-
-// 0 is walkable
-bool Area::isWalkable(int z, int x)
-{
-	if (isInBounds(z, x))
-		return this->floor[getIndex(z, x)] == WALKABLE;
-
-	return false;
-}
 
 TileType Area::getTileType(int z, int x)
 {
 	if (!isInBounds(z, x))
 		return INVALID;
 	else
-		return floor.at(getIndex(z, x));
+		return v_typeVector.at(getIndex(z, x));
 }
-
 
 TileType Area::getDestinationType(TileType origin) {
 	switch (origin) {
@@ -121,7 +107,7 @@ int Area::getCellPathLength(int sz, int sx, int dz, int dx)
 	if (!isInBounds(sz, sx) || !isInBounds(dz, dx) || !isWalkable(dz, dx))
 		return INT_MAX;
 	else
-		return pathLength.at(getIndex(sz, sx)).at(getIndex(dz, dx));
+		return v_pathLengthVector.at(getIndex(sz, sx)).at(getIndex(dz, dx));
 }
 
 // Get the path from (sx, sz) to (dx, dz)
@@ -131,7 +117,28 @@ deque<Cell*> Area::getCellPath(int sz, int sx, int dz, int dx)
 	if (!isInBounds(sz, sx) || !isInBounds(dz, dz))
 		return d;
 	else
-		return paths.at(getIndex(sz, sx)).at(getIndex(dz, dx));
+		return v_pathVector.at(getIndex(sz, sx)).at(getIndex(dz, dx));
+}
+
+bool Area::isInBounds(int z, int x)
+{
+	return x < m_width && z < m_height && x >= 0 && z >= 0;
+}
+
+// 0 is walkable
+bool Area::isWalkable(int z, int x)
+{
+	if (isInBounds(z, x))
+		return v_typeVector[getIndex(z, x)] == WALKABLE;
+
+	return false;
+}
+
+bool Area::isReserved(int z, int x) {
+	if (isInBounds(z, x))
+		return v_reservationVector.at(getIndex(z, x));
+	else
+		return false;
 }
 
 // Because we are using a vector to represent a 2D array, there must be a bit of math
@@ -148,83 +155,15 @@ int Area::getIndex(int z, int x)
 void Area::setTile(int z, int x, TileType tileType)
 {
 	if (isInBounds(z, x))
-		this->floor[getIndex(z, x)] = tileType;
+		v_typeVector[getIndex(z, x)] = tileType;
 }
 
-void Area::fillPathLength()
-{
-	for (int i = 0; i < m_height; i++) {
-		for (int j = 0; j < m_width; j++) {
-			deque<Cell> current, next;
+void Area::reserveTile(int z, int x) {
+	if (isInBounds(z, x)) v_reservationVector.at(getIndex(z, x)) = true;
+}
 
-			Cell currentCell;
-			currentCell.x = j;
-			currentCell.z = i;
-			current.push_back(currentCell);
-
-			int length = 1;
-			int size = this->floor.size();
-
-			do {
-				// Have to set next to empty after while comparison
-				deque<struct Cell> emptyDeque;
-				next = emptyDeque;
-
-				while (!current.empty()) {
-					Cell c = current.back();
-
-					// Check if adjacent cells are walkable and unmarked
-					if (isWalkable(c.z, c.x - 1) &&
-						getCellPathLength(currentCell.z, currentCell.x, c.z, c.x - 1) == INT_MAX) {
-						// Set the length in the "origin" cell's matrix's destination cell and push it to the deque
-						pathLength.at(getIndex(currentCell.z, currentCell.x))
-							.at(getIndex(c.z, c.x - 1)) = length;
-						Cell newSlot;
-						newSlot.x = c.x - 1;
-						newSlot.z = c.z;
-						next.push_back(newSlot);
-					}
-
-					if (isWalkable(c.z, c.x + 1) &&
-						getCellPathLength(currentCell.z, currentCell.x, c.z, c.x + 1) == INT_MAX) {
-						pathLength.at(getIndex(currentCell.z, currentCell.x))
-							.at(getIndex(c.z, c.x + 1)) = length;
-						Cell newSlot;
-						newSlot.x = c.x + 1;
-						newSlot.z = c.z;
-						next.push_back(newSlot);
-					}
-
-					if (isWalkable(c.z - 1, c.x) &&
-						getCellPathLength(currentCell.z, currentCell.x, c.z - 1, c.x) == INT_MAX) {
-						pathLength.at(getIndex(currentCell.z, currentCell.x))
-							.at(getIndex(c.z - 1, c.x)) = length;
-						Cell newSlot;
-						newSlot.x = c.x;
-						newSlot.z = c.z - 1;
-						next.push_back(newSlot);
-					}
-
-					if (isWalkable(c.z + 1, c.x) &&
-						getCellPathLength(currentCell.z, currentCell.x, c.z + 1, c.x) == INT_MAX) {
-						pathLength.at(getIndex(currentCell.z, currentCell.x))
-							.at(getIndex(c.z + 1, c.x)) = length;
-						Cell newSlot;
-						newSlot.x = c.x;
-						newSlot.z = c.z + 1;
-						next.push_back(newSlot);
-					}
-
-					// Pop the current cell, as we're done looking at its neighbors
-					current.pop_back();
-				}
-
-				// The current stack is emptied
-				length++;
-				current = next;
-			} while (!next.empty());
-		}
-	}
+void Area::unreserveTile(int z, int x){
+	if (isInBounds(z, x)) v_reservationVector.at(getIndex(z, x)) = false;
 }
 
 void Area::fillPaths()
@@ -246,12 +185,12 @@ void Area::fillPaths()
 
 	for (int z = 0; z < m_height; z++)
 		for (int x = 0; x < m_width; x++) {
-			TileType tileType = floor[getIndex(z, x)];
+			TileType tileType = v_typeVector[getIndex(z, x)];
 			TileType destinationType = getDestinationType(tileType);
 
 			for (int i = 0; i < m_height; i++)
 				for (int j = 0; j < m_width; j++) {
-					if (floor[getIndex(i, j)] == destinationType) {
+					if (v_typeVector[getIndex(i, j)] == destinationType) {
 						// The path matrix doesn't have the distance on the destination cell. Need surrounding minimum
 						int minLength1 = min(getCellPathLength(z, x, i, j + 1),
 							getCellPathLength(z, x, i, j - 1));
@@ -267,7 +206,7 @@ void Area::fillPaths()
 						Cell* cell = new Cell;
 						cell->x = xx;
 						cell->z = zz;
-						paths.at(getIndex(z, x)).at(getIndex(i, j)).push_front(cell);
+						v_pathVector.at(getIndex(z, x)).at(getIndex(i, j)).push_front(cell);
 
 						while (totalLength-- > 0) {
 							if (isInBounds(zz, xx - 1) && getCellPathLength(z, x, zz, xx - 1) == totalLength) {
@@ -275,7 +214,7 @@ void Area::fillPaths()
 								Cell* c = new Cell;
 								c->x = --xx;
 								c->z = zz;
-								paths.at(getIndex(z, x)).at(getIndex(i, j)).push_front(c);
+								v_pathVector.at(getIndex(z, x)).at(getIndex(i, j)).push_front(c);
 
 								continue;
 							}
@@ -284,7 +223,7 @@ void Area::fillPaths()
 								Cell* c = new Cell;
 								c->x = ++xx;
 								c->z = zz;
-								paths.at(getIndex(z, x)).at(getIndex(i, j)).push_front(c);
+								v_pathVector.at(getIndex(z, x)).at(getIndex(i, j)).push_front(c);
 
 								continue;
 							}
@@ -293,7 +232,7 @@ void Area::fillPaths()
 								Cell* c = new Cell;
 								c->x = xx;
 								c->z = --zz;
-								paths.at(getIndex(z, x)).at(getIndex(i, j)).push_front(c);
+								v_pathVector.at(getIndex(z, x)).at(getIndex(i, j)).push_front(c);
 
 								continue;
 							}
@@ -302,7 +241,7 @@ void Area::fillPaths()
 								Cell* c = new Cell;
 								c->x = xx;
 								c->z = ++zz;
-								paths.at(getIndex(z, x)).at(getIndex(i, j)).push_front(c);
+								v_pathVector.at(getIndex(z, x)).at(getIndex(i, j)).push_front(c);
 
 								continue;
 							}
@@ -313,18 +252,94 @@ void Area::fillPaths()
 }
 
 void Area::clearPaths() {
-	for (size_t i = 0; i < paths.size(); i++) {
-		for (size_t j = 0; j < paths.size(); j++)
-			while (!paths.at(i).at(j).empty()) {
-				Cell* c = paths.at(i).at(j).front();
+	for (size_t i = 0; i < v_pathVector.size(); i++) {
+		for (size_t j = 0; j < v_pathVector.size(); j++)
+			while (!v_pathVector.at(i).at(j).empty()) {
+				Cell* c = v_pathVector.at(i).at(j).front();
 				delete c;
-				paths.at(i).at(j).pop_front();
+				v_pathVector.at(i).at(j).pop_front();
 			}
 	}
 
-	for (size_t i = 0; i < pathLength.size(); i++)
-		for (size_t j = 0; j < pathLength.size(); j++)
-			pathLength.at(i).at(j) = INT_MAX;
+	for (size_t i = 0; i < v_pathLengthVector.size(); i++)
+		for (size_t j = 0; j < v_pathLengthVector.size(); j++)
+			v_pathLengthVector.at(i).at(j) = INT_MAX;
+}
+
+void Area::fillPathLength()
+{
+	for (int i = 0; i < m_height; i++) {
+		for (int j = 0; j < m_width; j++) {
+			deque<Cell> current, next;
+
+			Cell currentCell;
+			currentCell.x = j;
+			currentCell.z = i;
+			current.push_back(currentCell);
+
+			int length = 1;
+			int size = v_typeVector.size();
+
+			do {
+				// Have to set next to empty after while comparison
+				deque<struct Cell> emptyDeque;
+				next = emptyDeque;
+
+				while (!current.empty()) {
+					Cell c = current.back();
+
+					// Check if adjacent cells are walkable and unmarked
+					if (isWalkable(c.z, c.x - 1) &&
+						getCellPathLength(currentCell.z, currentCell.x, c.z, c.x - 1) == INT_MAX) {
+						// Set the length in the "origin" cell's matrix's destination cell and push it to the deque
+						v_pathLengthVector.at(getIndex(currentCell.z, currentCell.x))
+							.at(getIndex(c.z, c.x - 1)) = length;
+						Cell newSlot;
+						newSlot.x = c.x - 1;
+						newSlot.z = c.z;
+						next.push_back(newSlot);
+					}
+
+					if (isWalkable(c.z, c.x + 1) &&
+						getCellPathLength(currentCell.z, currentCell.x, c.z, c.x + 1) == INT_MAX) {
+						v_pathLengthVector.at(getIndex(currentCell.z, currentCell.x))
+							.at(getIndex(c.z, c.x + 1)) = length;
+						Cell newSlot;
+						newSlot.x = c.x + 1;
+						newSlot.z = c.z;
+						next.push_back(newSlot);
+					}
+
+					if (isWalkable(c.z - 1, c.x) &&
+						getCellPathLength(currentCell.z, currentCell.x, c.z - 1, c.x) == INT_MAX) {
+						v_pathLengthVector.at(getIndex(currentCell.z, currentCell.x))
+							.at(getIndex(c.z - 1, c.x)) = length;
+						Cell newSlot;
+						newSlot.x = c.x;
+						newSlot.z = c.z - 1;
+						next.push_back(newSlot);
+					}
+
+					if (isWalkable(c.z + 1, c.x) &&
+						getCellPathLength(currentCell.z, currentCell.x, c.z + 1, c.x) == INT_MAX) {
+						v_pathLengthVector.at(getIndex(currentCell.z, currentCell.x))
+							.at(getIndex(c.z + 1, c.x)) = length;
+						Cell newSlot;
+						newSlot.x = c.x;
+						newSlot.z = c.z + 1;
+						next.push_back(newSlot);
+					}
+
+					// Pop the current cell, as we're done looking at its neighbors
+					current.pop_back();
+				}
+
+				// The current stack is emptied
+				length++;
+				current = next;
+			} while (!next.empty());
+		}
+	}
 }
 
 /*==============================
@@ -337,7 +352,7 @@ void Area::printArray()
 	for (int z = 0; z < this->m_height; z++) {
 		cout << "|";
 		for (int x = 0; x < this->m_width; x++) {
-			cout << floor[getIndex(z, x)] << "|";
+			cout << v_typeVector[getIndex(z, x)] << "|";
 		}
 		cout << endl;
 	}
@@ -351,12 +366,12 @@ void Area::printPaths()
 
 	for (int z = 0; z < m_height; z++)
 		for (int x = 0; x < m_width; x++) {
-			if (floor[getIndex(z, x)] == START) {
+			if (v_typeVector[getIndex(z, x)] == START) {
 				// If the cell is a potential destination, print the path
 				for (int i = 0; i < m_height; i++)
 					for (int j = 0; j < m_width; j++) {
-						for (int k = 0; k < paths.at(getIndex(z, x)).at(getIndex(i, j)).size(); k++) {
-							Cell* top = paths.at(getIndex(z, x)).at(getIndex(i, j)).at(k);
+						for (int k = 0; k < v_pathVector.at(getIndex(z, x)).at(getIndex(i, j)).size(); k++) {
+							Cell* top = v_pathVector.at(getIndex(z, x)).at(getIndex(i, j)).at(k);
 							// 7 is just a visual symbol to represent the path
 							pathMap[getIndex(top->z, top->x)] = 7;
 						}

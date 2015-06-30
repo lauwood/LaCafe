@@ -34,18 +34,23 @@ public:
 	~Area();
 
 	// Accessors
-	Cell getStart() { return start; }
+	Cell getStart() { return m_start; }
 	int getHeight() { return m_height; }
 	int getWidth() { return m_width; }
-	bool isInBounds(int z, int x);
-	bool isWalkable(int z, int x);
+
 	TileType getTileType(int z, int x);
 	TileType getDestinationType(TileType);
 	int getCellPathLength(int sz, int sx, int dz, int dx);
 	deque<Cell*> getCellPath(int sz, int sx, int dz, int dx);
 
+	bool isInBounds(int z, int x);
+	bool isWalkable(int z, int x);
+	bool isReserved(int z, int x);
+
 	// Mutators
 	void setTile(int z, int x, TileType tileType);
+	void reserveTile(int z, int x);
+	void unreserveTile(int z, int x);
 	void fillPaths();
 	void clearPaths();
 
@@ -58,12 +63,14 @@ private:
 	int getIndex(int z, int x);
 	void fillPathLength();
 
-	Cell start;
+	Cell m_start;
 	int m_width;
 	int m_height;
 
 	// Dynamic arrays for expandable restaurants
-	vector<TileType> floor;					// Represents the actual floor of the restaurant
-	vector<vector<int>> pathLength;		// Represents the path lengths to the appropriate destinations
-	vector<vector<deque<Cell*>>> paths;			// Holds the shortest distance path for tables only
+	vector<TileType> v_typeVector;				// Represents the actual floor of the restaurant
+	vector<vector<int>> v_pathLengthVector;		// Represents the path lengths to the appropriate destinations
+	vector<vector<deque<Cell*>>> v_pathVector;	// Holds the shortest distance path for tables only
+	vector<bool> v_reservationVector;			// Tells whether or not a cell is being used for an action
+	vector<int> v_decorationVector;				// Tells whether or not a cell is being used for an action
 };
