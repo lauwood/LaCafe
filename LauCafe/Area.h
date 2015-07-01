@@ -5,7 +5,7 @@
 
 using namespace std;
 
-enum TileType { WALKABLE, START, OBSTACLE, TABLE, LOBBYCHAIR, STOVE, BAR, TOILET, INVALID};
+enum TileType { WALKABLE, START, OBSTACLE, RECEPTION, TABLE, STOVE, BAR, TOILET, INVALID};
 
 // Represents a single tile in the array
 struct Cell {
@@ -72,5 +72,5 @@ private:
 	vector<vector<int>> v_pathLengthVector;		// Represents the path lengths to the appropriate destinations
 	vector<vector<deque<Cell*>>> v_pathVector;	// Holds the shortest distance path for tables only
 	vector<bool> v_reservationVector;			// Tells whether or not a cell is being used for an action
-	vector<int> v_decorationVector;				// Tells whether or not a cell is being used for an action
+	vector<int> v_decorationVector;				// Represents what decoration occupies the table (IDs)
 };

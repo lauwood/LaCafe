@@ -1,7 +1,6 @@
 #ifndef PATRON_H
 #define PATRON_H
 
-#include "MeshLoader.h"
 #include "Area.h"
 #include "Person.h"
 
@@ -23,12 +22,11 @@ public:
 	void wait();
 
 	bool canDelete() { return m_canDelete; }
-
-	void Render();
 private:
-	Mesh m_mesh;
-	int m_pathIndex;
 	bool m_canDelete;
+	bool m_hasBeenSeated;
+	bool m_hasEaten;
+	bool m_timedOut;
 };
 
 #endif

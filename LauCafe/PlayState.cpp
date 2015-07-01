@@ -144,14 +144,14 @@ void PlayState::Input() {
 						// Clear the previous paths
 						for (int k = 0; k < a->getHeight(); k++)
 							for (int l = 0; l < a->getWidth(); l++) {
-							if (a->getTileType(k, l) == TABLE)
+							if (a->getTileType(k, l) == RECEPTION)
 								a->setTile(k, l, WALKABLE);
 							g_SquarePath->at(l + a->getHeight() * k).Unpath();
 							}
 
 						// To only allow one destination
 						if (a->getTileType(closest_square_clicked / 10, closest_square_clicked % 10) == WALKABLE)
-							a->setTile(closest_square_clicked / 10, closest_square_clicked % 10, TABLE);
+							a->setTile(closest_square_clicked / 10, closest_square_clicked % 10, RECEPTION);
 
 						a->fillPaths();
 
@@ -167,7 +167,7 @@ void PlayState::Input() {
 						if (c != nullptr) {
 							for (int z = 0; z < a->getHeight(); z++)
 								for (int x = 0; x < a->getWidth(); x++) {
-								if (a->getTileType(z, x) == TABLE) {
+									if (a->getTileType(z, x) == RECEPTION) {
 									// If the cell is a potential destination, print the path
 									deque<Cell*> p = a->getCellPath(c->z, c->x, z, x);
 									for (size_t j = 0; j < p.size(); j++) {

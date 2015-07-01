@@ -10,7 +10,10 @@ Patron::Patron(Area* area, Camera *m_Camera) : Person(area) {
 
 	// Initialize status variables
 	m_canDelete = false;
-	m_isWalking = true; // May need to change this
+	m_isWalking = true;
+	m_hasBeenSeated = false;
+	m_hasEaten = false;
+	m_timedOut = false;
 
 	Cell entrance = area->getStart();
 	m_currentPosition.x = entrance.x;
@@ -32,7 +35,11 @@ Patron::~Patron() {
 void Patron::findNextDestination() {
 	bool foundDestination = false;
 	TileType currentTileType = m_area->getTileType(m_currentPosition.z, m_currentPosition.x);
-	TileType destinationType = m_area->getDestinationType(currentTileType);
+	TileType destinationType;
+
+	if (m_hasEaten || m_timedOut) destinationType = START;
+	else if (m_hasBeenSeated) destinationType = TABLE;
+	else destinationType = RECEPTION;
 
 	// Find the next available destination (not necessarily closest)
 	for (int z = 0; z < m_area->getHeight() && !foundDestination; z++)
@@ -48,7 +55,8 @@ void Patron::findNextDestination() {
 	m_pathToNextDestination = m_area->getCellPath(m_currentPosition.z, m_currentPosition.x,
 		m_destination.z, m_destination.x);
 	// Reserve the tile so that no two patrons can take the same tile (even when walking to it)
-	m_area->reserveTile(m_destination.z, m_destination.x);
+	if (destinationType == TABLE)
+		m_area->reserveTile(m_destination.z, m_destination.x);
 
 	// Clear variable if path was found before
 	m_pathIndex = 0;
@@ -116,9 +124,12 @@ void Patron::act() {
 		else {
 			// Person may "do nothing" for a frame
 			m_time = 0;
+
+			m_area->unreserveTile(m_currentPosition.z, m_currentPosition.x);
+
+			// Prep for the next tick
 			findNextDestination();
 			setWalking();
-			walk();
 		}
 }
 
@@ -130,6 +141,7 @@ void Patron::arrive() {
 		m_canDelete = true;
 	}
 	else {
+		finishWalking();
 		// Set a timer for the next activity
 		setTimer();
 	}
@@ -146,7 +158,7 @@ void Patron::update() {
 }
 
 void Patron::wait() {
-	int decrementValue = TimeManager::Instance().DeltaTime;
+	int decrementValue = TimeManager::Instance().DeltaTime * 1000;
 
 	if (m_isWaiting)
 		if (m_time > decrementValue) {
@@ -155,10 +167,8 @@ void Patron::wait() {
 		else {
 			// Mark for deletion, waiting too long
 			m_time = 0;
-			m_canDelete = true;
+			m_timedOut = true;
+			findNextDestination();
+			setWalking();
 		}
-}
-
-void Patron::Render() {
-	m_mesh.Render();
 }

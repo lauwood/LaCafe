@@ -1,11 +1,11 @@
 #pragma once
-#include "Model.h"
 #include "Area.h"
+#include "MeshLoader.h"
 #include <stdlib.h>
 #include <time.h>
 
-#define MAX_TIME 20000
-#define MIN_TIME 10000
+#define MAX_TIME 2000
+#define MIN_TIME 1000
 
 enum Direction {LEFT, RIGHT, UP, DOWN};
 
@@ -31,11 +31,14 @@ public:
 	void finishWalking();
 
 	void setTimer();
+	void Render() { m_mesh.Render(); }
 
 protected:
+	Mesh m_mesh;			// Holds model information for the person
 	bool m_isBusy;			// Cooking, cleaning, eating, toilet, etc.
 	bool m_isWaiting;		// For a seat, for food to cook, for food to arrive
 	bool m_isWalking;
+	int m_pathIndex;
 	int m_time;				// Time left for current task
 	Direction m_direction;	// Used to determine which way the model moves every tick
 	float m_distance = 0;	// 0 - 1, used to determine when direction has to be recalculated

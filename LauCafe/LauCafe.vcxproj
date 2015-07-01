@@ -87,6 +87,7 @@
     <ClInclude Include="Camera.h" />
     <ClInclude Include="CubeMap.h" />
     <ClInclude Include="EditState.h" />
+    <ClInclude Include="Employee.h" />
     <ClInclude Include="Floor.h" />
     <ClInclude Include="GameState.h" />
     <ClInclude Include="Logger.h" />
@@ -109,6 +110,7 @@
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="CubeMap.cpp" />
     <ClCompile Include="EditState.cpp" />
+    <ClCompile Include="Employee.cpp" />
     <ClCompile Include="Floor.cpp" />
     <ClCompile Include="Logger.cpp" />
     <ClCompile Include="Main.cpp" />

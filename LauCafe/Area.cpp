@@ -94,7 +94,8 @@ TileType Area::getTileType(int z, int x)
 TileType Area::getDestinationType(TileType origin) {
 	switch (origin) {
 	case START:
-	case LOBBYCHAIR:
+		return RECEPTION;
+	case RECEPTION:
 	case STOVE:
 	case BAR:
 		return TABLE;
@@ -196,7 +197,7 @@ void Area::fillPaths()
 
 			for (int i = 0; i < m_height; i++)
 				for (int j = 0; j < m_width; j++) {
-					if (v_typeVector[getIndex(i, j)] == destinationType) {
+					//if (v_typeVector[getIndex(i, j)] == destinationType) {
 						// The path matrix doesn't have the distance on the destination cell. Need surrounding minimum
 						int minLength1 = min(getCellPathLength(z, x, i, j + 1),
 							getCellPathLength(z, x, i, j - 1));
@@ -252,7 +253,7 @@ void Area::fillPaths()
 								continue;
 							}
 						}
-					}
+					//}
 				}
 		}
 }

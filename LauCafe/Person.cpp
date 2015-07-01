@@ -41,7 +41,7 @@ void Person::setWalking()
 void Person::finishWalking()
 {
 	m_isWalking = false;
-	m_isBusy = true;
+	m_isWaiting = true;
 }
 
 // Set the timer for the current activity
