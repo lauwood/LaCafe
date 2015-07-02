@@ -20,7 +20,7 @@ Area::Area(int height, int width, int sz, int sx)
 	// Dynamically allocate the vectors
 	v_typeVector = vector<TileType>(width * height);
 	v_statusVector = vector<TileStatus>(width * height);
-	fill(v_statusVector.begin(), v_statusVector.end(), false);
+	fill(v_statusVector.begin(), v_statusVector.end(), OPEN);
 	v_decorationVector = vector<int>(width * height);
 
 	// Set the default values of the path length to INT_MAX
@@ -51,7 +51,7 @@ Area::Area(int height, int width, int sz, int sx, vector<TileType> existingVecto
 	// Dynamically allocate the vectors
 	v_typeVector = vector<TileType>(existingVector);
 	v_statusVector = vector<TileStatus>(width * height);
-	fill(v_statusVector.begin(), v_statusVector.end(), false);
+	fill(v_statusVector.begin(), v_statusVector.end(), OPEN);
 	v_decorationVector = vector<int>(width * height);
 
 	// Set the default values of the path length to INT_MAX

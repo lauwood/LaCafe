@@ -44,7 +44,7 @@ void Patron::findNextDestination() {
 	// Find the next available destination (not necessarily closest)
 	for (int z = 0; z < m_area->getHeight() && !foundDestination; z++)
 		for (int x = 0; x < m_area->getWidth() && !foundDestination; x++) {
-			if (m_area->getTileType(z, x) == destinationType && !m_area->getTileStatus(z, x) == OPEN) {
+			if (m_area->getTileType(z, x) == destinationType && m_area->getTileStatus(z, x) == OPEN) {
 				m_destination.x = x;
 				m_destination.z = z;
 				foundDestination = true;
