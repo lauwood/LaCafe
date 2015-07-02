@@ -19,8 +19,8 @@ Area::Area(int height, int width, int sz, int sx)
 
 	// Dynamically allocate the vectors
 	v_typeVector = vector<TileType>(width * height);
-	v_reservationVector = vector<bool>(width * height);
-	fill(v_reservationVector.begin(), v_reservationVector.end(), false);
+	v_statusVector = vector<TileStatus>(width * height);
+	fill(v_statusVector.begin(), v_statusVector.end(), false);
 	v_decorationVector = vector<int>(width * height);
 
 	// Set the default values of the path length to INT_MAX
@@ -50,8 +50,8 @@ Area::Area(int height, int width, int sz, int sx, vector<TileType> existingVecto
 
 	// Dynamically allocate the vectors
 	v_typeVector = vector<TileType>(existingVector);
-	v_reservationVector = vector<bool>(width * height);
-	fill(v_reservationVector.begin(), v_reservationVector.end(), false);
+	v_statusVector = vector<TileStatus>(width * height);
+	fill(v_statusVector.begin(), v_statusVector.end(), false);
 	v_decorationVector = vector<int>(width * height);
 
 	// Set the default values of the path length to INT_MAX
@@ -86,7 +86,7 @@ Area::~Area()
 TileType Area::getTileType(int z, int x)
 {
 	if (!isInBounds(z, x))
-		return INVALID;
+		return INVALID_TYPE;
 	else
 		return v_typeVector.at(getIndex(z, x));
 }
@@ -101,10 +101,11 @@ TileType Area::getDestinationType(TileType origin) {
 		return TABLE;
 	case TOILET:
 	case TABLE:
+	case TABLE_CHAIR:
 		return START;
 	}
 
-	return INVALID;
+	return INVALID_TYPE;
 }
 
 // Used primarily in pathfinding
@@ -127,6 +128,30 @@ deque<Cell*> Area::getCellPath(int sz, int sx, int dz, int dx)
 		return v_pathVector.at(getIndex(sz, sx)).at(getIndex(dz, dx));
 }
 
+Cell Area::getAdjacentTable(int z, int x) {
+	Cell table;
+	table.x = table.z = -1;
+
+	if (getTileType(z - 1, x) == TABLE) {
+		table.z = z - 1;
+		table.x = x;
+	}
+	else if (getTileType(z + 1, x) == TABLE) {
+		table.z = z + 1;
+		table.x = x;
+	}
+	else if (getTileType(z, x + 1) == TABLE) {
+		table.z = z;
+		table.x = x + 1;
+	}
+	else if (getTileType(z, x - 1) == TABLE) {
+		table.z = z;
+		table.x = x - 1;
+	}
+
+	return table;
+}
+
 bool Area::isInBounds(int z, int x)
 {
 	return x < m_width && z < m_height && x >= 0 && z >= 0;
@@ -141,11 +166,11 @@ bool Area::isWalkable(int z, int x)
 	return false;
 }
 
-bool Area::isReserved(int z, int x) {
+TileStatus Area::getTileStatus(int z, int x) {
 	if (isInBounds(z, x))
-		return v_reservationVector.at(getIndex(z, x));
+		return v_statusVector.at(getIndex(z, x));
 	else
-		return false;
+		return INVALID_STATUS;
 }
 
 // Because we are using a vector to represent a 2D array, there must be a bit of math
@@ -165,12 +190,9 @@ void Area::setTile(int z, int x, TileType tileType)
 		v_typeVector[getIndex(z, x)] = tileType;
 }
 
-void Area::reserveTile(int z, int x) {
-	if (isInBounds(z, x)) v_reservationVector.at(getIndex(z, x)) = true;
-}
-
-void Area::unreserveTile(int z, int x){
-	if (isInBounds(z, x)) v_reservationVector.at(getIndex(z, x)) = false;
+void Area::setTileStatus(int z, int x, TileStatus status) {
+	if (isInBounds(z, x))
+		v_statusVector.at(getIndex(z, x)) = status;
 }
 
 void Area::fillPaths()

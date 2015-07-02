@@ -27,6 +27,8 @@ private:
 	bool m_hasBeenSeated;
 	bool m_hasEaten;
 	bool m_timedOut;
+
+	Cell m_tableCell;
 };
 
 #endif
