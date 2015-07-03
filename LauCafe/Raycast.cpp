@@ -1,4 +1,5 @@
 #include "Raycast.h"
+#include "Globals.h"
 
 bool RayIntersect(vec3 ray_origin_wor, vec3 ray_direction_wor, vec3 object_center_wor, float object_radius, float* intersection_distance) {
 	vec3 distance_to_object = ray_origin_wor - object_center_wor;
@@ -43,7 +44,7 @@ bool RayIntersect(vec3 ray_origin_wor, vec3 ray_direction_wor, vec3 object_cente
 ////////////////////////////////////////////////////////////////////////////////
 
 /* takes mouse position on screen and return ray in world coords */
-vec3 GetRayFromMouse(float mouse_x, float mouse_y, float ScreenWidth, float ScreenHeight, Camera *pCamera) {
+vec3 GetRayFromMouse(float mouse_x, float mouse_y, float ScreenWidth, float ScreenHeight) {
 	// screen space (viewport coordinates)
 	float x = (2.0f * mouse_x) / ScreenWidth - 1.0f;
 	float y = 1.0f - (2.0f * mouse_y) / ScreenHeight;
@@ -53,10 +54,10 @@ vec3 GetRayFromMouse(float mouse_x, float mouse_y, float ScreenWidth, float Scre
 	// clip space
 	vec4 ray_clip = vec4(ray_nds.x, ray_nds.y, -1.0, 1.0);
 	// eye space
-	vec4 ray_eye = inverse(pCamera->GetProjectionMatrix()) * ray_clip;
+	vec4 ray_eye = inverse(Globals::Camera.GetProjectionMatrix()) * ray_clip;
 	ray_eye = vec4(ray_eye.x, ray_eye.y, -1.0, 0.0);
 	// world space
-	vec3 ray_wor = vec3(inverse(pCamera->GetViewMatrix()) * ray_eye);
+	vec3 ray_wor = vec3(inverse(Globals::Camera.GetViewMatrix()) * ray_eye);
 	// don't forget to normalise the vector at some point
 	ray_wor = normalize(ray_wor);
 	return ray_wor;

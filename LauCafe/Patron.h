@@ -8,7 +8,7 @@ class Patron : public Person
 {
 public:
 	Patron() {}
-	Patron(Area* area, Camera *m_Camera);
+	Patron(Area* area);
 	~Patron();
 
 	// Implement virtual functions

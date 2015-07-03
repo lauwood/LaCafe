@@ -7,6 +7,7 @@
 #include "StateManager.h"
 #include "TimeManager.h"
 #include <cstdio>
+#include "Globals.h"
 
 #define Y_OFFSET 0.5
 
@@ -25,11 +26,10 @@ int PlayState::Initialize() {
 
 	MouseActiveButton = 0;
 
-	m_Camera = new Camera(); 
-	m_Camera->SetPerspective(radians(60.0f), WinX / (float)WinY, 0.01f, 1000);
+	Globals::Camera.SetPerspective(radians(60.0f), WinX / (float)WinY, 0.01f, 1000);
 	//					     Position	  Yaw	 Pitch
-	m_Camera->PositionCamera(1.06, 8, 4.41,     1.57,     1.25);
-
+	Globals::Camera.PositionCamera(1.06, 8, 4.41, 1.57, 1.25);
+	
 	Skybox.Initialize();
 	std::string cmRelPath = "CubeMap/Yokohama3/";
 	Skybox.CreateCubeMap((cmRelPath + "negz.jpg").c_str(),  // front
@@ -38,14 +38,11 @@ int PlayState::Initialize() {
 						 (cmRelPath + "negy.jpg").c_str(),  // bottom
 						 (cmRelPath + "negx.jpg").c_str(),  // left
 						 (cmRelPath + "posx.jpg").c_str()); // right
-	Skybox.SetCamera(m_Camera);
-
-	g_Floor.SetCamera(m_Camera);
 	g_Floor.SetPosition(vec3(0, 0, 0));
 
 	g_Axis.Initialize(Model::axis, 6, GL_LINES, "Shaders/Shader_vs.glsl", "Shaders/Shader_fs.glsl");
-	g_Axis.SetCamera(m_Camera); 
 	g_Axis.SetPosition(vec3(0, 0, 0));
+	g_Table.Initialize();
 	
 	glEnable(GL_DEPTH_TEST); // enable depth-testing
 	glDepthFunc(GL_LESS); // depth-testing interprets a smaller value as "closer"
@@ -57,7 +54,6 @@ int PlayState::Initialize() {
 	g_SquarePath = new std::vector<Model>(NUM_OF_SQUARES);
 	for (int i = 0; i < NUM_OF_SQUARES; i++) {
 		g_SquarePath->at(i).Initialize(Model::square2, 6, GL_TRIANGLES, "Shaders/Shader_vs.glsl", "Shaders/Shader_fs.glsl");
-		g_SquarePath->at(i).SetCamera(m_Camera);
 		g_SquarePath->at(i).SetPosition(vec3(i / 10, Y_OFFSET, i % 10));
 		g_SquarePath->at(i).SetScale(vec3(0.5, 0.5, 0.5));
 	}
@@ -70,45 +66,45 @@ int PlayState::Initialize() {
 void PlayState::Input() {
 	// Camera output
 	/*fprintf(stdout, "Camera POSITION: (%.2f, %.2f, %.2f), YAW: %.2f, PITCH: %.2f\n",
-		m_Camera->GetPosition().x,
-		m_Camera->GetPosition().y,
-		m_Camera->GetPosition().z, 
-		m_Camera->GetYaw(),
-		m_Camera->GetPitch());*/
+		Globals::Camera.GetPosition().x,
+		Globals::Camera.GetPosition().y,
+		Globals::Camera.GetPosition().z, 
+		Globals::Camera.GetYaw(),
+		Globals::Camera.GetPitch());*/
 	// Keyboard
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE)) {
 		glfwSetWindowShouldClose(window, GL_TRUE);
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_W)) {
-		m_Camera->MoveForward(m_Camera->GetSpeed());
+		Globals::Camera.MoveForward(Globals::Camera.GetSpeed());
 	}
 	if (glfwGetKey(window, GLFW_KEY_A)) {
-		m_Camera->MoveLeft(m_Camera->GetSpeed());
+		Globals::Camera.MoveLeft(Globals::Camera.GetSpeed());
 	}
 	if (glfwGetKey(window, GLFW_KEY_S)) {
-		m_Camera->MoveBackward(m_Camera->GetSpeed());
+		Globals::Camera.MoveBackward(Globals::Camera.GetSpeed());
 	}
 	if (glfwGetKey(window, GLFW_KEY_D)) {
-		m_Camera->MoveRight(m_Camera->GetSpeed());
+		Globals::Camera.MoveRight(Globals::Camera.GetSpeed());
 	}
 	if (glfwGetKey(window, GLFW_KEY_R)) {
-		m_Camera->MoveUp(m_Camera->GetSpeed());
+		Globals::Camera.MoveUp(Globals::Camera.GetSpeed());
 	}
 	if (glfwGetKey(window, GLFW_KEY_F)) {
-		m_Camera->MoveDown(m_Camera->GetSpeed());
+		Globals::Camera.MoveDown(Globals::Camera.GetSpeed());
 	}
 	if (glfwGetKey(window, GLFW_KEY_UP)) {
-		m_Camera->SetPitch(m_Camera->GetPitch() + m_Camera->GetSpeed() * -1/1000);
+		Globals::Camera.SetPitch(Globals::Camera.GetPitch() + Globals::Camera.GetSpeed() * -1/1000);
 	}
 	if (glfwGetKey(window, GLFW_KEY_DOWN)) {
-		m_Camera->SetPitch(m_Camera->GetPitch() + m_Camera->GetSpeed() * 1/1000);
+		Globals::Camera.SetPitch(Globals::Camera.GetPitch() + Globals::Camera.GetSpeed() * 1/1000);
 	}
 	if (glfwGetKey(window, GLFW_KEY_LEFT)) {
-		m_Camera->SetYaw(m_Camera->GetYaw() + m_Camera->GetSpeed() * -1/1000);
+		Globals::Camera.SetYaw(Globals::Camera.GetYaw() + Globals::Camera.GetSpeed() * -1/1000);
 	}
 	if (glfwGetKey(window, GLFW_KEY_RIGHT)) {
-		m_Camera->SetYaw(m_Camera->GetYaw() + m_Camera->GetSpeed() * 1/1000);
+		Globals::Camera.SetYaw(Globals::Camera.GetYaw() + Globals::Camera.GetSpeed() * 1/1000);
 	}
 
 	// Mouse motions
@@ -129,13 +125,13 @@ void PlayState::Input() {
 
 			glfwGetCursorPos(window, &nx, &ny);
 
-			vec3 ray_wor = GetRayFromMouse((float)nx, (float)ny, WinX, WinY, m_Camera);
+			vec3 ray_wor = GetRayFromMouse((float)nx, (float)ny, WinX, WinY);
 
 			int closest_square_clicked = -1;
 			float closest_intersection = 0.0f;
 			for (int i = 0; i < NUM_OF_SQUARES; i++) {
 				float t_dist = 0.0f;
-				if (RayIntersect(m_Camera->GetPosition(), ray_wor, g_SquarePath->at(i).GetPosition(), SquareRadius, &t_dist)) {
+				if (RayIntersect(Globals::Camera.GetPosition(), ray_wor, g_SquarePath->at(i).GetPosition(), SquareRadius, &t_dist)) {
 					// if more than one sphere is in path of ray, only use the closest one
 					if (-1 == closest_square_clicked || t_dist < closest_intersection) {
 						closest_square_clicked = i;
@@ -185,7 +181,7 @@ void PlayState::Input() {
 			}
 			SelectedSquare = closest_square_clicked;
 
-			g_Patron.push_back(new Patron(a, m_Camera));
+			g_Patron.push_back(new Patron(a));
 			//fprintf(stdout, "center of square: x: %.2f, z: %.2f", g_SquarePath->at(SelectedSquare).GetPosition().x, g_SquarePath->at(SelectedSquare).GetPosition().z);
 		}
 	}
@@ -218,7 +214,7 @@ void PlayState::Draw() {
 	// Clear the screen
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	//Skybox.Render();
-
+	
 	glDisable(GL_CULL_FACE);
 	g_Floor.Render();
 	for (int i = 0; i < g_Patron.size(); i++)
@@ -233,6 +229,8 @@ void PlayState::Draw() {
 		}
 		g_SquarePath->at(i).Render();
 	}
+
+	g_Table.Render();
 
 	glfwSwapBuffers(window);
 }

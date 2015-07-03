@@ -1,7 +1,7 @@
 #include "Employee.h"
 #include "TimeManager.h"
 
-Employee::Employee(Area* area, Camera *m_Camera)
+Employee::Employee(Area* area)
 {
 }
 

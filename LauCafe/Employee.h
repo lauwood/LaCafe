@@ -12,7 +12,7 @@ class Employee :
 {
 public:
 	Employee() {}
-	Employee(Area* area, Camera *m_Camera);
+	Employee(Area* area);
 	~Employee();
 
 	// Implement virtual functions

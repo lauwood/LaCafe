@@ -28,7 +28,6 @@ void StateManager::KeyCallback(GLFWwindow* window, int key, int scancode, int ac
 				PeekState()->Pause();
 				EditState *State_EditMode= new EditState(window, a);
 				State_EditMode->SetSquarePath(((PlayState*)PeekState())->GetSquarePath());
-				State_EditMode->SetCamera(PeekState()->GetCamera());
 				PushState(State_EditMode);
 				b_EditMode = true;
 			}

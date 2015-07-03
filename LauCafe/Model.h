@@ -51,10 +51,6 @@ public:
 	vec3 GetScale() { return scale; }
 	void SetScale(vec3 pScale) { scale = pScale; }
 
-	// This gets and sets the camera to get access to the view and projection matrices
-	Camera *GetCamera() { return m_Camera; }
-	void SetCamera(Camera *pCamera) { m_Camera = pCamera; }
-
 	void Select()		{ isSelect = true; }
 	void Unselect()		{ isSelect = false; }
 	void Path()			{ isPath = true; }
@@ -82,9 +78,6 @@ protected:
 
 	// Our shader object to initialize and run the shaders
 	Shader m_Shader;
-
-	// Add our camera object to access its matrices
-	Camera *m_Camera;
 };
 
 

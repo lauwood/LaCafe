@@ -1,10 +1,9 @@
 #include "Patron.h"
 #include "TimeManager.h"
 
-Patron::Patron(Area* area, Camera *m_Camera) : Person(area) {
+Patron::Patron(Area* area) : Person(area) {
 	// Initialize model and shader
 	m_mesh = Mesh("Models/Dude.fbx", "Shaders/Banana_vs.glsl", "Shaders/Banana_fs.glsl");
-	m_mesh.SetCamera(m_Camera);
 	m_mesh.SetPosition(vec3(0, 0.5, 0));
 	m_mesh.SetScale(vec3(0.5, 0.5, 0.5));
 

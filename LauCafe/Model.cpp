@@ -1,4 +1,5 @@
 #include "Model.h"
+#include "Globals.h"
 
 Vertex3 Model::axis[6] = { vec3(1.0, 0.0, 0.0), vec4(1, 0, 0, 1),
 						   vec3(0.0, 0.0, 0.0), vec4(1, 0, 0, 1),
@@ -45,8 +46,8 @@ void Model::Initialize(Vertex3 pVertices[], int length, GLenum pFace, std::strin
 void Model::Render() {
 	m_Shader.Bind();
 
-	mat4 projectionMatrix = m_Camera->GetProjectionMatrix();
-	mat4 viewMatrix = m_Camera->GetViewMatrix();
+	mat4 projectionMatrix = Globals::Camera.GetProjectionMatrix();
+	mat4 viewMatrix = Globals::Camera.GetViewMatrix();
 	mat4 modelMatrix = glm::translate(mat4(1.0f), position);
 	modelMatrix = glm::scale(modelMatrix, scale);
 
@@ -104,6 +105,5 @@ void Model::Destroy() {
 		glDeleteVertexArrays(1, &VAO);
 		VAO = 0;
 	}
-	m_Camera = nullptr;
 	m_Shader.Destroy();
 }

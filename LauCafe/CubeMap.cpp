@@ -1,5 +1,6 @@
 #include "CubeMap.h"
 #include <assert.h>
+#include "Globals.h"
 
 #define STBI_ONLY_JPEG
 #define STB_IMAGE_IMPLEMENTATION
@@ -126,8 +127,8 @@ bool CubeMap::LoadCubeMapSide(GLuint texture, GLenum side_target, const char* fi
 }
 
 void CubeMap::Render() {
-	glm::mat4 viewMatrix = m_Camera->GetRotationMatrix(); // no translation
-	glm::mat4 projectionMatrix = m_Camera->GetProjectionMatrix();
+	glm::mat4 viewMatrix = Globals::Camera.GetRotationMatrix(); // no translation
+	glm::mat4 projectionMatrix = Globals::Camera.GetProjectionMatrix();
 
 	m_Shader.Bind();
 	GLint viewMatrixId = m_Shader.GetVariable("viewMatrix");

@@ -19,16 +19,11 @@ public:
 
 	bool LoadCubeMapSide(GLuint texture, GLenum side_target, const char* file_name);
 	void Render();
-
-	Camera *GetCamera() { return m_Camera; }
-	void SetCamera(Camera *pCamera) { m_Camera = pCamera; }
-
 private:
 	GLuint vbo;
 	GLuint vao;
 	GLuint tex_cube;
 
-	Camera *m_Camera;
 	Shader m_Shader;
 };
 

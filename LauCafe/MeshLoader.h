@@ -77,10 +77,6 @@ public:
 	vec3 GetScale() { return Scale; }
 	void SetScale(vec3 scale) { Scale = scale; }
 
-	// Get and Set for the model's camera
-	Camera *GetCamera() { return m_Camera; }
-	void SetCamera(Camera *pCamera) { m_Camera = pCamera; }
-
 private:
 	bool m_ForceNoBones;
 	bool m_IsAnimated;
@@ -117,7 +113,6 @@ private:
 	vec3 Rotation;										// The model's rotation
 	vec3 Scale;											// The model's scale
 
-	Camera* m_Camera;
 	Shader m_Shader;
 };
 

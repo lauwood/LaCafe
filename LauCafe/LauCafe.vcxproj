@@ -89,7 +89,12 @@
     <ClInclude Include="EditState.h" />
     <ClInclude Include="Employee.h" />
     <ClInclude Include="Floor.h" />
+    <ClInclude Include="GameObject.h" />
+    <ClInclude Include="GameObjectChair.h" />
+    <ClInclude Include="GameObjectPodium.h" />
+    <ClInclude Include="GameObjectStove.h" />
     <ClInclude Include="GameState.h" />
+    <ClInclude Include="Globals.h" />
     <ClInclude Include="Logger.h" />
     <ClInclude Include="Main.h" />
     <ClInclude Include="MeshLoader.h" />
@@ -102,6 +107,7 @@
     <ClInclude Include="StateManager.h" />
     <ClInclude Include="PlayState.h" />
     <ClInclude Include="stb_image.h" />
+    <ClInclude Include="GameObjectTable.h" />
     <ClInclude Include="TimeManager.h" />
   </ItemGroup>
   <ItemGroup>
@@ -112,6 +118,11 @@
     <ClCompile Include="EditState.cpp" />
     <ClCompile Include="Employee.cpp" />
     <ClCompile Include="Floor.cpp" />
+    <ClCompile Include="GameObjectChair.cpp" />
+    <ClCompile Include="GameObjectPodium.cpp" />
+    <ClCompile Include="GameObjectStove.cpp" />
+    <ClCompile Include="GameObjectTable.cpp" />
+    <ClCompile Include="Globals.cpp" />
     <ClCompile Include="Logger.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="MeshLoader.cpp" />

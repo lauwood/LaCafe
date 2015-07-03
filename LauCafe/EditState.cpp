@@ -4,6 +4,7 @@
 
 #include "EditState.h"
 #include "StateManager.h"
+#include "Globals.h"
 
 EditState::EditState(GLFWwindow* window, Area* area) : GameState(window) {
 	a = area;
@@ -20,12 +21,12 @@ void EditState::Input() {
 		double nx, ny;
 		glfwGetCursorPos(window, &nx, &ny);
 
-		vec3 ray_wor = GetRayFromMouse((float)nx, (float)ny, WinX, WinY, m_Camera);
+		vec3 ray_wor = GetRayFromMouse((float)nx, (float)ny, WinX, WinY);
 		int closest_square_clicked = -1;
 		float closest_intersection = 0.0f;
 		for (int i = 0; i < NUM_OF_SQUARES; i++) {
 			float t_dist = 0.0f;
-			if (RayIntersect(m_Camera->GetPosition(), ray_wor, g_SquarePath->at(i).GetPosition(), SquareRadius, &t_dist)) {
+			if (RayIntersect(Globals::Camera.GetPosition(), ray_wor, g_SquarePath->at(i).GetPosition(), SquareRadius, &t_dist)) {
 				// if more than one sphere is in path of ray, only use the closest one
 				if (-1 == closest_square_clicked || t_dist < closest_intersection) {
 					closest_square_clicked = i;
@@ -60,7 +61,7 @@ void EditState::Draw() {
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	for (int i = 0; i < NUM_OF_SQUARES; i++) {
+	/*for (int i = 0; i < NUM_OF_SQUARES; i++) {
 		if (SelectedSquare == i) {
 			g_SquarePath->at(i).Select();
 		}
@@ -68,6 +69,6 @@ void EditState::Draw() {
 			g_SquarePath->at(i).Unselect();
 		}
 		g_SquarePath->at(i).Render();
-	}
+	}*/
 	glfwSwapBuffers(window);
 }

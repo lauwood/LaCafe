@@ -34,7 +34,7 @@ extern "C" {
 #endif  /* _INC_STDARG */
 
 bool Log(const char* message, ...) {
-	va_list argptr;
+	/*va_list argptr;
 	FILE* file = fopen(GL_LOG_FILE, "a");
 	if (!file) {
 		fprintf(
@@ -47,15 +47,15 @@ bool Log(const char* message, ...) {
 	va_start(argptr, message);
 	vfprintf(file, message, argptr);
 	va_end(argptr);
-	fclose(file);
+	fclose(file);*/
 	return true;
 }
 
 void Print_Program_Info_Log(GLuint ShaderProgram) {
-	int max_length = 2048;
+	/*int max_length = 2048;
 	int actual_length = 0;
 	char log[2048];
 	glGetProgramInfoLog(ShaderProgram, max_length, &actual_length, log);
 	printf("program info log for GL index %u:\n%s", ShaderProgram, log);
-	Log("program info log for GL index %u:\n%s", ShaderProgram, log);
+	Log("program info log for GL index %u:\n%s", ShaderProgram, log);*/
 }

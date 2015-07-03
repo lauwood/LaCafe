@@ -3,6 +3,7 @@
 //
 
 #include "MeshLoader.h"
+#include "Globals.h"
 #include <time.h>
 #include <string>
 #include <GL/glew.h>
@@ -170,8 +171,8 @@ void Mesh::SetAnimation(unsigned int index) {
 void Mesh::RenderMesh(const aiNode* node) {
 	m_Shader.Bind();
 
-	mat4 projectionMatrix = m_Camera->GetProjectionMatrix();
-	mat4 viewMatrix = m_Camera->GetViewMatrix();
+	mat4 projectionMatrix = Globals::Camera.GetProjectionMatrix();
+	mat4 viewMatrix = Globals::Camera.GetViewMatrix();
 	mat4 modelMatrix = translate(mat4(1.0f), Position);
 
 	// Similar to the Position above, we do the same for the Scale

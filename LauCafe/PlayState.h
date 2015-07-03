@@ -16,6 +16,10 @@
 #include <vector>
 #include "Area.h"
 #include "Patron.h"
+#include "GameObjectTable.h"
+#include "GameObjectChair.h"
+#include "GameObjectStove.h"
+#include "GameObjectPodium.h"
 
 class PlayState : public GameState
 {
@@ -45,6 +49,7 @@ private:
 	
 	Model g_Axis;
 	Floor g_Floor;
+	GameObjectPodium g_Table;
 	
 	std::vector<Model> *g_SquarePath;
 	std::vector<Patron*> g_Patron;
