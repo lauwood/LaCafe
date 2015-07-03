@@ -50,6 +50,7 @@ private:
 	Model g_Axis;
 	Floor g_Floor;
 	GameObjectPodium g_Table;
+	Mesh Dude;
 	
 	std::vector<Model> *g_SquarePath;
 	std::vector<Patron*> g_Patron;

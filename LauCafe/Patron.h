@@ -8,7 +8,7 @@ class Patron : public Person
 {
 public:
 	Patron() {}
-	Patron(Area* area);
+	Patron(Area* area, Mesh dude);
 	~Patron();
 
 	// Implement virtual functions
