@@ -10,6 +10,7 @@ Patron::Patron(Area* area) : Person(area) {
 	// Initialize status variables
 	m_canDelete = false;
 	m_isWalking = true;
+	m_hasBeenDirected = false;
 	m_hasBeenSeated = false;
 	m_hasEaten = false;
 	m_timedOut = false;
@@ -37,7 +38,7 @@ void Patron::findNextDestination() {
 	TileType destinationType;
 
 	if (m_hasEaten || m_timedOut) destinationType = START;
-	else if (m_hasBeenSeated) destinationType = TABLE_CHAIR;
+	else if (m_hasBeenDirected) destinationType = TABLE_CHAIR;
 	else destinationType = RECEPTION;
 
 	// Find the next available destination (not necessarily closest)
@@ -88,7 +89,6 @@ void Patron::walk() {
 				// Hit the end already
 				m_distance = 0;
 				m_direction = LEFT; // Arbitrary
-				finishWalking();
 				arrive();
 			}
 		}
@@ -143,15 +143,20 @@ void Patron::arrive() {
 		m_canDelete = true;
 	}
 	else {
-		finishWalking();
-		// Set a timer for the next activity
-		setTimer();
-
+		if (!m_hasBeenDirected) {
+			m_hasBeenDirected = true;
+			findNextDestination();
+		}
+		else if (!m_hasBeenSeated) {
 		// If arrived at a table, mark it
-		if (m_area->getTileType(m_currentPosition.z, m_currentPosition.x) == TABLE_CHAIR) {
 			// Don't need to mark the chair, it's "reserved" so nobody will walk to it
 			Cell tableTile = m_area->getAdjacentTable(m_currentPosition.z, m_currentPosition.x);
 			m_area->setTileStatus(tableTile.z, tableTile.x, WAITING);
+			m_hasBeenSeated = true;
+
+			finishWalking();
+			// Set a timer for the next activity
+			setTimer();
 		}
 	}
 }

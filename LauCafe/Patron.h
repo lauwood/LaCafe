@@ -24,6 +24,7 @@ public:
 	bool canDelete() { return m_canDelete; }
 private:
 	bool m_canDelete;
+	bool m_hasBeenDirected;	// To a chair
 	bool m_hasBeenSeated;
 	bool m_hasEaten;
 	bool m_timedOut;
