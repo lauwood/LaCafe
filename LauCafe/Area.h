@@ -2,15 +2,24 @@
 
 #include <vector>
 #include <deque>
+#include <queue>
 
 using namespace std;
 
-enum TileType { WALKABLE, START, OBSTACLE, RECEPTION, TABLE, STOVE, BAR, TOILET, INVALID};
+enum TileType { WALKABLE, START, OBSTACLE, RECEPTION, RECEPTION_WORKER, TABLE, TABLE_CHAIR, STOVE,
+	STOVE_WORKER, BAR, BAR_WORKER, TOILET, INVALID_TYPE};
+enum TileStatus { OPEN, RESERVED, COOKING, FOOD_COMING, FOOD_READY, WAITING, EATING, DIRTY, CLEANING, INVALID_STATUS };
 
 // Represents a single tile in the array
 struct Cell {
 	int x;
 	int z;
+};
+
+struct FoodTask {
+	Cell stove;
+	Cell table;
+	bool ready;
 };
 
 class Area
@@ -42,15 +51,16 @@ public:
 	TileType getDestinationType(TileType);
 	int getCellPathLength(int sz, int sx, int dz, int dx);
 	deque<Cell*> getCellPath(int sz, int sx, int dz, int dx);
+	Cell getAdjacentTable(int z, int x);
+	Cell getAdjacentStove(int z, int x);
 
 	bool isInBounds(int z, int x);
 	bool isWalkable(int z, int x);
-	bool isReserved(int z, int x);
+	TileStatus getTileStatus(int z, int x);
 
 	// Mutators
 	void setTile(int z, int x, TileType tileType);
-	void reserveTile(int z, int x);
-	void unreserveTile(int z, int x);
+	void setTileStatus(int z, int x, TileStatus status);
 	void fillPaths();
 	void clearPaths();
 
@@ -58,6 +68,9 @@ public:
 	void printArray();
 	void printPaths();
 
+	queue<Cell> v_waitingCustomerCells;
+	queue<Cell> v_doneCookingStoveCells;
+	queue<Cell> v_dirtyTableCells;
 private:
 	// This function is private to prevent accessing the right cell easily
 	int getIndex(int z, int x);
@@ -71,6 +84,6 @@ private:
 	vector<TileType> v_typeVector;				// Represents the actual floor of the restaurant
 	vector<vector<int>> v_pathLengthVector;		// Represents the path lengths to the appropriate destinations
 	vector<vector<deque<Cell*>>> v_pathVector;	// Holds the shortest distance path for tables only
-	vector<bool> v_reservationVector;			// Tells whether or not a cell is being used for an action
+	vector<TileStatus> v_statusVector;			// Tells the state of the tile
 	vector<int> v_decorationVector;				// Represents what decoration occupies the table (IDs)
 };
