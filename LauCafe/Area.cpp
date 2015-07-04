@@ -152,6 +152,30 @@ Cell Area::getAdjacentTable(int z, int x) {
 	return table;
 }
 
+Cell Area::getAdjacentStove(int z, int x) {
+	Cell stove;
+	stove.x = stove.z = -1;
+
+	if (getTileType(z - 1, x) == STOVE || getTileType(z - 1, x) == BAR) {
+		stove.z = z - 1;
+		stove.x = x;
+	}
+	else if (getTileType(z + 1, x) == STOVE || getTileType(z + 1, x) == BAR) {
+		stove.z = z + 1;
+		stove.x = x;
+	}
+	else if (getTileType(z, x + 1) == STOVE || getTileType(z, x + 1) == BAR) {
+		stove.z = z;
+		stove.x = x + 1;
+	}
+	else if (getTileType(z, x - 1) == STOVE || getTileType(z, x - 1) == BAR) {
+		stove.z = z;
+		stove.x = x - 1;
+	}
+
+	return stove;
+}
+
 bool Area::isInBounds(int z, int x)
 {
 	return x < m_width && z < m_height && x >= 0 && z >= 0;
@@ -235,7 +259,9 @@ void Area::fillPaths()
 						Cell* cell = new Cell;
 						cell->x = xx;
 						cell->z = zz;
-						v_pathVector.at(getIndex(z, x)).at(getIndex(i, j)).push_front(cell);
+						// Only push the chair or start tile onto the path
+						if (getTileType(zz, xx) == TABLE_CHAIR || getTileType(zz, xx) == START)
+							v_pathVector.at(getIndex(z, x)).at(getIndex(i, j)).push_front(cell);
 
 						while (totalLength-- > 0) {
 							if (isInBounds(zz, xx - 1) && getCellPathLength(z, x, zz, xx - 1) == totalLength) {

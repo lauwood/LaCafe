@@ -56,9 +56,9 @@ void Patron::findNextDestination() {
 		m_destination.z, m_destination.x);
 	// Reserve the tile so that no two patrons can take the same tile (even when walking to it)
 	if (destinationType == TABLE_CHAIR) {
-		Cell tableCell = m_area->getAdjacentTable(m_destination.z, m_destination.x);
+		m_tableCell = m_area->getAdjacentTable(m_destination.z, m_destination.x);
 		m_area->setTileStatus(m_destination.z, m_destination.x, RESERVED);
-		m_area->setTileStatus(tableCell.z, tableCell.x, RESERVED);
+		m_area->setTileStatus(m_tableCell.z, m_tableCell.x, RESERVED);
 	}
 
 	// Clear variable if path was found before
@@ -171,14 +171,28 @@ void Patron::wait() {
 	int decrementValue = TimeManager::Instance().DeltaTime * 1000;
 
 	if (m_isWaiting)
-		if (m_time > decrementValue) {
+		if (m_area->getTileStatus(m_tableCell.z, m_tableCell.x) == FOOD_READY) {
+			// Food arrived
+			m_isWaiting = false;
+			m_isBusy = true;
+			setTimer();
+			m_area->setTileStatus(m_tableCell.z, m_tableCell.x, EATING);
+		}
+		else if (m_time > decrementValue) {
 			m_time -= decrementValue;
 		}
 		else {
+			// If food is coming, don't leave
+			if (m_hasBeenSeated && m_area->getTileStatus(m_tableCell.z, m_tableCell.x) == FOOD_COMING)
+				return;
 			// Mark for deletion, waiting too long
 			m_time = 0;
 			m_timedOut = true;
 			findNextDestination();
 			setWalking();
+
+			// Unreserve the table and chair
+			m_area->setTileStatus(m_currentPosition.z, m_currentPosition.x, OPEN);
+			m_area->setTileStatus(m_tableCell.z, m_tableCell.x, OPEN);
 		}
 }
