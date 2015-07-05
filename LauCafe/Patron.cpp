@@ -88,7 +88,7 @@ void Patron::walk() {
 			else {
 				// Hit the end already
 				m_distance = 0;
-				m_direction = LEFT; // Arbitrary
+				m_direction = STAY;
 				arrive();
 			}
 		}
@@ -106,15 +106,14 @@ void Patron::walk() {
 		case DOWN:
 			dz = -m_distance;
 			break;
+		case STAY:
+			// Don't move if staying right after arriving
+			// Patron will "freeze" for a few frames
+			break;
 		}
 
 		m_mesh.SetPosition(vec3(m_currentPosition.z + dz, 0.5, m_currentPosition.x + dx));
 	}
-}
-
-void Patron::finishCurrentTask() {
-	findNextDestination();
-	setWalking();
 }
 
 void Patron::act() {
@@ -148,11 +147,17 @@ void Patron::arrive() {
 			findNextDestination();
 		}
 		else if (!m_hasBeenSeated) {
-		// If arrived at a table, mark it
+			// If arrived at a table, mark it
 			// Don't need to mark the chair, it's "reserved" so nobody will walk to it
 			Cell tableTile = m_area->getAdjacentTable(m_currentPosition.z, m_currentPosition.x);
 			m_area->setTileStatus(tableTile.z, tableTile.x, WAITING);
 			m_hasBeenSeated = true;
+
+			// Increment so cooks get to work ASAP
+			m_area->seatCustomer();
+
+			// Set up the table so that waiters will go to it once food is ready
+			m_area->v_waitingCustomerCells.push_back(tableTile);
 
 			finishWalking();
 			// Set a timer for the next activity

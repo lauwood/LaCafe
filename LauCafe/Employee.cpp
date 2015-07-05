@@ -19,52 +19,73 @@ void Employee::findNextDestination() {
 	if (m_role == COOK || m_role == RECEPTIONIST || m_role == BARISTA) {
 		m_destination = m_area->getAdjacentStove(m_currentPosition.z, m_currentPosition.x);
 	}
-	
-	bool foundDestination = false;
+	else {
+		if (m_role == WAITER) {
+			deque<Cell> stoveCells = m_area->v_doneCookingStoveCells;
+			deque<Cell> tableCells = m_area->v_dirtyTableCells;
 
-	if (m_role == WAITER) {
+			if (m_isIdle) {
+				// Loop through the vector for a reachable stove
+				for (int i = 0; i < stoveCells.size() && m_isIdle; i++) {
+					Cell destination(stoveCells.at(i));
+					if (m_area->getCellPathLength(
+						m_currentPosition.z, m_currentPosition.x, destination.z, destination.x)) {
+						m_isBusy = true;
+						m_isIdle = false;
+						m_isWalking = true;
+						stoveCells.erase(stoveCells.begin() + i);
+						m_destination = destination;
+					}
+				}
+			}
+			else if (m_carryingFood) {
+				for (int i = 0; i < tableCells.size(); i++) {
+					Cell destination(tableCells.at(i));
+					if (m_area->getCellPathLength(
+						m_currentPosition.z, m_currentPosition.x, destination.z, destination.x)) {
+						tableCells.erase(tableCells.begin() + i);
+						m_destination = destination;
+						break;
+					}
+				}
+			}
+		}
+		else if (m_role == DISHWASHER) {
+			if (m_isIdle) {
+				deque<Cell> dirtyCells = m_area->v_dirtyTableCells;
+				for (int i = 0; i < dirtyCells.size(); i++) {
+					Cell destination(dirtyCells.at(i));
+					if (m_area->getCellPathLength(
+						m_currentPosition.z, m_currentPosition.x, destination.z, destination.x)) {
+						dirtyCells.erase(dirtyCells.begin() + i);
+						m_destination = destination;
+						m_isIdle = false;
+						m_isBusy = true;
+						m_isWalking = true;
+						break;
+					}
+				}
+			}
+		}
+
 		if (m_isIdle) {
-			if (m_area->v_doneCookingStoveCells.size() > 0) {
-				m_destination = m_area->v_doneCookingStoveCells.back();
-				foundDestination = true;
-				m_area->v_doneCookingStoveCells.pop();
+			srand(time(NULL));
+
+			// There's nowhere to go and nothing to do, wander around
+			int x = -1;
+			int z = -1;
+
+			while (m_area->isWalkable(z, x)) {
+				x = rand() % m_area->getWidth();
+				z = rand() % m_area->getHeight();
 			}
-		}
-		else if (m_carryingFood) {
-			if (m_area->v_waitingCustomerCells.size() > 0) {
-				m_destination = m_area->v_waitingCustomerCells.back();
-				foundDestination = true;
-				m_area->v_waitingCustomerCells.pop();
-			}
+
+			m_destination.x = x;
+			m_destination.z = z;
+
+			m_isWalking = true;
 		}
 	}
-	else if(m_role == DISHWASHER) {
-		if (m_area->v_dirtyTableCells.size() > 0) {
-			m_destination = m_area->v_dirtyTableCells.back();
-			foundDestination = true;
-			m_area->v_dirtyTableCells.pop();
-		}
-	}
-
-	if (!foundDestination) {
-		srand(time(NULL));
-
-		// There's nowhere to go and nothing to do, wander around
-		int x = -1;
-		int z = -1;
-
-		while (m_area->isWalkable(z, x)) {
-			x = rand() % m_area->getWidth();
-			z = rand() % m_area->getHeight();
-		}
-
-		m_destination.x = x;
-		m_destination.z = z;
-	}
-}
-
-void Employee::finishCurrentTask() {
-	return;
 }
 
 void Employee::act() {
@@ -80,16 +101,17 @@ void Employee::act() {
 			// Waiters don't need to act
 			if (m_role == DISHWASHER) {
 				m_area->setTileStatus(m_destination.z, m_destination.x, OPEN);
+				m_isBusy = false;
+				m_isIdle = true;
 				// Prep for the next tick
 				findNextDestination();
-				setWalking();
 			}
 			else if (m_role == COOK || m_role == BARISTA) {
 				m_area->setTileStatus(m_destination.z, m_destination.x, FOOD_READY);
 				Cell stoveCell;
 				stoveCell.z = m_destination.z;
 				stoveCell.x = m_destination.x;
-				m_area->v_doneCookingStoveCells.push(stoveCell);
+				m_area->v_doneCookingStoveCells.push_back(stoveCell);
 			}
 		}
 }
@@ -129,8 +151,29 @@ void Employee::arrive() {
 
 void Employee::update() {
 	if (m_isIdle){
-		findNextDestination();
+		switch (m_role) {
+		case WAITER:
+			if (m_area->v_doneCookingStoveCells.size() > 0)
+				findNextDestination();
+			break;
+		case COOK:
+		case BARISTA:
+			if (m_area->getWaitingCustomers() > 0) {
+				m_isIdle = false;
+				m_isBusy = true;
+				m_area->setTileStatus(m_destination.z, m_destination.x, COOKING);
+				m_area->cookForCustomer();
+			}
+			break;
+		case DISHWASHER:
+			if (m_area->v_dirtyTableCells.size() > 0)
+				findNextDestination();
+			break;
+		}
 	}
+	else if (m_isBusy)
+		act();
+
 	return;
 }
 

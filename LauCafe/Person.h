@@ -7,7 +7,7 @@
 #define MAX_TIME 2000
 #define MIN_TIME 1000
 
-enum Direction {LEFT, RIGHT, UP, DOWN};
+enum Direction { LEFT, RIGHT, UP, DOWN, STAY };
 
 class Person
 {

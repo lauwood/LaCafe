@@ -13,7 +13,6 @@ public:
 
 	// Implement virtual functions
 	void findNextDestination();
-	void finishCurrentTask();
 	void act();
 	void arrive();
 	void update();
