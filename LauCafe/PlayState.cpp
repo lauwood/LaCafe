@@ -91,8 +91,8 @@ int PlayState::Initialize() {
 	g_Podium.Initialize();
 	for (int i = 0; i < g_Tables.size(); i++)
 		g_Tables.at(i).Initialize();
-	//for (int i = 0; i < g_Chairs.size(); i++)
-	//	g_Chairs.at(i).Initialize();
+	for (int i = 0; i < g_Chairs.size(); i++)
+		g_Chairs.at(i).Initialize();
 	for (int i = 0; i < g_Stoves.size(); i++)
 		g_Stoves.at(i).Initialize();
 
@@ -267,6 +267,15 @@ void PlayState::Draw() {
 		}
 		g_SquarePath->at(i).Render();
 	}
+
+	for (int i = 0; i < g_Tables.size(); i++)
+		g_Tables.at(i).Render();
+
+	for (int i = 0; i < g_Stoves.size(); i++)
+		g_Stoves.at(i).Render();
+
+	for (int i = 0; i < g_Chairs.size(); i++)
+		g_Chairs.at(i).Render();
 
 	g_Podium.Render();
 

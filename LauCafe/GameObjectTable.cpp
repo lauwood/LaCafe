@@ -15,11 +15,11 @@ void GameObjectTable::Initialize() {
 	leg2.Initialize(Model::square, 6, GL_TRIANGLES, "Shaders/Banana_vs.glsl", "Shaders/Banana_fs.glsl");
 	leg3.Initialize(Model::square, 6, GL_TRIANGLES, "Shaders/Banana_vs.glsl", "Shaders/Banana_fs.glsl");
 	leg4.Initialize(Model::square, 6, GL_TRIANGLES, "Shaders/Banana_vs.glsl", "Shaders/Banana_fs.glsl");
-	model.SetPosition(vec3(0, 1, 0));
-	leg1.SetPosition(vec3(-0.4, Y_OFFSET, -0.4));
-	leg2.SetPosition(vec3(-0.4, Y_OFFSET, 0.4));
-	leg3.SetPosition(vec3(0.4, Y_OFFSET, -0.4));
-	leg4.SetPosition(vec3(0.4, Y_OFFSET, 0.4));
+	model.SetPosition(vec3(x, 1, z));
+	leg1.SetPosition(vec3(x-0.4, Y_OFFSET, z-0.4));
+	leg2.SetPosition(vec3(x-0.4, Y_OFFSET, z+0.4));
+	leg3.SetPosition(vec3(x+0.4, Y_OFFSET, z-0.4));
+	leg4.SetPosition(vec3(x+0.4, Y_OFFSET, z+0.4));
 
 	model.SetScale(vec3(0.5, 0.5, 0.5));
 	leg1.SetScale(vec3(0.1, 0.5, 0.1));
