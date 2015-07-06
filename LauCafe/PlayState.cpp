@@ -16,6 +16,17 @@
 PlayState::PlayState(GLFWwindow* window, Area* area) : GameState(window) {
 	a = area;
 	a->setTile(2, 2, RECEPTION);
+	a->setTile(5, 0, TABLE_CHAIR);
+	a->setTile(5, 2, TABLE_CHAIR);
+	a->setTile(5, 4, TABLE_CHAIR);
+	a->setTile(6, 0, TABLE);
+	a->setTile(6, 2, TABLE);
+	a->setTile(6, 4, TABLE);
+	a->setTile(2, 5, STOVE);
+	a->setTile(2, 6, STOVE_WORKER);
+	a->setTile(4, 5, STOVE);
+	a->setTile(4, 6, STOVE_WORKER);
+
 	a->fillPaths();
 	Initialize();
 }
@@ -43,7 +54,6 @@ int PlayState::Initialize() {
 
 	g_Axis.Initialize(Model::axis, 6, GL_LINES, "Shaders/Shader_vs.glsl", "Shaders/Shader_fs.glsl");
 	g_Axis.SetPosition(vec3(0, 0, 0));
-	g_Table.Initialize();
 	
 	glEnable(GL_DEPTH_TEST); // enable depth-testing
 	glDepthFunc(GL_LESS); // depth-testing interprets a smaller value as "closer"
@@ -58,6 +68,33 @@ int PlayState::Initialize() {
 		g_SquarePath->at(i).SetPosition(vec3(i / 10, Y_OFFSET, i % 10));
 		g_SquarePath->at(i).SetScale(vec3(0.5, 0.5, 0.5));
 	}
+
+	for (int i = 0; i < a->getHeight(); i++)
+		for (int j = 0; j < a->getWidth(); j++) {
+			TileType tileType = a->getTileType(i, j);
+			switch (tileType) {
+			case TABLE:
+				g_Tables.push_back(GameObjectTable(i, j));
+				break;
+			case TABLE_CHAIR:
+				g_Chairs.push_back(GameObjectChair(i, j));
+				break;
+			case STOVE:
+				g_Stoves.push_back(GameObjectStove(i, j));
+				break;
+			case RECEPTION:
+				g_Podium = GameObjectPodium(i, j);
+				break;
+			}
+		}
+
+	g_Podium.Initialize();
+	for (int i = 0; i < g_Tables.size(); i++)
+		g_Tables.at(i).Initialize();
+	//for (int i = 0; i < g_Chairs.size(); i++)
+	//	g_Chairs.at(i).Initialize();
+	for (int i = 0; i < g_Stoves.size(); i++)
+		g_Stoves.at(i).Initialize();
 
 	return INIT_OK; // OK
 }
@@ -231,7 +268,7 @@ void PlayState::Draw() {
 		g_SquarePath->at(i).Render();
 	}
 
-	g_Table.Render();
+	g_Podium.Render();
 
 	glfwSwapBuffers(window);
 }

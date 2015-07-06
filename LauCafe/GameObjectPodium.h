@@ -6,7 +6,8 @@
 
 class GameObjectPodium : public GameObject {
 public:
-	GameObjectPodium();
+	GameObjectPodium() {}
+	GameObjectPodium(int z, int x);
 	~GameObjectPodium();
 
 	void Initialize();

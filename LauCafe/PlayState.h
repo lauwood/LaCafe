@@ -49,8 +49,11 @@ private:
 	
 	Model g_Axis;
 	Floor g_Floor;
-	GameObjectPodium g_Table;
+	GameObjectPodium g_Podium;
 	
+	std::vector<GameObjectChair> g_Chairs;
+	std::vector<GameObjectTable> g_Tables;
+	std::vector<GameObjectStove> g_Stoves;
 	std::vector<Model> *g_SquarePath;
 	std::vector<Patron*> g_Patron;
 

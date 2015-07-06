@@ -6,7 +6,8 @@
 
 class GameObjectChair : public GameObject {
 public:
-	GameObjectChair();
+	GameObjectChair() {}
+	GameObjectChair(int z, int x);
 	~GameObjectChair();
 
 	void Initialize();

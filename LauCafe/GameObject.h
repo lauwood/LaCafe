@@ -7,8 +7,9 @@ using namespace glm;
 
 class GameObject {
 public:
-	GameObject()		{}
-	~GameObject()		{}
+	GameObject()				{}
+	GameObject(int z, int x)	{ this->z = z; this->x = x; }
+	~GameObject()				{}
 
 	virtual void Initialize() = 0;
 	virtual void Render() = 0;
@@ -26,6 +27,9 @@ protected:
 	vec3 position;
 	vec3 rotation;
 	vec3 scale;
+
+	int z;
+	int x;
 };
 
 #endif

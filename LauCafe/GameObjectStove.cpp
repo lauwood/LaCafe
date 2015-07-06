@@ -1,6 +1,6 @@
 #include "GameObjectStove.h"
 
-GameObjectStove::GameObjectStove() {
+GameObjectStove::GameObjectStove(int z, int x) : GameObject(z, x) {
 }
 
 GameObjectStove::~GameObjectStove() {

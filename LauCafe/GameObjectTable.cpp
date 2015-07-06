@@ -2,7 +2,7 @@
 
 #define Y_OFFSET 0.75
 
-GameObjectTable::GameObjectTable() {
+GameObjectTable::GameObjectTable(int z, int x) : GameObject(z, x) {
 }
 
 GameObjectTable::~GameObjectTable() {

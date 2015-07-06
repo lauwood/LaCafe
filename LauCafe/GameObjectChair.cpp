@@ -1,6 +1,6 @@
 #include "GameObjectChair.h"
 
-GameObjectChair::GameObjectChair() {
+GameObjectChair::GameObjectChair(int z, int x) : GameObject(z, x) {
 }
 
 GameObjectChair::~GameObjectChair() {
