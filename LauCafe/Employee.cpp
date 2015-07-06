@@ -7,6 +7,7 @@ Employee::Employee(Area* area)
 {
 	m_isIdle = true;
 	m_carryingFood = false;
+	m_isWalking = false;
 }
 
 
@@ -43,6 +44,7 @@ void Employee::findNextDestination() {
 					Cell destination(tableCells.at(i));
 					if (m_area->getCellPathLength(
 						m_currentPosition.z, m_currentPosition.x, destination.z, destination.x)) {
+						// No need to set walking, should be already walking
 						tableCells.erase(tableCells.begin() + i);
 						m_destination = destination;
 						break;
@@ -70,20 +72,25 @@ void Employee::findNextDestination() {
 
 		if (m_isIdle) {
 			srand(time(NULL));
+			
+			// Need a better algorithm, this doesn't "scale" with lag
+			// Have a chance to idle
+			if (rand() % 1000 < 950) {
+				// There's nowhere to go and nothing to do, wander around
+				int x = -1;
+				int z = -1;
 
-			// There's nowhere to go and nothing to do, wander around
-			int x = -1;
-			int z = -1;
+				while (m_area->isWalkable(z, x)) {
+					x = rand() % m_area->getWidth();
+					z = rand() % m_area->getHeight();
+				}
 
-			while (m_area->isWalkable(z, x)) {
-				x = rand() % m_area->getWidth();
-				z = rand() % m_area->getHeight();
+				m_destination.x = x;
+				m_destination.z = z;
+
+				m_isWalking = true;
 			}
-
-			m_destination.x = x;
-			m_destination.z = z;
-
-			m_isWalking = true;
+			else m_isWalking = false;
 		}
 	}
 }
@@ -117,6 +124,8 @@ void Employee::act() {
 }
 
 void Employee::arrive() {
+	m_isWalking = false;
+
 	switch(m_role) {
 	case WAITER:
 		if (!m_carryingFood) {
@@ -144,16 +153,23 @@ void Employee::arrive() {
 		}
 		break;
 	case COOK:
+	case BARISTA:
 		// Do nothing
 		break;
 	}
 }
 
 void Employee::update() {
+	/*
+	 * Employees should update their status when:
+	 *	1. They're idle (obviously), get the next task (if available)
+	 *	2. For movers, when they arrive at their random destination
+	 *		while wandering while idle
+	 */
 	if (m_isIdle){
 		switch (m_role) {
 		case WAITER:
-			if (m_area->v_doneCookingStoveCells.size() > 0)
+			if (m_area->v_doneCookingStoveCells.size() > 0 || !m_isIdle)
 				findNextDestination();
 			break;
 		case COOK:
@@ -166,7 +182,7 @@ void Employee::update() {
 			}
 			break;
 		case DISHWASHER:
-			if (m_area->v_dirtyTableCells.size() > 0)
+			if (m_area->v_dirtyTableCells.size() > 0 || !m_isIdle)
 				findNextDestination();
 			break;
 		}

@@ -18,7 +18,6 @@ public:
 
 	// Virtual functions for all people
 	virtual void findNextDestination() = 0;
-	virtual void finishCurrentTask() = 0;
 	virtual void act() = 0;
 	virtual void arrive() = 0;
 	virtual void update() = 0;
