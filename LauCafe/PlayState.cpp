@@ -15,6 +15,7 @@
 
 PlayState::PlayState(GLFWwindow* window, Area* area) : GameState(window) {
 	a = area;
+	a->setTile(2, 2, RECEPTION);
 	a->fillPaths();
 	Initialize();
 }
@@ -142,14 +143,14 @@ void PlayState::Input() {
 						// Clear the previous paths
 						for (int k = 0; k < a->getHeight(); k++)
 							for (int l = 0; l < a->getWidth(); l++) {
-							if (a->getTileType(k, l) == RECEPTION)
-								a->setTile(k, l, WALKABLE);
+								if (a->getTileType(k, l) == TABLE_CHAIR)
+									a->setTile(k, l, WALKABLE);
 							g_SquarePath->at(l + a->getHeight() * k).Unpath();
 							}
 
 						// To only allow one destination
 						if (a->getTileType(closest_square_clicked / 10, closest_square_clicked % 10) == WALKABLE)
-							a->setTile(closest_square_clicked / 10, closest_square_clicked % 10, RECEPTION);
+							a->setTile(closest_square_clicked / 10, closest_square_clicked % 10, TABLE_CHAIR);
 
 						a->fillPaths();
 

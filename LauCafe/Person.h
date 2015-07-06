@@ -7,7 +7,7 @@
 #define MAX_TIME 2000
 #define MIN_TIME 1000
 
-enum Direction {LEFT, RIGHT, UP, DOWN};
+enum Direction { LEFT, RIGHT, UP, DOWN, STAY };
 
 class Person
 {
@@ -18,7 +18,6 @@ public:
 
 	// Virtual functions for all people
 	virtual void findNextDestination() = 0;
-	virtual void finishCurrentTask() = 0;
 	virtual void act() = 0;
 	virtual void arrive() = 0;
 	virtual void update() = 0;
