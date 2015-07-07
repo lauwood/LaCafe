@@ -10,11 +10,11 @@ public:
 	GameObjectPodium(int z, int x);
 	~GameObjectPodium();
 
-	void Initialize();
+	void Initialize(Mesh *PodiumModel);
 	void Render();
 
 private:
-	Mesh model;
+	Mesh *model;
 };
 
 #endif

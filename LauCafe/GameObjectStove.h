@@ -10,11 +10,11 @@ public:
 	GameObjectStove(int z, int x);
 	~GameObjectStove();
 
-	void Initialize();
+	void Initialize(Mesh *StoveModel);
 	void Render();
 
 private:
-	Mesh model;
+	Mesh *model;
 };
 
 #endif

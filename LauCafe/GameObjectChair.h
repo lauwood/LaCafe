@@ -10,11 +10,11 @@ public:
 	GameObjectChair(int z, int x);
 	~GameObjectChair();
 
-	void Initialize();
+	void Initialize(Mesh* ChairModel);
 	void Render();
 
 private:
-	Mesh model;
+	Mesh *model;
 };
 
 #endif
