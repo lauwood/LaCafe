@@ -252,14 +252,10 @@ void PlayState::Update() {
 ////////////////////////////////////////////////////////////////////////////////
 
 void PlayState::Draw() {
-	// timers
-	UpdateFPSCounter(window);
-
-	// Clear the screen
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	//Skybox.Render();
-	
+	glEnable(GL_DEPTH_TEST);
 	glDisable(GL_CULL_FACE);
+
 	g_Floor.Render();
 	for (int i = 0; i < g_Patron.size(); i++)
 		g_Patron.at(i)->Render();
@@ -284,8 +280,6 @@ void PlayState::Draw() {
 		g_Chairs.at(i).Render();
 
 	g_Podium.Render();
-
-	glfwSwapBuffers(window);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

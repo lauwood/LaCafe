@@ -17,6 +17,9 @@
       <UniqueIdentifier>{39d35e0e-fb3a-4434-a6b8-c4f29ea08290}</UniqueIdentifier>
       <Extensions>glsl</Extensions>
     </Filter>
+    <Filter Include="imgui">
+      <UniqueIdentifier>{f88cd82b-b785-42ef-9dfa-ebd0853c7d75}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Main.h">
@@ -100,6 +103,24 @@
     <ClInclude Include="GameObjectPodium.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="imgui\imgui_impl_glfw_gl3.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui\stb_rect_pack.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui\stb_textedit.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui\stb_truetype.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui\imconfig.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui\imgui.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -173,6 +194,12 @@
     </ClCompile>
     <ClCompile Include="GameObjectPodium.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="imgui\imgui_impl_glfw_gl3.cpp">
+      <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="imgui\imgui.cpp">
+      <Filter>imgui</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
