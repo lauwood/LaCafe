@@ -23,7 +23,7 @@ public:
 	void update();
 	void wait();
 
-	void setRole(Role);
+	void setRole(Role r) { m_role = r; }
 private:
 	Role m_role;
 	bool m_isIdle;

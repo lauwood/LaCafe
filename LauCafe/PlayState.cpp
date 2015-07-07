@@ -77,7 +77,7 @@ int PlayState::Initialize() {
 				g_Tables.push_back(GameObjectTable(i, j));
 				break;
 			case TABLE_CHAIR:
-				g_Chairs.push_back(GameObjectChair(i, j));
+				//g_Chairs.push_back(GameObjectChair(i, j));
 				break;
 			case STOVE:
 				g_Stoves.push_back(GameObjectStove(i, j));
@@ -95,6 +95,9 @@ int PlayState::Initialize() {
 		g_Chairs.at(i).Initialize();
 	for (int i = 0; i < g_Stoves.size(); i++)
 		g_Stoves.at(i).Initialize();
+
+	g_Receptionist = Employee(a);
+	g_Receptionist.setRole(RECEPTIONIST);
 
 	return INIT_OK; // OK
 }
@@ -167,7 +170,7 @@ void PlayState::Input() {
 
 			int closest_square_clicked = -1;
 			float closest_intersection = 0.0f;
-			for (int i = 0; i < NUM_OF_SQUARES; i++) {
+			/*for (int i = 0; i < NUM_OF_SQUARES; i++) {
 				float t_dist = 0.0f;
 				if (RayIntersect(Globals::Camera.GetPosition(), ray_wor, g_SquarePath->at(i).GetPosition(), SquareRadius, &t_dist)) {
 					// if more than one sphere is in path of ray, only use the closest one
@@ -217,7 +220,7 @@ void PlayState::Input() {
 					}
 				}
 			}
-			SelectedSquare = closest_square_clicked;
+			SelectedSquare = closest_square_clicked;*/
 
 			g_Patron.push_back(new Patron(a));
 			//fprintf(stdout, "center of square: x: %.2f, z: %.2f", g_SquarePath->at(SelectedSquare).GetPosition().x, g_SquarePath->at(SelectedSquare).GetPosition().z);
@@ -241,6 +244,7 @@ void PlayState::Update() {
 		}
 	}
 	
+	g_Receptionist.update();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

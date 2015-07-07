@@ -9,7 +9,7 @@ GameObjectStove::~GameObjectStove() {
 
 void GameObjectStove::Initialize() {
 	model = Mesh("Models/stove.fbx", "Shaders/Banana_vs.glsl", "Shaders/Banana_fs.glsl");
-	model.SetPosition(vec3(x, 0.5, z));
+	model.SetPosition(vec3(z, 0.5, x));
 	model.SetScale(vec3(0.01, 0.01, 0.01));
 }
 

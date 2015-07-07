@@ -51,6 +51,10 @@ void Patron::findNextDestination() {
 			}
 	}
 
+	if (!foundDestination)
+		// Still haven't found a destination, leave!
+		m_destination = m_area->getStart();
+
 	// Set the path of the patron to that of the path array
 	m_pathToNextDestination = m_area->getCellPath(m_currentPosition.z, m_currentPosition.x,
 		m_destination.z, m_destination.x);
@@ -60,6 +64,8 @@ void Patron::findNextDestination() {
 		m_area->setTileStatus(m_destination.z, m_destination.x, RESERVED);
 		m_area->setTileStatus(m_tableCell.z, m_tableCell.x, RESERVED);
 	}
+
+	m_isWalking = true;
 
 	// Clear variable if path was found before
 	m_pathIndex = 0;
@@ -142,11 +148,7 @@ void Patron::arrive() {
 		m_canDelete = true;
 	}
 	else {
-		if (!m_hasBeenDirected) {
-			m_hasBeenDirected = true;
-			findNextDestination();
-		}
-		else if (!m_hasBeenSeated) {
+		if (!m_hasBeenSeated) {
 			// If arrived at a table, mark it
 			// Don't need to mark the chair, it's "reserved" so nobody will walk to it
 			Cell tableTile = m_area->getAdjacentTable(m_currentPosition.z, m_currentPosition.x);
@@ -179,7 +181,12 @@ void Patron::update() {
 void Patron::wait() {
 	int decrementValue = TimeManager::Instance().DeltaTime * 1000;
 
-	if (m_isWaiting)
+	if (!m_hasBeenDirected && m_area->recStatus == R_READY) {
+		m_hasBeenDirected = true;
+		findNextDestination();
+		m_area->recStatus = R_JUST_DIRECTED;
+	}
+	else if (m_isWaiting)
 		if (m_area->getTileStatus(m_tableCell.z, m_tableCell.x) == FOOD_READY) {
 			// Food arrived
 			m_isWaiting = false;

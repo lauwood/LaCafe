@@ -9,7 +9,7 @@ GameObjectPodium::~GameObjectPodium() {
 
 void GameObjectPodium::Initialize() {
 	model = Mesh("Models/Podium.fbx", "Shaders/Banana_vs.glsl", "Shaders/Banana_fs.glsl");
-	model.SetPosition(vec3(x, 0, z));
+	model.SetPosition(vec3(z, 0, x));
 	model.SetScale(vec3(0.9, 0.9, 0.9));
 }
 
