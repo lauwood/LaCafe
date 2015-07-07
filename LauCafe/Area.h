@@ -8,6 +8,7 @@ using namespace std;
 enum TileType { WALKABLE, START, OBSTACLE, RECEPTION, RECEPTION_WORKER, TABLE, TABLE_CHAIR, STOVE,
 	STOVE_WORKER, BAR, BAR_WORKER, TOILET, INVALID_TYPE};
 enum TileStatus { OPEN, RESERVED, COOKING, FOOD_COMING, FOOD_READY, WAITING, EATING, DIRTY, CLEANING, INVALID_STATUS };
+enum ReceptionistStatus { R_READY, R_JUST_DIRECTED, R_COOLDOWN };
 
 // Represents a single tile in the array
 struct Cell {
@@ -68,6 +69,8 @@ public:
 	deque<Cell> v_waitingCustomerCells;
 	deque<Cell> v_doneCookingStoveCells;
 	deque<Cell> v_dirtyTableCells;
+
+	ReceptionistStatus recStatus;
 private:
 	// This function is private to prevent accessing the right cell easily
 	int getIndex(int z, int x);

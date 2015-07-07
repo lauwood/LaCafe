@@ -40,6 +40,8 @@ Area::Area(int height, int width, int sz, int sx)
 	setTile(sz, sx, START);
 
 	m_waitingCustomers = 0;
+
+	recStatus = R_READY;
 }
 
 Area::Area(int height, int width, int sz, int sx, vector<TileType> existingVector)
@@ -75,6 +77,8 @@ Area::Area(int height, int width, int sz, int sx, vector<TileType> existingVecto
 	setTile(sz, sx, START);
 
 	m_waitingCustomers = 0;
+
+	recStatus = R_READY;
 }
 
 Area::~Area()

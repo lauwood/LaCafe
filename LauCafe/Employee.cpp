@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <time.h>
 
-Employee::Employee(Area* area)
+Employee::Employee(Area* area) : Person(area)
 {
 	m_isIdle = true;
 	m_carryingFood = false;
@@ -120,6 +120,12 @@ void Employee::act() {
 				stoveCell.x = m_destination.x;
 				m_area->v_doneCookingStoveCells.push_back(stoveCell);
 			}
+			else {
+				// Receptionists only
+				m_isBusy = false;
+				m_isIdle = true;
+				m_area->recStatus = R_READY;
+			}
 		}
 }
 
@@ -185,6 +191,13 @@ void Employee::update() {
 			if (m_area->v_dirtyTableCells.size() > 0 || !m_isIdle)
 				findNextDestination();
 			break;
+		case RECEPTIONIST:
+			if (m_area->recStatus == R_JUST_DIRECTED) {
+				m_area->recStatus = R_COOLDOWN;
+				setTimer();
+				m_isIdle = false;
+				m_isBusy = true;
+			}
 		}
 	}
 	else if (m_isBusy)

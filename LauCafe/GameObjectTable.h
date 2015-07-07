@@ -6,7 +6,8 @@
 
 class GameObjectTable : public GameObject {
 public:
-	GameObjectTable();
+	GameObjectTable() {}
+	GameObjectTable(int z, int x);
 	~GameObjectTable();
 
 	void Initialize();

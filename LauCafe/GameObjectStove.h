@@ -6,7 +6,8 @@
 
 class GameObjectStove : public GameObject {
 public:
-	GameObjectStove();
+	GameObjectStove() {}
+	GameObjectStove(int z, int x);
 	~GameObjectStove();
 
 	void Initialize();
