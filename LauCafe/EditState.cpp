@@ -56,11 +56,6 @@ void EditState::Update() {
 }
 
 void EditState::Draw() {
-	// timers
-	UpdateFPSCounter(window);
-
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
 	for (int i = 0; i < NUM_OF_SQUARES; i++) {
 		if (SelectedSquare == i) {
 			g_SquarePath->at(i).Select();
@@ -70,5 +65,4 @@ void EditState::Draw() {
 		}
 		g_SquarePath->at(i).Render();
 	}
-	glfwSwapBuffers(window);
 }

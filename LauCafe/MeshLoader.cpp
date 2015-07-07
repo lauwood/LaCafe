@@ -30,7 +30,6 @@ void MeshEntry::Init(const std::vector<aiVector3D>& CachedPositions, const std::
 }
 
 Mesh::Mesh(const Mesh& mesh, std::string vert, std::string frag) {
-	std::cout << "Mesh:: deep copy " << std::endl;
 	m_Entries = mesh.m_Entries;
 	CachedPositions = mesh.CachedPositions;
 	CachedNormals = mesh.CachedNormals;
@@ -45,7 +44,7 @@ Mesh::Mesh(const Mesh& mesh, std::string vert, std::string frag) {
 	CurrentTime = 0;
 	LastPlaying = 0;
 
-	//memset(m_Buffers, 0, sizeof(m_Buffers)); 
+	memset(m_Buffers, 0, sizeof(m_Buffers)); 
 	
 	LoadVBO();
 }

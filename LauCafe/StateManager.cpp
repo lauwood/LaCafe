@@ -4,8 +4,11 @@
 
 #include "StateManager.h"
 #include "TimeManager.h"
+#include "imgui/imgui.h"
+#include "imgui/imgui_impl_glfw_gl3.h"
 
 static StateManager* StateMan;
+bool ShowDebugger = true;
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -35,6 +38,7 @@ void StateManager::KeyCallback(GLFWwindow* window, int key, int scancode, int ac
 			break;
 		case GLFW_KEY_F2:
 			fprintf(stdout, "F2 pressed");
+			ShowDebugger = !ShowDebugger;
 			break;
 		}
 	}
@@ -88,12 +92,33 @@ StateManager::StateManager(GLFWwindow* window) {
 ////////////////////////////////////////////////////////////////////////////////
 
 void StateManager::GameLoop() {
+	ImGui_ImplGlfwGL3_Init(window, false);
+
+	ImVec4 clear_color = ImColor(114, 144, 154);
+
 	while (!glfwWindowShouldClose(GetWindow())) {
 		TimeManager::Instance().CalculateFrameRate(false);
+		// timers
+		UpdateFPSCounter(window);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+
+		ImGuiIO& io = ImGui::GetIO();
+		glfwPollEvents();
+		ImGui_ImplGlfwGL3_NewFrame();
+
+		if (ShowDebugger) {
+			ImGui::Text("Debugger (hide with F2)");
+			ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+		}
 
 		Input();
 		Update();
 		Draw();
+
+		glViewport(0, 0, (int)io.DisplaySize.x, (int)io.DisplaySize.y);
+		ImGui::Render();
+		glfwSwapBuffers(window);
 	}
 }
 
