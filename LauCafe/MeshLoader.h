@@ -43,14 +43,19 @@ public:
 
 	Mesh() {};
 	~Mesh();
+
+	Mesh(const Mesh& mesh, std::string vert, std::string frag);
 	Mesh(const char* filename, std::string vert, std::string frag);
 
+	bool LoadAsset(const char* filename);
 	void LoadScene();
 	void LoadMesh(unsigned int index, const aiMesh* mesh, 
 				  std::vector<aiVector3D>& CachedPositions, 
 				  std::vector<aiVector3D>& CachedNormals, 
 				  std::vector<aiVector2D>& TexCoords, 
 				  std::vector<unsigned int>& Indices);
+
+	void LoadVBO();
 	
 	// Renders the mesh using VBOs
 	void Render();
@@ -85,11 +90,6 @@ private:
 	double CurrentTime;
 	double LastPlaying;
 
-	bool LoadAsset(const char* filename);
-	void CalculateBones(const aiNode* node);
-
-	void RenderMesh(const aiNode* node);
-
 	const aiScene* m_Scene;
 	SceneAnimator* mAnimator;
 
@@ -114,6 +114,9 @@ private:
 	vec3 Scale;											// The model's scale
 
 	Shader m_Shader;
+
+	void CalculateBones(const aiNode* node);
+	void RenderMesh();
 };
 
 #endif

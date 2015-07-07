@@ -29,6 +29,27 @@ void MeshEntry::Init(const std::vector<aiVector3D>& CachedPositions, const std::
 	NumIndices = Indices.size();
 }
 
+Mesh::Mesh(const Mesh& mesh, std::string vert, std::string frag) {
+	std::cout << "Mesh:: deep copy " << std::endl;
+	m_Entries = mesh.m_Entries;
+	CachedPositions = mesh.CachedPositions;
+	CachedNormals = mesh.CachedNormals;
+	TexCoords = mesh.TexCoords;
+	Indices = mesh.Indices;
+
+	m_Shader = mesh.m_Shader;
+	m_ForceNoBones = false;
+	m_Scene = NULL;
+	m_VAO = 0;
+
+	CurrentTime = 0;
+	LastPlaying = 0;
+
+	//memset(m_Buffers, 0, sizeof(m_Buffers)); 
+	
+	LoadVBO();
+}
+
 Mesh::Mesh(const char* filename, std::string vert, std::string frag) {
 	m_Shader.Initialize(vert, frag);
 	m_ForceNoBones = false;
@@ -45,6 +66,8 @@ Mesh::Mesh(const char* filename, std::string vert, std::string frag) {
 		std::cout << "Error loading file" << std::endl;
 	};
 	std::cout << "Mesh:: finished " << std::endl;
+
+	LoadVBO();
 }
 
 Mesh::~Mesh() {
@@ -58,11 +81,6 @@ Mesh::~Mesh() {
 }
 
 bool Mesh::LoadAsset(const char* filename) {
-	glGenVertexArrays(1, &m_VAO);
-	glBindVertexArray(m_VAO);
-
-	glGenBuffers(sizeof(m_Buffers) / sizeof(m_Buffers[0]), m_Buffers);
-
 	m_Scene = aiImportFile(filename, aiProcessPreset_TargetRealtime_MaxQuality);
 
 	if (!m_Scene) {
@@ -116,25 +134,6 @@ void Mesh::LoadScene() {
 		const aiMesh* mesh = m_Scene->mMeshes[i];
 		LoadMesh(i, mesh, CachedPositions, CachedNormals, TexCoords, Indices);
 	}
-
-	glBindBuffer(GL_ARRAY_BUFFER, m_Buffers[POS_VB]);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(CachedPositions[0]) * CachedPositions.size(), &CachedPositions[0], GL_DYNAMIC_DRAW);
-
-	glEnableVertexAttribArray(POSITION_LOCATION);
-	glVertexAttribPointer(POSITION_LOCATION, 3, GL_FLOAT, GL_FALSE, 0, 0);
-
-	glBindBuffer(GL_ARRAY_BUFFER, m_Buffers[NORMAL_VB]);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(CachedNormals[0]) * CachedNormals.size(), &CachedNormals[0], GL_DYNAMIC_DRAW);
-	glEnableVertexAttribArray(NORMAL_LOCATION);
-	glVertexAttribPointer(NORMAL_LOCATION, 3, GL_FLOAT, GL_FALSE, 0, 0);
-
-	glBindBuffer(GL_ARRAY_BUFFER, m_Buffers[TEXCOORD_VB]);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(TexCoords[0]) * TexCoords.size(), &TexCoords[0], GL_DYNAMIC_DRAW);
-	glEnableVertexAttribArray(TEX_COORD_LOCATION);
-	glVertexAttribPointer(TEX_COORD_LOCATION, 2, GL_FLOAT, GL_FALSE, 0, 0);
-
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_Buffers[INDEX_BUFFER]);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(Indices[0]) * Indices.size(), &Indices[0], GL_DYNAMIC_DRAW);
 }
 
 void Mesh::LoadMesh(unsigned int index, const aiMesh* mesh, std::vector<aiVector3D>& CachedPositions, std::vector<aiVector3D>& CachedNormals, std::vector<aiVector2D>& TexCoords, std::vector<unsigned int>& Indices) {
@@ -168,7 +167,33 @@ void Mesh::SetAnimation(unsigned int index) {
 	}
 }
 
-void Mesh::RenderMesh(const aiNode* node) {
+void Mesh::LoadVBO() {
+	glGenVertexArrays(1, &m_VAO);
+	glBindVertexArray(m_VAO);
+
+	glGenBuffers(sizeof(m_Buffers) / sizeof(m_Buffers[0]), m_Buffers);
+
+	glBindBuffer(GL_ARRAY_BUFFER, m_Buffers[POS_VB]);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(CachedPositions[0]) * CachedPositions.size(), &CachedPositions[0], GL_DYNAMIC_DRAW);
+
+	glEnableVertexAttribArray(POSITION_LOCATION);
+	glVertexAttribPointer(POSITION_LOCATION, 3, GL_FLOAT, GL_FALSE, 0, 0);
+
+	glBindBuffer(GL_ARRAY_BUFFER, m_Buffers[NORMAL_VB]);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(CachedNormals[0]) * CachedNormals.size(), &CachedNormals[0], GL_DYNAMIC_DRAW);
+	glEnableVertexAttribArray(NORMAL_LOCATION);
+	glVertexAttribPointer(NORMAL_LOCATION, 3, GL_FLOAT, GL_FALSE, 0, 0);
+
+	glBindBuffer(GL_ARRAY_BUFFER, m_Buffers[TEXCOORD_VB]);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(TexCoords[0]) * TexCoords.size(), &TexCoords[0], GL_DYNAMIC_DRAW);
+	glEnableVertexAttribArray(TEX_COORD_LOCATION);
+	glVertexAttribPointer(TEX_COORD_LOCATION, 2, GL_FLOAT, GL_FALSE, 0, 0);
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_Buffers[INDEX_BUFFER]);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(Indices[0]) * Indices.size(), &Indices[0], GL_DYNAMIC_DRAW);
+}
+
+void Mesh::RenderMesh() {
 	m_Shader.Bind();
 
 	mat4 projectionMatrix = Globals::Camera.GetProjectionMatrix();
@@ -256,5 +281,5 @@ void Mesh::CalculateBones(const aiNode* node) {
 
 void Mesh::Render() {
 //	CalculateBones(m_Scene->mRootNode);
-	RenderMesh(m_Scene->mRootNode);
+	RenderMesh();
 }

@@ -50,6 +50,7 @@ private:
 	
 	Model g_Axis;
 	Floor g_Floor;
+	Mesh Dude;
 	GameObjectPodium g_Podium;
 	
 	std::vector<GameObjectChair> g_Chairs;
