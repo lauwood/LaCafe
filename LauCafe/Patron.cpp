@@ -142,26 +142,26 @@ void Patron::act() {
 
 void Patron::arrive() {
 	m_pathIndex = 0;
+
+	finishWalking();
+
 	Cell start = m_area->getStart();
 	if (m_currentPosition.x == start.x && m_currentPosition.z == start.z) {
 		// Customer is done and we can mark this for deletion
 		m_canDelete = true;
 	}
 	else {
-		if (!m_hasBeenSeated) {
+		if (!m_hasBeenSeated && m_hasBeenDirected) {
 			// If arrived at a table, mark it
 			// Don't need to mark the chair, it's "reserved" so nobody will walk to it
 			Cell tableTile = m_area->getAdjacentTable(m_currentPosition.z, m_currentPosition.x);
 			m_area->setTileStatus(tableTile.z, tableTile.x, WAITING);
-			m_hasBeenSeated = true;
 
 			// Increment so cooks get to work ASAP
 			m_area->seatCustomer();
 
 			// Set up the table so that waiters will go to it once food is ready
 			m_area->v_waitingCustomerCells.push_back(tableTile);
-
-			finishWalking();
 			// Set a timer for the next activity
 			setTimer();
 		}
@@ -184,7 +184,15 @@ void Patron::wait() {
 	if (!m_hasBeenDirected && m_area->recStatus == R_READY) {
 		m_hasBeenDirected = true;
 		findNextDestination();
-		m_area->recStatus = R_JUST_DIRECTED;
+		if (m_area->getTileType(m_destination.z, m_destination.x) == TABLE_CHAIR) {
+			m_area->recStatus = R_JUST_DIRECTED;
+
+			// If arrived at a table, mark it
+			// Don't need to mark the chair, it's "reserved" so nobody will walk to it
+			Cell tableTile = m_area->getAdjacentTable(m_destination.z, m_destination.x);
+			m_area->setTileStatus(tableTile.z, tableTile.x, RESERVED);
+			m_hasBeenSeated = true;
+		}
 	}
 	else if (m_isWaiting)
 		if (m_area->getTileStatus(m_tableCell.z, m_tableCell.x) == FOOD_READY) {
