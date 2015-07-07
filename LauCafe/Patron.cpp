@@ -2,9 +2,13 @@
 #include "TimeManager.h"
 
 Patron::Patron(Area* area, Mesh dude) : Person(area) {
+	Cell entrance = area->getStart();
+	m_currentPosition.x = entrance.x;
+	m_currentPosition.z = entrance.z;
+
 	// Initialize model and shader
 	m_mesh = Mesh(dude, "Shaders/Banana_vs.glsl", "Shaders/Banana_fs.glsl");
-	m_mesh.SetPosition(vec3(0, 0.5, 0));
+	m_mesh.SetPosition(vec3(m_currentPosition.z, 0.5, m_currentPosition.x));
 	m_mesh.SetScale(vec3(0.5, 0.5, 0.5));
 
 	// Initialize status variables
@@ -14,10 +18,6 @@ Patron::Patron(Area* area, Mesh dude) : Person(area) {
 	m_hasBeenSeated = false;
 	m_hasEaten = false;
 	m_timedOut = false;
-
-	Cell entrance = area->getStart();
-	m_currentPosition.x = entrance.x;
-	m_currentPosition.z = entrance.z;
 
 	// Immediately find the next destination so it can start walking right away
 	findNextDestination();

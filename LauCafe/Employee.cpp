@@ -18,7 +18,7 @@ Employee::~Employee()
 void Employee::findNextDestination() {
 	// These roles do not move
 	if (m_role == COOK || m_role == RECEPTIONIST || m_role == BARISTA) {
-		m_destination = m_area->getAdjacentStove(m_currentPosition.z, m_currentPosition.x);
+		return;
 	}
 	else {
 		if (m_role == WAITER) {
@@ -44,7 +44,7 @@ void Employee::findNextDestination() {
 					Cell destination(tableCells.at(i));
 					if (m_area->getCellPathLength(
 						m_currentPosition.z, m_currentPosition.x, destination.z, destination.x)) {
-						// No need to set walking, should be already walking
+						m_isWalking = true;
 						tableCells.erase(tableCells.begin() + i);
 						m_destination = destination;
 						break;
@@ -114,6 +114,8 @@ void Employee::act() {
 				findNextDestination();
 			}
 			else if (m_role == COOK || m_role == BARISTA) {
+				m_isBusy = false;
+				m_isIdle = true;
 				m_area->setTileStatus(m_destination.z, m_destination.x, FOOD_READY);
 				Cell stoveCell;
 				stoveCell.z = m_destination.z;
@@ -134,7 +136,8 @@ void Employee::arrive() {
 
 	switch(m_role) {
 	case WAITER:
-		if (!m_carryingFood) {
+		if (m_isIdle) findNextDestination();
+		else if (!m_carryingFood) {
 			if (m_area->getTileStatus(m_destination.z, m_destination.x) == FOOD_READY) {
 				m_area->setTileStatus(m_destination.z, m_destination.x, OPEN);
 				m_carryingFood = true;
@@ -175,12 +178,13 @@ void Employee::update() {
 	if (m_isIdle){
 		switch (m_role) {
 		case WAITER:
-			if (m_area->v_doneCookingStoveCells.size() > 0 || !m_isIdle)
+			if (m_area->v_doneCookingStoveCells.size() > 0 || !m_carryingFood)
 				findNextDestination();
 			break;
 		case COOK:
 		case BARISTA:
-			if (m_area->getWaitingCustomers() > 0) {
+			if (m_area->getWaitingCustomers() > 0 &&
+				m_area->getTileStatus(m_destination.z, m_destination.x) == OPEN) {
 				m_isIdle = false;
 				m_isBusy = true;
 				m_area->setTileStatus(m_destination.z, m_destination.x, COOKING);
