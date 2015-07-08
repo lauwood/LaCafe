@@ -9,7 +9,7 @@ GameObjectTable::~GameObjectTable() {
 
 }
 
-void GameObjectTable::Initialize() {
+void GameObjectTable::Initialize(Mesh *TableModel) {
 	model.Initialize(Model::square2, 6, GL_TRIANGLES, "Shaders/Banana_vs.glsl", "Shaders/Banana_fs.glsl");
 	leg1.Initialize(Model::square, 6, GL_TRIANGLES, "Shaders/Banana_vs.glsl", "Shaders/Banana_fs.glsl");
 	leg2.Initialize(Model::square, 6, GL_TRIANGLES, "Shaders/Banana_vs.glsl", "Shaders/Banana_fs.glsl");

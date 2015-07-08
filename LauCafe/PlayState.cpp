@@ -37,10 +37,6 @@ int PlayState::Initialize() {
 	glEnable(GL_DEPTH_TEST);
 
 	MouseActiveButton = 0;
-
-	Globals::Camera.SetPerspective(radians(60.0f), WinX / (float)WinY, 0.01f, 1000);
-	//					     Position	  Yaw	 Pitch
-	Globals::Camera.PositionCamera(1.06, 8, 4.41, 1.57, 1.25);
 	
 	Skybox.Initialize();
 	std::string cmRelPath = "CubeMap/Yokohama3/";
@@ -71,6 +67,10 @@ int PlayState::Initialize() {
 		g_SquarePath->at(i).SetScale(vec3(0.5, 0.5, 0.5));
 	}
 
+	Mesh *ChairModel = new Mesh("Models/chair/chair.obj", "Shaders/Banana_vs.glsl", "Shaders/Banana_fs.glsl");
+	Mesh *PodiumModel = new Mesh("Models/Podium.fbx", "Shaders/Banana_vs.glsl", "Shaders/Banana_fs.glsl");
+	Mesh *StoveModel = new Mesh("Models/stove.fbx", "Shaders/Banana_vs.glsl", "Shaders/Banana_fs.glsl");
+
 	for (int i = 0; i < a->getHeight(); i++)
 		for (int j = 0; j < a->getWidth(); j++) {
 			TileType tileType = a->getTileType(i, j);
@@ -90,13 +90,13 @@ int PlayState::Initialize() {
 			}
 		}
 
-	g_Podium.Initialize();
+	g_Podium.Initialize(PodiumModel);
 	for (int i = 0; i < g_Tables.size(); i++)
-		g_Tables.at(i).Initialize();
+		g_Tables.at(i).Initialize(NULL);
 	for (int i = 0; i < g_Chairs.size(); i++)
-		g_Chairs.at(i).Initialize();
+		g_Chairs.at(i).Initialize(ChairModel);
 	for (int i = 0; i < g_Stoves.size(); i++)
-		g_Stoves.at(i).Initialize();
+		g_Stoves.at(i).Initialize(StoveModel);
 
 	g_Receptionist = Employee(a);
 	g_Receptionist.setRole(RECEPTIONIST);

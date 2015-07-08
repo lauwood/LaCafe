@@ -3,6 +3,7 @@
 
 #include "GameObject.h"
 #include "Model.h"
+#include "MeshLoader.h"
 
 class GameObjectTable : public GameObject {
 public:
@@ -10,7 +11,7 @@ public:
 	GameObjectTable(int z, int x);
 	~GameObjectTable();
 
-	void Initialize();
+	void Initialize(Mesh *TableModel);
 	void Render();
 
 private:

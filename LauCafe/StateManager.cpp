@@ -4,6 +4,7 @@
 
 #include "StateManager.h"
 #include "TimeManager.h"
+#include "Globals.h"
 #include "imgui/imgui.h"
 #include "imgui/imgui_impl_glfw_gl3.h"
 
@@ -75,6 +76,10 @@ void StateManager::MouseButtonCallback(GLFWwindow* window, int button, int actio
 }
 
 StateManager::StateManager(GLFWwindow* window) {
+	Globals::Camera.SetPerspective(radians(60.0f), WinX / (float)WinY, 0.01f, 1000);
+	//					     Position	  Yaw	 Pitch
+	Globals::Camera.PositionCamera(1.06, 8, 4.41, 1.57, 1.25);
+
 	a = new Area(10, 10, 0, 0);
 	b_EditMode = false;
 

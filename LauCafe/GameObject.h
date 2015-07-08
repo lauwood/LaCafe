@@ -2,6 +2,7 @@
 #define GAMEOBJ_H
 
 #include "Main.h"
+#include "MeshLoader.h"
 
 using namespace glm;
 
@@ -11,7 +12,7 @@ public:
 	GameObject(int z, int x)	{ this->z = z; this->x = x; }
 	~GameObject()				{}
 
-	virtual void Initialize() = 0;
+	virtual void Initialize(Mesh* model) = 0;
 	virtual void Render() = 0;
 
 	vec3 GetPosition() { return position; }
