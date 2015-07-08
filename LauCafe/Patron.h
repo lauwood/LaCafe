@@ -26,11 +26,9 @@ public:
 	void arrive();
 	void update();
 
-	void walk();
-
+	void decrementOrTimeOut();
 	bool canDelete() { return m_stage == PATRON_CAN_DELETE; }
 private:
-	void decrementOrTimeOut();
 
 	Cell m_tableCell;
 	PatronStage m_stage;

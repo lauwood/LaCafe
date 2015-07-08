@@ -20,7 +20,7 @@ Area::Area(int height, int width, int sz, int sx)
 	// Dynamically allocate the vectors
 	v_typeVector = vector<TileType>(width * height);
 	v_statusVector = vector<TileStatus>(width * height);
-	fill(v_statusVector.begin(), v_statusVector.end(), OPEN);
+	fill(v_statusVector.begin(), v_statusVector.end(), TILE_OPEN);
 	v_decorationVector = vector<int>(width * height);
 
 	// Set the default values of the path length to INT_MAX
@@ -39,9 +39,7 @@ Area::Area(int height, int width, int sz, int sx)
 	// Mark the start
 	setTile(sz, sx, START);
 
-	m_waitingCustomers = 0;
-
-	recStatus = R_READY;
+	recStatus = REC_READY;
 }
 
 Area::Area(int height, int width, int sz, int sx, vector<TileType> existingVector)
@@ -55,7 +53,7 @@ Area::Area(int height, int width, int sz, int sx, vector<TileType> existingVecto
 	// Dynamically allocate the vectors
 	v_typeVector = vector<TileType>(existingVector);
 	v_statusVector = vector<TileStatus>(width * height);
-	fill(v_statusVector.begin(), v_statusVector.end(), OPEN);
+	fill(v_statusVector.begin(), v_statusVector.end(), TILE_OPEN);
 	v_decorationVector = vector<int>(width * height);
 
 	// Set the default values of the path length to INT_MAX
@@ -76,9 +74,7 @@ Area::Area(int height, int width, int sz, int sx, vector<TileType> existingVecto
 	// Mark the start
 	setTile(sz, sx, START);
 
-	m_waitingCustomers = 0;
-
-	recStatus = R_READY;
+	recStatus = REC_READY;
 }
 
 Area::~Area()
@@ -202,7 +198,7 @@ TileStatus Area::getTileStatus(int z, int x) {
 	if (isInBounds(z, x))
 		return v_statusVector.at(getIndex(z, x));
 	else
-		return INVALID_STATUS;
+		return TILE_INVALID_STATUS;
 }
 
 // Because we are using a vector to represent a 2D array, there must be a bit of math

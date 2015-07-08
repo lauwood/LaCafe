@@ -26,11 +26,10 @@ public:
 
 	void setTimer();
 	void Render() { m_mesh.Render(); }
+	void walk();
 
 protected:
 	Mesh m_mesh;			// Holds model information for the person
-	bool m_isIdle;
-	bool m_isBusy;			// Cooking, cleaning, eating, toilet, etc.
 	bool m_isWaiting;		// For a seat, for food to cook, for food to arrive
 	bool m_isWalking;
 	int m_pathIndex;

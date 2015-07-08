@@ -7,10 +7,13 @@ using namespace std;
 
 enum TileType { WALKABLE, START, OBSTACLE, RECEPTION, RECEPTION_WORKER, TABLE, TABLE_CHAIR, STOVE,
 	STOVE_WORKER, BAR, BAR_WORKER, TOILET, INVALID_TYPE};
-enum TileStatus { OPEN, RESERVED, COOKING, FOOD_COMING, FOOD_READY, WAITING, EATING, DIRTY, CLEANING, INVALID_STATUS,
-	TILE_TABLE_FOOD_COMING, TILE_TABLE_FOOD, TILE_TABLE_DIRTY
+enum TileStatus {
+	TILE_OPEN, TILE_RESERVED,
+	TILE_STOVE_COOKING, TILE_STOVE_FOOD,
+	TILE_TABLE_FOOD_COMING, TILE_TABLE_FOOD, TILE_TABLE_DIRTY,
+	TILE_INVALID_STATUS
 };
-enum ReceptionistStatus { R_READY, R_JUST_DIRECTED, R_COOLDOWN };
+enum ReceptionistStatus { REC_READY, REC_JUST_DIRECTED, REC_COOLDOWN };
 
 // Represents a single tile in the array
 struct Cell {
@@ -42,7 +45,6 @@ public:
 	Cell getStart() { return m_start; }
 	int getHeight() { return m_height; }
 	int getWidth() { return m_width; }
-	int getWaitingCustomers() { return m_waitingCustomers; }
 
 	TileType getTileType(int z, int x);
 	TileType getDestinationType(TileType);
@@ -60,8 +62,6 @@ public:
 	void setTileStatus(int z, int x, TileStatus status);
 	void fillPaths();
 	void clearPaths();
-	void seatCustomer() { m_waitingCustomers++; }
-	void cookForCustomer() { if(m_waitingCustomers > 0) m_waitingCustomers--; }
 
 	// Debugging info
 	void printArray();
@@ -69,6 +69,7 @@ public:
 
 	// Would use queues, but what if an employee cannot reach, while another can?
 	deque<Cell> v_waitingCustomerCells;
+	deque<Cell> v_servingCustomerCells;
 	deque<Cell> v_doneCookingStoveCells;
 	deque<Cell> v_dirtyTableCells;
 
@@ -81,7 +82,6 @@ private:
 	Cell m_start;
 	int m_width;
 	int m_height;
-	int m_waitingCustomers;
 
 	// Dynamic arrays for expandable restaurants
 	vector<TileType> v_typeVector;				// Represents the actual floor of the restaurant

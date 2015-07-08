@@ -50,7 +50,7 @@ void Patron::findNextDestination() {
 	// Find the next available destination (not necessarily closest)
 	for (int z = 0; z < m_area->getHeight() && !foundDestination; z++)
 		for (int x = 0; x < m_area->getWidth() && !foundDestination; x++) {
-			if (m_area->getTileType(z, x) == destinationType && m_area->getTileStatus(z, x) == OPEN) {
+			if (m_area->getTileType(z, x) == destinationType && m_area->getTileStatus(z, x) == TILE_OPEN) {
 				m_destination.x = x;
 				m_destination.z = z;
 				foundDestination = true;
@@ -67,8 +67,8 @@ void Patron::findNextDestination() {
 	// Reserve the tile so that no two patrons can take the same tile (even when walking to it)
 	if (destinationType == TABLE_CHAIR) {
 		m_tableCell = m_area->getAdjacentTable(m_destination.z, m_destination.x);
-		m_area->setTileStatus(m_destination.z, m_destination.x, RESERVED);
-		m_area->setTileStatus(m_tableCell.z, m_tableCell.x, RESERVED);
+		m_area->setTileStatus(m_destination.z, m_destination.x, TILE_RESERVED);
+		m_area->setTileStatus(m_tableCell.z, m_tableCell.x, TILE_RESERVED);
 	}
 
 	m_isWalking = true;
@@ -91,63 +91,12 @@ void Patron::findNextDestination() {
 	m_pathIndex = 0;
 }
 
-// Translate the model across the appropriate axis and speed
-// Calls arrival function when path is exhausted
-void Patron::walk() {
-	double delta = TimeManager::Instance().DeltaTime;
-	if(m_pathIndex < m_pathToNextDestination.size()) {
-		double dx, dz;
-		dx = dz = 0;
-
-		m_distance += delta;
-
-		Cell* c = m_pathToNextDestination.at(m_pathIndex);
-		// While loop is for in case of major lag and < 1 fps instead of if
-		while (m_distance >= 1) {
-			m_distance -= 1;
-			// Advance a cell
-			m_currentPosition = *c;
-			if (++m_pathIndex < m_pathToNextDestination.size()) {
-				c = m_pathToNextDestination.at(m_pathIndex);
-				m_direction = getDirection(&m_currentPosition, c);
-			}
-			else {
-				// Hit the end already
-				m_distance = 0;
-				m_direction = STAY;
-				arrive();
-			}
-		}
-		
-		switch (m_direction) {
-		case LEFT:
-			dx = -m_distance;
-			break;
-		case RIGHT:
-			dx = m_distance;
-			break;
-		case UP:
-			dz = m_distance;
-			break;
-		case DOWN:
-			dz = -m_distance;
-			break;
-		case STAY:
-			// Don't move if staying right after arriving
-			// Patron will "freeze" for a few frames
-			break;
-		}
-
-		m_mesh.SetPosition(vec3(m_currentPosition.z + dz, 0.5, m_currentPosition.x + dx));
-	}
-}
-
 void Patron::actOrWait() {
 	switch (m_stage) {
 	case PATRON_WAITING_REC:
 		// Prep to go to a table if available
-		if (m_area->recStatus == R_READY) {
-			m_area->recStatus = R_JUST_DIRECTED;
+		if (m_area->recStatus == REC_READY) {
+			m_area->recStatus = REC_JUST_DIRECTED;
 			findNextDestination();
 		}
 		else
@@ -161,8 +110,8 @@ void Patron::actOrWait() {
 			decrementOrTimeOut();
 			// Open up the current tiles for future use if timed out
 			if (m_stage == PATRON_WALKING_EXIT) {
-				m_area->setTileStatus(m_tableCell.z, m_tableCell.x, OPEN);
-				m_area->setTileStatus(m_currentPosition.z, m_currentPosition.x, OPEN);
+				m_area->setTileStatus(m_tableCell.z, m_tableCell.x, TILE_OPEN);
+				m_area->setTileStatus(m_currentPosition.z, m_currentPosition.x, TILE_OPEN);
 
 				findNextDestination();
 			}
@@ -178,8 +127,8 @@ void Patron::actOrWait() {
 		decrementOrTimeOut();
 		// Time out = done eating
 		if (m_stage == PATRON_WALKING_EXIT) {
-			m_area->setTileStatus(m_tableCell.z, m_tableCell.x, DIRTY);
-			m_area->setTileStatus(m_currentPosition.z, m_currentPosition.x, OPEN);
+			m_area->setTileStatus(m_tableCell.z, m_tableCell.x, TILE_TABLE_DIRTY);
+			m_area->setTileStatus(m_currentPosition.z, m_currentPosition.x, TILE_OPEN);
 
 			//TODO: Rating calculations
 			//TODO: May need to change the "stage" to something else
@@ -204,10 +153,6 @@ void Patron::arrive() {
 		// If arrived at a table, mark it
 		// Don't need to mark the chair, it's "reserved" so nobody will walk to it
 		tableTile = m_area->getAdjacentTable(m_currentPosition.z, m_currentPosition.x);
-		m_area->setTileStatus(tableTile.z, tableTile.x, WAITING);
-
-		// Increment so cooks get to work ASAP
-		m_area->seatCustomer();
 
 		// Set up the table so that waiters will go to it once food is ready
 		m_area->v_waitingCustomerCells.push_back(tableTile);

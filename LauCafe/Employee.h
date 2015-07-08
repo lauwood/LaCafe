@@ -8,6 +8,9 @@
 // To facilitate role switching, no inheritance to each of the roles
 enum Role { RECEPTIONIST, COOK, BARISTA, WAITER, DISHWASHER };
 
+enum WaiterStage { WAITER_IDLE, WAITER_WALKING_STOVE, WAITER_CARRYING_FOOD };
+enum DishwasherStage { DISHWASHER_IDLE, DISHWASHER_WALKING_TABLE, DISHWASHER_CLEANING };
+
 class Employee :
 	public Person
 {
@@ -21,12 +24,13 @@ public:
 	void actOrWait();
 	void arrive();
 	void update();
-	void wait();
 
-	void setRole(Role r) { m_role = r; }
+	void setRole(Role role);
 private:
+	bool m_isBusy;			// Cooking, cleaning, eating, toilet, etc.
 	Role m_role;
-	bool m_isIdle;
-	bool m_carryingFood;
+
+	WaiterStage m_waiterStage;
+	DishwasherStage m_dishwasherStage;
 };
 

@@ -3,7 +3,6 @@
 
 Person::Person(Area* area)
 {
-	m_isBusy = false;
 	m_time = 0;
 	m_area = area;
 }
@@ -33,4 +32,55 @@ Direction Person::getDirection(Cell* c1, Cell *c2) {
 void Person::setTimer() {
 	srand(time(NULL));
 	m_time = (rand() % (MAX_TIME - MIN_TIME + 1)) + MIN_TIME;
+}
+
+// Translate the model across the appropriate axis and speed
+// Calls arrival function when path is exhausted
+void Person::walk() {
+	double delta = TimeManager::Instance().DeltaTime;
+	if (m_pathIndex < m_pathToNextDestination.size()) {
+		double dx, dz;
+		dx = dz = 0;
+
+		m_distance += delta;
+
+		Cell* c = m_pathToNextDestination.at(m_pathIndex);
+		// While loop is for in case of major lag and < 1 fps instead of if
+		while (m_distance >= 1) {
+			m_distance -= 1;
+			// Advance a cell
+			m_currentPosition = *c;
+			if (++m_pathIndex < m_pathToNextDestination.size()) {
+				c = m_pathToNextDestination.at(m_pathIndex);
+				m_direction = getDirection(&m_currentPosition, c);
+			}
+			else {
+				// Hit the end already
+				m_distance = 0;
+				m_direction = STAY;
+				arrive();
+			}
+		}
+
+		switch (m_direction) {
+		case LEFT:
+			dx = -m_distance;
+			break;
+		case RIGHT:
+			dx = m_distance;
+			break;
+		case UP:
+			dz = m_distance;
+			break;
+		case DOWN:
+			dz = -m_distance;
+			break;
+		case STAY:
+			// Don't move if staying right after arriving
+			// Patron will "freeze" for a few frames
+			break;
+		}
+
+		m_mesh.SetPosition(vec3(m_currentPosition.z + dz, 0.5, m_currentPosition.x + dx));
+	}
 }
