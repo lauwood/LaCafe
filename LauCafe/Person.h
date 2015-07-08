@@ -18,22 +18,18 @@ public:
 
 	// Virtual functions for all people
 	virtual void findNextDestination() = 0;
-	virtual void act() = 0;
+	virtual void actOrWait() = 0;
 	virtual void arrive() = 0;
 	virtual void update() = 0;
-	virtual void wait() = 0;
 
 	Direction getDirection(Cell* c1, Cell* c2);
-
-	// Status update
-	void setWalking();
-	void finishWalking();
 
 	void setTimer();
 	void Render() { m_mesh.Render(); }
 
 protected:
 	Mesh m_mesh;			// Holds model information for the person
+	bool m_isIdle;
 	bool m_isBusy;			// Cooking, cleaning, eating, toilet, etc.
 	bool m_isWaiting;		// For a seat, for food to cook, for food to arrive
 	bool m_isWalking;

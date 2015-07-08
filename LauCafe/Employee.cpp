@@ -95,7 +95,7 @@ void Employee::findNextDestination() {
 	}
 }
 
-void Employee::act() {
+void Employee::actOrWait() {
 	int decrementValue = TimeManager::Instance().DeltaTime * 1000;
 	if (m_isBusy)
 		if (m_time > decrementValue) {
@@ -205,7 +205,7 @@ void Employee::update() {
 		}
 	}
 	else if (m_isBusy)
-		act();
+		actOrWait();
 
 	return;
 }

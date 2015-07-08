@@ -29,21 +29,6 @@ Direction Person::getDirection(Cell* c1, Cell *c2) {
 	}
 }
 
-// Status updates
-
-void Person::setWalking()
-{
-	m_isWaiting = false;
-	m_isBusy = false;
-	m_isWalking = true;
-}
-
-void Person::finishWalking()
-{
-	m_isWalking = false;
-	m_isWaiting = true;
-}
-
 // Set the timer for the current activity
 void Person::setTimer() {
 	srand(time(NULL));

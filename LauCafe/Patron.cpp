@@ -12,15 +12,10 @@ Patron::Patron(Area* area, Mesh dude) : Person(area) {
 	m_mesh.SetScale(vec3(0.5, 0.5, 0.5));
 
 	// Initialize status variables
-	m_canDelete = false;
-	m_isWalking = true;
-	m_hasBeenDirected = false;
-	m_hasBeenSeated = false;
-	m_hasEaten = false;
-	m_timedOut = false;
+	m_stage = PATRON_INIT;
 
 	// Immediately find the next destination so it can start walking right away
-	findNextDestination();
+	findNextDestination();		// Will set the walking status
 
 	// Set initial direction to reduce calls in walk
 	Cell* c = m_pathToNextDestination.at(m_pathIndex);
@@ -37,9 +32,20 @@ void Patron::findNextDestination() {
 	TileType currentTileType = m_area->getTileType(m_currentPosition.z, m_currentPosition.x);
 	TileType destinationType;
 
-	if (m_hasEaten || m_timedOut) destinationType = START;
-	else if (m_hasBeenDirected) destinationType = TABLE_CHAIR;
-	else destinationType = RECEPTION;
+	switch (m_stage) {
+	case PATRON_INIT :
+		destinationType = RECEPTION;
+		break;
+	case PATRON_WAITING_REC :
+		destinationType = TABLE_CHAIR;
+		break;
+	case PATRON_TIMED_OUT :
+		destinationType = START;
+		break;
+	default:
+		// This should not be called anytime
+		return;
+	}
 
 	// Find the next available destination (not necessarily closest)
 	for (int z = 0; z < m_area->getHeight() && !foundDestination; z++)
@@ -52,8 +58,8 @@ void Patron::findNextDestination() {
 	}
 
 	if (!foundDestination)
-		// Still haven't found a destination, leave!
-		m_destination = m_area->getStart();
+		// Still haven't found a destination, wait for next time
+		return;
 
 	// Set the path of the patron to that of the path array
 	m_pathToNextDestination = m_area->getCellPath(m_currentPosition.z, m_currentPosition.x,
@@ -66,6 +72,20 @@ void Patron::findNextDestination() {
 	}
 
 	m_isWalking = true;
+
+	// Since we found a destination, update the stage accordingly
+	switch (m_stage) {
+	case PATRON_INIT :
+		m_stage = PATRON_WALKING_REC;
+		break;
+	case PATRON_WAITING_REC :
+		m_isWaiting = false;
+		m_stage = PATRON_WALKING_TABLE;
+		break;
+	case PATRON_TIMED_OUT :
+		m_stage = PATRON_WALKING_EXIT;
+		break;
+	}
 
 	// Clear variable if path was found before
 	m_pathIndex = 0;
@@ -122,101 +142,102 @@ void Patron::walk() {
 	}
 }
 
-void Patron::act() {
-	int decrementValue = TimeManager::Instance().DeltaTime * 1000;
-	if (m_isBusy)
-		if (m_time > decrementValue) {
-			m_time -= decrementValue;
+void Patron::actOrWait() {
+	switch (m_stage) {
+	case PATRON_WAITING_REC:
+		// Prep to go to a table if available
+		if (m_area->recStatus == R_READY) {
+			m_area->recStatus = R_JUST_DIRECTED;
+			findNextDestination();
+		}
+		else
+			decrementOrTimeOut();
+		break;
+	case PATRON_WAITING_SERVE:
+		if (m_area->getTileStatus(m_tableCell.z, m_tableCell.x) == TILE_TABLE_FOOD_COMING) {
+			m_stage = PATRON_WAITING_FOOD;
 		}
 		else {
-			// Person may "do nothing" for a frame
-			m_time = 0;
+			decrementOrTimeOut();
+			// Open up the current tiles for future use if timed out
+			if (m_stage == PATRON_WALKING_EXIT) {
+				m_area->setTileStatus(m_tableCell.z, m_tableCell.x, OPEN);
+				m_area->setTileStatus(m_currentPosition.z, m_currentPosition.x, OPEN);
 
-			m_area->setTileStatus(m_tableCell.z, m_tableCell.x, DIRTY);
-
-			// Prep for the next tick
-			findNextDestination();
-			setWalking();
+				findNextDestination();
+			}
 		}
+		break;
+	case PATRON_WAITING_FOOD:
+		if (m_area->getTileStatus(m_tableCell.z, m_tableCell.x) == TILE_TABLE_FOOD) {
+			m_stage = PATRON_EATING_FOOD;
+			setTimer();
+		}
+		break;
+	case PATRON_EATING_FOOD:
+		decrementOrTimeOut();
+		// Time out = done eating
+		if (m_stage == PATRON_WALKING_EXIT) {
+			m_area->setTileStatus(m_tableCell.z, m_tableCell.x, DIRTY);
+			m_area->setTileStatus(m_currentPosition.z, m_currentPosition.x, OPEN);
+
+			//TODO: Rating calculations
+			//TODO: May need to change the "stage" to something else
+			findNextDestination();
+		}
+		break;
+	}
 }
 
 void Patron::arrive() {
-	m_pathIndex = 0;
+	m_isWalking = false;
+	Cell tableTile;
+	tableTile.x = tableTile.z = -1;
 
-	finishWalking();
+	switch (m_stage) {
+	case PATRON_WALKING_REC :
+		// Arrived at receptionist, wait for a free receptionist/table
+		m_stage = PATRON_WAITING_REC;
+		m_isWaiting = true;
+		break;
+	case PATRON_WALKING_TABLE :
+		// If arrived at a table, mark it
+		// Don't need to mark the chair, it's "reserved" so nobody will walk to it
+		tableTile = m_area->getAdjacentTable(m_currentPosition.z, m_currentPosition.x);
+		m_area->setTileStatus(tableTile.z, tableTile.x, WAITING);
 
-	Cell start = m_area->getStart();
-	if (m_currentPosition.x == start.x && m_currentPosition.z == start.z) {
-		// Customer is done and we can mark this for deletion
-		m_canDelete = true;
-	}
-	else {
-		if (!m_hasBeenSeated && m_hasBeenDirected) {
-			// If arrived at a table, mark it
-			// Don't need to mark the chair, it's "reserved" so nobody will walk to it
-			Cell tableTile = m_area->getAdjacentTable(m_currentPosition.z, m_currentPosition.x);
-			m_area->setTileStatus(tableTile.z, tableTile.x, WAITING);
+		// Increment so cooks get to work ASAP
+		m_area->seatCustomer();
 
-			// Increment so cooks get to work ASAP
-			m_area->seatCustomer();
+		// Set up the table so that waiters will go to it once food is ready
+		m_area->v_waitingCustomerCells.push_back(tableTile);
+		// Set a timer for the next activity
+		setTimer();
 
-			// Set up the table so that waiters will go to it once food is ready
-			m_area->v_waitingCustomerCells.push_back(tableTile);
-			// Set a timer for the next activity
-			setTimer();
-		}
+		m_stage = PATRON_WAITING_SERVE;
+		break;
+	case PATRON_WALKING_EXIT :
+		m_stage = PATRON_CAN_DELETE;
+		break;
 	}
 }
 
 void Patron::update() {
 	if (m_isWalking)
 		walk();
-	else if (m_isBusy)
-		act();
-	else if (m_isWaiting)
-		wait();
-	return;
+	else
+		actOrWait();
 }
 
-void Patron::wait() {
+void Patron::decrementOrTimeOut() {
 	int decrementValue = TimeManager::Instance().DeltaTime * 1000;
 
-	if (!m_hasBeenDirected && m_area->recStatus == R_READY) {
-		m_hasBeenDirected = true;
-		findNextDestination();
-		if (m_area->getTileType(m_destination.z, m_destination.x) == TABLE_CHAIR) {
-			m_area->recStatus = R_JUST_DIRECTED;
-
-			// If arrived at a table, mark it
-			// Don't need to mark the chair, it's "reserved" so nobody will walk to it
-			Cell tableTile = m_area->getAdjacentTable(m_destination.z, m_destination.x);
-			m_area->setTileStatus(tableTile.z, tableTile.x, RESERVED);
-			m_hasBeenSeated = true;
-		}
+	// Decrement timer and timeout if necessary
+	if (m_time > decrementValue) {
+		m_time -= decrementValue;
 	}
-	else if (m_isWaiting)
-		if (m_area->getTileStatus(m_tableCell.z, m_tableCell.x) == FOOD_READY) {
-			// Food arrived
-			m_isWaiting = false;
-			m_isBusy = true;
-			setTimer();
-			m_area->setTileStatus(m_tableCell.z, m_tableCell.x, EATING);
-		}
-		else if (m_time > decrementValue) {
-			m_time -= decrementValue;
-		}
-		else {
-			// If food is coming, don't leave
-			if (m_hasBeenSeated && m_area->getTileStatus(m_tableCell.z, m_tableCell.x) == FOOD_COMING)
-				return;
-			// Mark for deletion, waiting too long
-			m_time = 0;
-			m_timedOut = true;
-			findNextDestination();
-			setWalking();
-
-			// Unreserve the table and chair
-			m_area->setTileStatus(m_currentPosition.z, m_currentPosition.x, OPEN);
-			m_area->setTileStatus(m_tableCell.z, m_tableCell.x, OPEN);
-		}
+	else {
+		m_stage = PATRON_TIMED_OUT;
+		findNextDestination();
+	}
 }

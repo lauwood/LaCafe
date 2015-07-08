@@ -18,7 +18,7 @@ public:
 
 	// Implement virtual functions
 	void findNextDestination();
-	void act();
+	void actOrWait();
 	void arrive();
 	void update();
 	void wait();
