@@ -3,13 +3,60 @@
 #include <stdlib.h>
 #include <time.h>
 
-Employee::Employee(Area* area) : Person(area)
+Employee::Employee(Area* area, Role role) : Person(area)
 {
 	m_isBusy = false;
 	m_isWalking = false;
 
 	m_waiterStage = WAITER_IDLE;
 	m_dishwasherStage = DISHWASHER_IDLE;
+
+	bool placed = false;
+
+	setRole(role);
+	TileType placeType;
+
+	switch (m_role)
+	{
+	case RECEPTIONIST:
+		placeType = RECEPTION_WORKER;
+		break;
+	case COOK:
+		placeType = STOVE_WORKER;
+		break;
+	case BARISTA:
+		placeType = BAR_WORKER;
+		break;
+	case WAITER:
+	case DISHWASHER:
+		placeType = WALKABLE;
+		break;
+	default:
+		break;
+	}
+
+	for (int i = 0; i < m_area->getHeight() && !placed; i++) {
+		for (int j = 0; j < m_area->getWidth() && !placed; j++) {
+			if (m_area->getTileType(i, j) == placeType) {
+				if (placeType == STOVE_WORKER) {
+					if (m_area->getTileStatus(i, j) == TILE_RESERVED) {
+						// Don't take another cook's spot!
+						continue;
+					}
+					else {
+						m_area->setTileStatus(i, j, TILE_RESERVED);
+					}
+				}
+				m_currentPosition.z = i;
+				m_currentPosition.x = j;
+				placed = true;
+			}
+		}
+	}
+
+	m_mesh = Mesh("Models/Dude.fbx", "Shaders/Banana_vs.glsl", "Shaders/Banana_fs.glsl");
+	m_mesh.SetPosition(vec3(m_currentPosition.z, 0.5, m_currentPosition.x));
+	m_mesh.SetScale(vec3(0.5, 0.5, 0.5));
 }
 
 

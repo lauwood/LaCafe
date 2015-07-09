@@ -16,6 +16,7 @@
 PlayState::PlayState(GLFWwindow* window, Area* area) : GameState(window) {
 	a = area;
 	a->setTile(2, 2, RECEPTION);
+	a->setTile(2, 3, RECEPTION_WORKER);
 	a->setTile(5, 0, TABLE_CHAIR);
 	a->setTile(5, 2, TABLE_CHAIR);
 	a->setTile(5, 4, TABLE_CHAIR);
@@ -98,7 +99,7 @@ int PlayState::Initialize() {
 	for (int i = 0; i < g_Stoves.size(); i++)
 		g_Stoves.at(i).Initialize(StoveModel);
 
-	g_Receptionist = Employee(a);
+	g_Receptionist = Employee(a, RECEPTIONIST);
 	g_Receptionist.setRole(RECEPTIONIST);
 
 	return INIT_OK; // OK
@@ -255,6 +256,8 @@ void PlayState::Draw() {
 	//Skybox.Render();
 	glEnable(GL_DEPTH_TEST);
 	glDisable(GL_CULL_FACE);
+
+	g_Receptionist.Render();
 
 	g_Floor.Render();
 	for (int i = 0; i < g_Patron.size(); i++)
