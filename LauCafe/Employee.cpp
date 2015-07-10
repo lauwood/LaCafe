@@ -73,9 +73,9 @@ Employee::Employee(Area* area, Role role) : Person(area)
 		}
 	}
 
-	m_mesh = Mesh("Models/Dude.fbx", "Shaders/Banana_vs.glsl", "Shaders/Banana_fs.glsl");
-	m_mesh.SetPosition(vec3(m_currentPosition.z, 0.5, m_currentPosition.x));
-	m_mesh.SetScale(vec3(0.5, 0.5, 0.5));
+	m_mesh = new Mesh("Models/Dude.fbx", "Shaders/Banana_vs.glsl", "Shaders/Banana_fs.glsl");
+	dz = dx = 0;
+	m_mesh->SetScale(vec3(0.5, 0.5, 0.5));
 }
 
 
