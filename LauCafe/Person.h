@@ -1,8 +1,6 @@
 #pragma once
 #include "Area.h"
 #include "MeshLoader.h"
-#include <stdlib.h>
-#include <time.h>
 
 #define MAX_TIME 2000
 #define MIN_TIME 1000

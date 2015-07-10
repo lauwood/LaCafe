@@ -16,7 +16,7 @@ class Employee :
 {
 public:
 	Employee() {}
-	Employee(Area* area);
+	Employee(Area* area, Role role);
 	~Employee();
 
 	// Implement virtual functions
