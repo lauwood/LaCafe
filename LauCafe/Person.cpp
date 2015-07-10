@@ -39,7 +39,6 @@ void Person::setTimer() {
 void Person::walk() {
 	double delta = TimeManager::Instance().DeltaTime;
 	if (m_pathIndex < m_pathToNextDestination.size()) {
-		double dx, dz;
 		dx = dz = 0;
 
 		m_distance += delta;
@@ -81,6 +80,5 @@ void Person::walk() {
 			break;
 		}
 
-		m_mesh.SetPosition(vec3(m_currentPosition.z + dz, 0.5, m_currentPosition.x + dx));
 	}
 }

@@ -1,15 +1,15 @@
 #include "Patron.h"
 #include "TimeManager.h"
 
-Patron::Patron(Area* area, Mesh dude) : Person(area) {
+Patron::Patron(Area* area, Mesh *model) : Person(area) {
 	Cell entrance = area->getStart();
 	m_currentPosition.x = entrance.x;
 	m_currentPosition.z = entrance.z;
 
 	// Initialize model and shader
-	m_mesh = Mesh(dude, "Shaders/Banana_vs.glsl", "Shaders/Banana_fs.glsl");
-	m_mesh.SetPosition(vec3(m_currentPosition.z, 0.5, m_currentPosition.x));
-	m_mesh.SetScale(vec3(0.5, 0.5, 0.5));
+	m_mesh = model;
+	m_mesh->SetPosition(vec3(m_currentPosition.z, 0.5, m_currentPosition.x));
+	m_mesh->SetScale(vec3(0.5, 0.5, 0.5));
 
 	// Initialize status variables
 	m_stage = PATRON_INIT;

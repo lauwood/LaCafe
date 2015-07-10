@@ -60,7 +60,7 @@ private:
 
 	std::vector<Patron*> g_Patron;
 	Employee g_Receptionist;
-
+	Mesh *PersonModel;
 	Area* a;
 };
 

@@ -50,8 +50,6 @@ int PlayState::Initialize() {
 
 	g_Axis.Initialize(Model::axis, 6, GL_LINES, "Shaders/Shader_vs.glsl", "Shaders/Shader_fs.glsl");
 	g_Axis.SetPosition(vec3(0, 0, 0));
-
-	Dude = Mesh("Models/Dude.fbx", "Shaders/Banana_vs.glsl", "Shaders/Banana_fs.glsl");
 	
 	glEnable(GL_DEPTH_TEST); // enable depth-testing
 	glDepthFunc(GL_LESS); // depth-testing interprets a smaller value as "closer"
@@ -67,6 +65,7 @@ int PlayState::Initialize() {
 		g_SquarePath->at(i).SetScale(vec3(0.5, 0.5, 0.5));
 	}
 
+	PersonModel = new Mesh("Models/Dude.fbx", "Shaders/Banana_vs.glsl", "Shaders/Banana_fs.glsl");
 	Mesh *ChairModel = new Mesh("Models/chair/chair.obj", "Shaders/Banana_vs.glsl", "Shaders/Banana_fs.glsl");
 	Mesh *PodiumModel = new Mesh("Models/Podium.fbx", "Shaders/Banana_vs.glsl", "Shaders/Banana_fs.glsl");
 	Mesh *StoveModel = new Mesh("Models/stove.fbx", "Shaders/Banana_vs.glsl", "Shaders/Banana_fs.glsl");
@@ -224,7 +223,7 @@ void PlayState::Input() {
 			}
 			SelectedSquare = closest_square_clicked;*/
 
-			g_Patron.push_back(new Patron(a, Dude));
+			g_Patron.push_back(new Patron(a, PersonModel));
 			//fprintf(stdout, "center of square: x: %.2f, z: %.2f", g_SquarePath->at(SelectedSquare).GetPosition().x, g_SquarePath->at(SelectedSquare).GetPosition().z);
 		}
 	}
@@ -260,6 +259,7 @@ void PlayState::Draw() {
 	for (int i = 0; i < g_Patron.size(); i++)
 		g_Patron.at(i)->Render();
 	g_Axis.Render();
+
 	for (int i = 0; i < NUM_OF_SQUARES; i++) {
 		if (SelectedSquare == i) {
 			g_SquarePath->at(i).Select();

@@ -29,26 +29,6 @@ void MeshEntry::Init(const std::vector<aiVector3D>& CachedPositions, const std::
 	NumIndices = Indices.size();
 }
 
-Mesh::Mesh(const Mesh& mesh, std::string vert, std::string frag) {
-	m_Entries = mesh.m_Entries;
-	CachedPositions = mesh.CachedPositions;
-	CachedNormals = mesh.CachedNormals;
-	TexCoords = mesh.TexCoords;
-	Indices = mesh.Indices;
-
-	m_Shader = mesh.m_Shader;
-	m_ForceNoBones = false;
-	m_Scene = NULL;
-	m_VAO = 0;
-
-	CurrentTime = 0;
-	LastPlaying = 0;
-
-	memset(m_Buffers, 0, sizeof(m_Buffers)); 
-	
-	LoadVBO();
-}
-
 Mesh::Mesh(const char* filename, std::string vert, std::string frag) {
 	m_Shader.Initialize(vert, frag);
 	m_ForceNoBones = false;
@@ -70,13 +50,13 @@ Mesh::Mesh(const char* filename, std::string vert, std::string frag) {
 }
 
 Mesh::~Mesh() {
-	/*if (m_Buffers[0] != 0) {
+	if (m_Buffers[0] != 0) {
 		glDeleteBuffers(sizeof(m_Buffers) / sizeof(m_Buffers[0]), m_Buffers);
 	}
 	if (m_VAO != 0) {
 		glDeleteVertexArrays(1, &m_VAO);
 	}
-	delete(m_Scene);*/
+	delete(m_Scene);
 }
 
 bool Mesh::LoadAsset(const char* filename) {

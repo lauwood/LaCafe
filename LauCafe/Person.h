@@ -25,11 +25,15 @@ public:
 	Direction getDirection(Cell* c1, Cell* c2);
 
 	void setTimer();
-	void Render() { m_mesh.Render(); }
+	void Render() {
+		m_mesh->SetPosition(vec3(m_currentPosition.z + dz, 0.5, m_currentPosition.x + dx));
+		m_mesh->Render();
+	}
 	void walk();
 
 protected:
-	Mesh m_mesh;			// Holds model information for the person
+	double dx, dz;
+	Mesh *m_mesh;			// Holds model information for the person
 	bool m_isWaiting;		// For a seat, for food to cook, for food to arrive
 	bool m_isWalking;
 	int m_pathIndex;
