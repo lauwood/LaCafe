@@ -1,7 +1,5 @@
 #include "Employee.h"
 #include "TimeManager.h"
-#include <stdlib.h>
-#include <time.h>
 
 Employee::Employee(Area* area, Role role) : Person(area)
 {
@@ -35,22 +33,43 @@ Employee::Employee(Area* area, Role role) : Person(area)
 		break;
 	}
 
-	for (int i = 0; i < m_area->getHeight() && !placed; i++) {
-		for (int j = 0; j < m_area->getWidth() && !placed; j++) {
-			if (m_area->getTileType(i, j) == placeType) {
-				if (placeType == STOVE_WORKER) {
+	if (!(m_role == WAITER || m_role == DISHWASHER))
+		for (int i = 0; i < m_area->getHeight() && !placed; i++) {
+			for (int j = 0; j < m_area->getWidth() && !placed; j++) {
+				if (m_area->getTileType(i, j) == placeType) {
 					if (m_area->getTileStatus(i, j) == TILE_RESERVED) {
 						// Don't take another cook's spot!
 						continue;
 					}
 					else {
 						m_area->setTileStatus(i, j, TILE_RESERVED);
+						m_destination = m_area->getAdjacentStove(i, j);
 					}
+
+					m_currentPosition.z = i;
+					m_currentPosition.x = j;
+					placed = true;
 				}
-				m_currentPosition.z = i;
-				m_currentPosition.x = j;
-				placed = true;
 			}
+		}
+
+	while (!placed) {
+		int x = rand() % m_area->getWidth();
+		int z = rand() % m_area->getHeight();
+
+		if (m_area->getTileType(z, x) == placeType) {
+			if (placeType == STOVE_WORKER) {
+				if (m_area->getTileStatus(z, x) == TILE_RESERVED) {
+					// Don't take another cook's spot!
+					continue;
+				}
+				else {
+					m_area->setTileStatus(z, x, TILE_RESERVED);
+				}
+			}
+			m_currentPosition.z = z;
+			m_currentPosition.x = x;
+			placed = true;
 		}
 	}
 
@@ -70,28 +89,45 @@ void Employee::findNextDestination() {
 		return;
 	}
 	else if (m_role == WAITER) {
-		deque<Cell> destinationCells;
+		deque<Cell>* destinationCells = nullptr;
 		switch (m_waiterStage) {
 		case WAITER_IDLE:
-			destinationCells = m_area->v_doneCookingStoveCells;
+			destinationCells = &(m_area->v_doneCookingStoveCells);
 			break;
 		case WAITER_CARRYING_FOOD:
-			destinationCells = m_area->v_servingCustomerCells;
+			destinationCells = &(m_area->v_servingCustomerCells);
 			break;
 		}
 
-		for (int i = 0; i < destinationCells.size(); i++) {
-			Cell destination(destinationCells.at(i));
+		for (int i = 0; destinationCells != nullptr && i < destinationCells->size(); i++) {
+			Cell destination(destinationCells->at(i));
 			if (m_area->getCellPathLength(
 				m_currentPosition.z, m_currentPosition.x, destination.z, destination.x) > 0) {
 				// Only proceed if the destination is reachable!
 				m_isBusy = true;
 				m_isWalking = true;
-				destinationCells.erase(destinationCells.begin() + i);
+				destinationCells->erase(destinationCells->begin() + i);
 				m_destination = destination;
+				cout << "x: " << m_destination.x << ", z:" << m_destination.z << endl;
 
 				m_pathToNextDestination = m_area->getCellPath(m_currentPosition.z, m_currentPosition.x,
 					m_destination.z, m_destination.x);
+
+				switch (m_waiterStage)
+				{
+				case WAITER_IDLE:
+					m_waiterStage = WAITER_WALKING_STOVE;
+					break;
+				case WAITER_WALKING_STOVE:
+					m_waiterStage = WAITER_CARRYING_FOOD;
+					break;
+				case WAITER_CARRYING_FOOD:
+					m_waiterStage = WAITER_IDLE;
+					break;
+				default:
+					break;
+				}
+
 				break;
 			}
 		}
@@ -107,6 +143,8 @@ void Employee::findNextDestination() {
 				dirtyCells.erase(dirtyCells.begin() + i);
 				m_destination = destination;
 
+				m_dishwasherStage = DISHWASHER_WALKING_TABLE;
+
 				m_pathToNextDestination = m_area->getCellPath(m_currentPosition.z, m_currentPosition.x,
 					m_destination.z, m_destination.x);
 				break;
@@ -116,33 +154,32 @@ void Employee::findNextDestination() {
 
 	// If an employee reaches this point, nowhere specific to go so wander around
 	if (!m_isBusy && !m_isWalking) {
-		srand(time(NULL));
 		m_isBusy = false;	// Used when this is called after finishing task
+		// There's nowhere to go and nothing to do, wander around
+		int x = -1;
+		int z = -1;
 
-		// Need a better algorithm, this doesn't "scale" with lag
-		// Have a chance to idle
-		// Move after 5 seconds? 5 sec * 60 fps = 300 frames
-		if (rand() % 300 < 1) {
-			// There's nowhere to go and nothing to do, wander around
-			int x = -1;
-			int z = -1;
-
-			while (m_area->isWalkable(z, x)) {
-				x = rand() % m_area->getWidth();
-				z = rand() % m_area->getHeight();
-			}
-
-			m_destination.x = x;
-			m_destination.z = z;
-
-			m_isWalking = true;
+		while (!m_area->isWalkable(z, x)) {
+			x = rand() % m_area->getWidth();
+			z = rand() % m_area->getHeight();
 		}
-		else m_isWalking = false;
+
+		m_waiterStage = WAITER_IDLE;
+		m_dishwasherStage = DISHWASHER_IDLE;
+
+		m_destination.x = x;
+		m_destination.z = z;
+
+		m_pathToNextDestination = m_area->getCellPath(m_currentPosition.z, m_currentPosition.x,
+			m_destination.z, m_destination.x);
+
+		m_isWalking = true;
 	}
 }
 
 void Employee::actOrWait() {
 	int decrementValue = TimeManager::Instance().DeltaTime * 1000;
+	Cell chair;
 
 	if (m_time > decrementValue) {
 		m_time -= decrementValue;
@@ -154,7 +191,17 @@ void Employee::actOrWait() {
 
 		switch (m_role) {
 		case DISHWASHER:
+			chair = m_area->getAdjacentChair(m_destination.z, m_destination.x);
 			m_area->setTileStatus(m_destination.z, m_destination.x, TILE_OPEN);
+			m_area->setTileStatus(chair.z, chair.x, TILE_OPEN);
+
+			for (int i = 0; i < m_area->v_dirtyTableCells.size(); i++) {
+				Cell tableCell(m_area->v_dirtyTableCells.at(i));
+				if (tableCell.z == m_destination.z && tableCell.x == m_destination.x) {
+					m_area->v_dirtyTableCells.erase(m_area->v_dirtyTableCells.begin() + i);
+				}
+			}
+
 			m_dishwasherStage = DISHWASHER_IDLE;
 			// Prep for the next tick
 			findNextDestination();
@@ -174,16 +221,27 @@ void Employee::actOrWait() {
 
 void Employee::arrive() {
 	m_isWalking = false;
+	TileType destinationType; // For waiter in switch statement
+
 	switch (m_role)
 	{
 	case WAITER:
+		switch (m_area->getTileType(m_destination.z, m_destination.x)) {
+		case STOVE:
+			m_area->setTileStatus(m_destination.z, m_destination.x, TILE_OPEN);
+			m_waiterStage = WAITER_CARRYING_FOOD;
+			break;
+		case TABLE:
+			m_area->setTileStatus(m_destination.z, m_destination.x, TILE_TABLE_FOOD);
+			m_waiterStage = WAITER_IDLE;
+			break;
+		}
 		findNextDestination();
 		break;
 	case DISHWASHER:
 		switch (m_dishwasherStage)
 		{
 		case DISHWASHER_IDLE:
-		case DISHWASHER_CLEANING:
 			findNextDestination();
 			break;
 		case DISHWASHER_WALKING_TABLE:
@@ -215,12 +273,21 @@ void Employee::update() {
 				if (m_area->getCellPathLength(m_destination.z, m_destination.x,
 					m_area->v_waitingCustomerCells.at(i).z, m_area->v_waitingCustomerCells.at(i).z) > 0) {
 					// The stove can reach the table, so the order is ok
+					Cell tableCell(m_area->v_waitingCustomerCells.at(i));
+					m_area->setTileStatus(tableCell.z, tableCell.x, TILE_TABLE_FOOD_COMING);
+
 					m_isBusy = true;
 					m_area->setTileStatus(m_destination.z, m_destination.x, TILE_STOVE_COOKING);
+					m_area->v_servingCustomerCells.push_back(m_area->v_waitingCustomerCells.at(i));
+					m_area->v_waitingCustomerCells.erase(m_area->v_waitingCustomerCells.begin() + i);
+
+					setTimer();
+
 					break;
 				}
 			}
 		}
+		else if (m_isBusy) actOrWait();
 		break;
 	case WAITER:
 		if (m_isBusy) {

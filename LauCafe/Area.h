@@ -51,6 +51,7 @@ public:
 	int getCellPathLength(int sz, int sx, int dz, int dx);
 	deque<Cell*> getCellPath(int sz, int sx, int dz, int dx);
 	Cell getAdjacentTable(int z, int x);
+	Cell getAdjacentChair(int z, int x);
 	Cell getAdjacentStove(int z, int x);
 
 	bool isInBounds(int z, int x);

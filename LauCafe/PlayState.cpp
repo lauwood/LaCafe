@@ -14,6 +14,8 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 PlayState::PlayState(GLFWwindow* window, Area* area) : GameState(window) {
+	srand(time(NULL));
+
 	a = area;
 	a->setTile(2, 2, RECEPTION);
 	a->setTile(2, 3, RECEPTION_WORKER);
@@ -101,6 +103,12 @@ int PlayState::Initialize() {
 
 	g_Receptionist = Employee(a, RECEPTIONIST);
 	g_Receptionist.setRole(RECEPTIONIST);
+
+	g_Employees.push_back(new Employee(a, COOK));
+	g_Employees.push_back(new Employee(a, COOK));
+	g_Employees.push_back(new Employee(a, WAITER));
+	//g_Employees.push_back(new Employee(a, WAITER));
+	g_Employees.push_back(new Employee(a, DISHWASHER));
 
 	return INIT_OK; // OK
 }
@@ -246,7 +254,9 @@ void PlayState::Update() {
 			g_Patron.at(i)->update();
 		}
 	}
-	
+
+	for (int i = 0; i < g_Employees.size(); i++)
+		g_Employees.at(i)->update();
 	g_Receptionist.update();
 }
 
@@ -260,6 +270,9 @@ void PlayState::Draw() {
 	g_Receptionist.Render();
 
 	g_Floor.Render();
+	for (int i = 0; i < g_Employees.size(); i++)
+		g_Employees.at(i)->Render();
+
 	for (int i = 0; i < g_Patron.size(); i++)
 		g_Patron.at(i)->Render();
 	g_Axis.Render();

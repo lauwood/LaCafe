@@ -156,6 +156,30 @@ Cell Area::getAdjacentTable(int z, int x) {
 	return table;
 }
 
+Cell Area::getAdjacentChair(int z, int x) {
+	Cell chair;
+	chair.x = chair.z = -1;
+
+	if (getTileType(z - 1, x) == TABLE_CHAIR) {
+		chair.z = z - 1;
+		chair.x = x;
+	}
+	else if (getTileType(z + 1, x) == TABLE_CHAIR) {
+		chair.z = z + 1;
+		chair.x = x;
+	}
+	else if (getTileType(z, x + 1) == TABLE_CHAIR) {
+		chair.z = z;
+		chair.x = x + 1;
+	}
+	else if (getTileType(z, x - 1) == TABLE_CHAIR) {
+		chair.z = z;
+		chair.x = x - 1;
+	}
+
+	return chair;
+}
+
 Cell Area::getAdjacentStove(int z, int x) {
 	Cell stove;
 	stove.x = stove.z = -1;

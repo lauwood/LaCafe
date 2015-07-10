@@ -59,6 +59,7 @@ private:
 	std::vector<Model> *g_SquarePath;
 
 	std::vector<Patron*> g_Patron;
+	std::vector<Employee*> g_Employees;
 	Employee g_Receptionist;
 
 	Area* a;
