@@ -112,6 +112,32 @@ int PlayState::Initialize() {
 	return INIT_OK; // OK
 }
 
+void PlayState::Resume() {
+	StateRunning = true;
+
+	// In case obstacles were changed
+	a->fillPaths();
+	
+	while (g_Patron.size() > 0) {
+		delete g_Patron.back();
+		g_Patron.pop_back();
+	}
+
+	while (g_Obstacles.size() > 0) {
+		delete g_Obstacles.back();
+		g_Obstacles.pop_back();
+	}
+
+	Mesh *PodiumModel = new Mesh("Models/Podium.fbx", "Shaders/Banana_vs.glsl", "Shaders/Banana_fs.glsl");
+	for (int i = 0; i < a->getHeight(); i++)
+		for (int j = 0; j < a->getWidth(); j++)
+			if (a->getTileType(i, j) == OBSTACLE) {
+				GameObjectPodium* obstacle = new GameObjectPodium(i, j);
+				obstacle->Initialize(PodiumModel);
+				g_Obstacles.push_back(obstacle);
+			}
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 void PlayState::Input() {
@@ -297,6 +323,9 @@ void PlayState::Draw() {
 
 	for (unsigned int i = 0; i < g_Chairs.size(); i++)
 		g_Chairs.at(i).Render();
+
+	for (unsigned int i = 0; i < g_Obstacles.size(); i++)
+		g_Obstacles.at(i)->Render();
 
 	/*for (GameObjectTable table : g_Tables) {
 		table.Render();

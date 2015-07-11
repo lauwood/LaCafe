@@ -30,7 +30,7 @@ public:
 	int Initialize();
 
 	void Pause()		{ StateRunning = false; }
-	void Resume()		{ StateRunning = true; }
+	void Resume();
 
 	void Input();
 	void Update();
@@ -52,14 +52,15 @@ private:
 	Floor g_Floor;
 	Mesh Dude;
 	GameObjectPodium g_Podium;
+	vector<GameObjectPodium*> g_Obstacles;
 	
-	std::vector<GameObjectChair> g_Chairs;
-	std::vector<GameObjectTable> g_Tables;
-	std::vector<GameObjectStove> g_Stoves;
-	std::vector<Model> *g_SquarePath;
+	vector<GameObjectChair> g_Chairs;
+	vector<GameObjectTable> g_Tables;
+	vector<GameObjectStove> g_Stoves;
+	vector<Model> *g_SquarePath;
 
-	std::vector<Patron*> g_Patron;
-	std::vector<Employee*> g_Employees;
+	vector<Patron*> g_Patron;
+	vector<Employee*> g_Employees;
 	Employee g_Receptionist;
 	Mesh *PersonModel;
 	Area* a;
