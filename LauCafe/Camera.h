@@ -12,7 +12,6 @@ public:
 	mat4 SetPerspective(float fov, float aspectRatio, float nearPlane, float farPlane);
 
 	mat4 GetRotationMatrix();
-	mat4 GetRotationYMatrix();
 
 	mat4 GetProjectionMatrix() { return ProjectionMatrix; }
 	mat4 GetViewMatrix();
@@ -30,11 +29,11 @@ public:
 	float GetPitch() { return Pitch; }
 	void SetPitch(float pitch) { Pitch = pitch; }
 
-	void SetSpeed(double speed) { Speed = speed; }
-	double GetSpeed() { return Speed; }
+	void SetSpeed(float speed) { Speed = speed; }
+	float GetSpeed() { return Speed; }
 
-	void SetRotationSpeed(double speed) { RotationSpeed = speed; }
-	double GetRotationSpeed() { return RotationSpeed; }
+	void SetRotationSpeed(float speed) { RotationSpeed = speed; }
+	float GetRotationSpeed() { return RotationSpeed; }
 
 	void SetViewByMouse(float mouseX, float mouseY);
 
@@ -56,11 +55,11 @@ protected:
 	mat4 ProjectionMatrix;								// The camera's projection matrix
 	vec3 Position;										// The camera's position
 
-	double Speed = 10;									// The camera's speed that is used with a time slice
-	double RotationSpeed = 2;							// The rotation speed for the camera
-	double MouseSpeed = 0.05;							// The speed for the mouse rotations
-	float Yaw = 0;										// The horizontal rotation angle (in radians), y-axis
-	float Pitch = 0;									// The vertical rotation angle (in radians, x-axis
+	float Speed = 10.f;									// The camera's speed that is used with a time slice
+	float RotationSpeed = 2.f;							// The rotation speed for the camera
+	float MouseSpeed = 0.05f;							// The speed for the mouse rotations
+	float Yaw = 0.f;									// The horizontal rotation angle (in radians), y-axis
+	float Pitch = 0.f;									// The vertical rotation angle (in radians, x-axis
 };
 
 #endif

@@ -77,8 +77,8 @@ void StateManager::MouseButtonCallback(GLFWwindow* window, int button, int actio
 
 StateManager::StateManager(GLFWwindow* window) {
 	Globals::Camera.SetPerspective(radians(60.0f), WinX / (float)WinY, 0.01f, 1000);
-	//					     Position	  Yaw	 Pitch
-	Globals::Camera.PositionCamera(1.06, 8, 4.41, 1.57, 1.25);
+	//							   Position			   Yaw	  Pitch
+	Globals::Camera.PositionCamera(1.06f, 8.0f, 4.41f, 1.57f, 1.25f);
 
 	a = new Area(10, 10, 0, 0);
 	b_EditMode = false;
@@ -103,10 +103,7 @@ void StateManager::GameLoop() {
 
 	while (!glfwWindowShouldClose(GetWindow())) {
 		TimeManager::Instance().CalculateFrameRate(false);
-		// timers
-		UpdateFPSCounter(window);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
 
 		ImGuiIO& io = ImGui::GetIO();
 		glfwPollEvents();

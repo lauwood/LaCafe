@@ -34,7 +34,7 @@ protected:
 	Mesh *m_mesh;			// Holds model information for the person
 	bool m_isWaiting;		// For a seat, for food to cook, for food to arrive
 	bool m_isWalking;
-	int m_pathIndex;
+	unsigned int m_pathIndex;
 	int m_time;				// Time left for current task
 	Direction m_direction;	// Used to determine which way the model moves every tick
 	float m_distance = 0;	// 0 - 1, used to determine when direction has to be recalculated

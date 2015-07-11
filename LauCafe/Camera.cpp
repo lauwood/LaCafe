@@ -39,18 +39,6 @@ mat4 Camera::GetRotationMatrix()
 	return rotationMatrix;
 }
 
-mat4 Camera::GetRotationYMatrix()
-{
-	// Create an identity matrix
-	mat4 rotationMatrix(1.0f);
-
-	// Add the Yaw rotation along the y-axis
-	rotationMatrix = rotate(rotationMatrix, Yaw, vec3(0, 1, 0));
-
-	// Return the final rotation matrix that stores our camera rotations
-	return rotationMatrix;
-}
-
 // This returns the camera's view matrix that is used to pass to our shaders
 mat4 Camera::GetViewMatrix()
 {

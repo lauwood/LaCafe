@@ -453,7 +453,7 @@ void Area::printPaths()
 				// If the cell is a potential destination, print the path
 				for (int i = 0; i < m_height; i++)
 					for (int j = 0; j < m_width; j++) {
-						for (int k = 0; k < v_pathVector.at(getIndex(z, x)).at(getIndex(i, j)).size(); k++) {
+						for (unsigned int k = 0; k < v_pathVector.at(getIndex(z, x)).at(getIndex(i, j)).size(); k++) {
 							Cell* top = v_pathVector.at(getIndex(z, x)).at(getIndex(i, j)).at(k);
 							// 7 is just a visual symbol to represent the path
 							pathMap[getIndex(top->z, top->x)] = 7;

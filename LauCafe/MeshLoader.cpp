@@ -79,7 +79,6 @@ bool Mesh::LoadAsset(const char* filename) {
 		for (unsigned int i = 0; i < m_Scene->mNumAnimations; i++) {
 			std::cout << "\t" << m_Scene->mAnimations[i]->mName.C_Str() << std::endl;
 		}
-		m_IsAnimated = true;
 		mAnimator = new SceneAnimator(m_Scene);
 	}
 
@@ -136,13 +135,6 @@ void Mesh::LoadMesh(unsigned int index, const aiMesh* mesh, std::vector<aiVector
 			Indices.push_back(face->mIndices[1]);
 			Indices.push_back(face->mIndices[2]);
 		}
-	}
-}
-
-void Mesh::SetAnimation(unsigned int index) {
-	if (m_IsAnimated) {
-		m_AnimIndex = index;
-		mAnimator->SetAnimIndex(index);
 	}
 }
 

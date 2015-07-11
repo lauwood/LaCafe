@@ -93,21 +93,21 @@ int PlayState::Initialize() {
 		}
 
 	g_Podium.Initialize(PodiumModel);
-	for (int i = 0; i < g_Tables.size(); i++)
+	for (unsigned int i = 0; i < g_Tables.size(); i++)
 		g_Tables.at(i).Initialize(NULL);
-	for (int i = 0; i < g_Chairs.size(); i++)
+	for (unsigned int i = 0; i < g_Chairs.size(); i++)
 		g_Chairs.at(i).Initialize(ChairModel);
-	for (int i = 0; i < g_Stoves.size(); i++)
+	for (unsigned int i = 0; i < g_Stoves.size(); i++)
 		g_Stoves.at(i).Initialize(StoveModel);
 
-	g_Receptionist = Employee(a, RECEPTIONIST);
+	g_Receptionist = Employee(a, RECEPTIONIST, PersonModel);
 	g_Receptionist.setRole(RECEPTIONIST);
 
-	g_Employees.push_back(new Employee(a, COOK));
-	g_Employees.push_back(new Employee(a, COOK));
-	g_Employees.push_back(new Employee(a, WAITER));
-	//g_Employees.push_back(new Employee(a, WAITER));
-	g_Employees.push_back(new Employee(a, DISHWASHER));
+	g_Employees.push_back(new Employee(a, COOK, PersonModel));
+	g_Employees.push_back(new Employee(a, COOK, PersonModel));
+	g_Employees.push_back(new Employee(a, WAITER, PersonModel));
+	//g_Employees.push_back(new Employee(a, WAITER, PersonModel));
+	g_Employees.push_back(new Employee(a, DISHWASHER, PersonModel));
 
 	return INIT_OK; // OK
 }
@@ -243,7 +243,7 @@ void PlayState::Input() {
 ////////////////////////////////////////////////////////////////////////////////
 
 void PlayState::Update() { 
-	for (int i = 0; i < g_Patron.size(); i++) {
+	for (unsigned int i = 0; i < g_Patron.size(); i++) {
 		if (g_Patron.at(i)->canDelete()) {
 			// Delete the patron now that it's done eating/waiting
 			delete g_Patron.at(i);
@@ -254,7 +254,7 @@ void PlayState::Update() {
 		}
 	}
 
-	for (int i = 0; i < g_Employees.size(); i++)
+	for (unsigned int i = 0; i < g_Employees.size(); i++)
 		g_Employees.at(i)->update();
 	g_Receptionist.update();
 }
@@ -269,11 +269,14 @@ void PlayState::Draw() {
 	g_Receptionist.Render();
 
 	g_Floor.Render();
-	for (int i = 0; i < g_Employees.size(); i++)
-		g_Employees.at(i)->Render();
+	for (Employee *e : g_Employees) {
+		e->Render();
+	}
+	
+	for (Patron *p : g_Patron) {
+		p->Render();
+	}
 
-	for (int i = 0; i < g_Patron.size(); i++)
-		g_Patron.at(i)->Render();
 	g_Axis.Render();
 
 	for (int i = 0; i < NUM_OF_SQUARES; i++) {
@@ -286,14 +289,26 @@ void PlayState::Draw() {
 		g_SquarePath->at(i).Render();
 	}
 
-	for (int i = 0; i < g_Tables.size(); i++)
+	for (unsigned int i = 0; i < g_Tables.size(); i++)
 		g_Tables.at(i).Render();
 
-	for (int i = 0; i < g_Stoves.size(); i++)
+	for (unsigned int i = 0; i < g_Stoves.size(); i++)
 		g_Stoves.at(i).Render();
 
-	for (int i = 0; i < g_Chairs.size(); i++)
+	for (unsigned int i = 0; i < g_Chairs.size(); i++)
 		g_Chairs.at(i).Render();
+
+	/*for (GameObjectTable table : g_Tables) {
+		table.Render();
+	}*/
+	/*
+	for (GameObjectStove stove : g_Stoves) {
+		stove.Render();
+	}
+	
+	for (GameObjectChair chair : g_Chairs) {
+		chair.Render();
+	}*/
 
 	g_Podium.Render();
 }

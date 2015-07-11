@@ -26,6 +26,4 @@ const int WinY = 768;
 #define NUM_OF_SQUARES 100
 const float SquareRadius = 1.0f;
 
-void UpdateFPSCounter(GLFWwindow* window);
-
 #endif

@@ -1,7 +1,7 @@
 #include "Employee.h"
 #include "TimeManager.h"
 
-Employee::Employee(Area* area, Role role) : Person(area)
+Employee::Employee(Area* area, Role role, Mesh *mesh) : Person(area)
 {
 	m_isBusy = false;
 	m_isWalking = false;
@@ -73,7 +73,7 @@ Employee::Employee(Area* area, Role role) : Person(area)
 		}
 	}
 
-	m_mesh = new Mesh("Models/Dude.fbx", "Shaders/Banana_vs.glsl", "Shaders/Banana_fs.glsl");
+	m_mesh = mesh;
 	dz = dx = 0;
 	m_mesh->SetScale(vec3(0.5, 0.5, 0.5));
 }
@@ -99,7 +99,7 @@ void Employee::findNextDestination() {
 			break;
 		}
 
-		for (int i = 0; destinationCells != nullptr && i < destinationCells->size(); i++) {
+		for (unsigned int i = 0; destinationCells != nullptr && i < destinationCells->size(); i++) {
 			Cell destination(destinationCells->at(i));
 			if (m_area->getCellPathLength(
 				m_currentPosition.z, m_currentPosition.x, destination.z, destination.x) > 0) {
@@ -134,7 +134,7 @@ void Employee::findNextDestination() {
 	}
 	else if (m_role == DISHWASHER) {
 		deque<Cell> dirtyCells = m_area->v_dirtyTableCells;
-		for (int i = 0; i < dirtyCells.size(); i++) {
+		for (unsigned int i = 0; i < dirtyCells.size(); i++) {
 			Cell destination(dirtyCells.at(i));
 			if (m_area->getCellPathLength(
 				m_currentPosition.z, m_currentPosition.x, destination.z, destination.x) > 0) {
@@ -195,7 +195,7 @@ void Employee::actOrWait() {
 			m_area->setTileStatus(m_destination.z, m_destination.x, TILE_OPEN);
 			m_area->setTileStatus(chair.z, chair.x, TILE_OPEN);
 
-			for (int i = 0; i < m_area->v_dirtyTableCells.size(); i++) {
+			for (unsigned int i = 0; i < m_area->v_dirtyTableCells.size(); i++) {
 				Cell tableCell(m_area->v_dirtyTableCells.at(i));
 				if (tableCell.z == m_destination.z && tableCell.x == m_destination.x) {
 					m_area->v_dirtyTableCells.erase(m_area->v_dirtyTableCells.begin() + i);
@@ -269,7 +269,7 @@ void Employee::update() {
 	case BARISTA:
 		if (m_area->getTileStatus(m_destination.z, m_destination.x) == TILE_OPEN) {
 			// Stove is open, cook if needed
-			for (int i = 0; i < m_area->v_waitingCustomerCells.size(); i++) {
+			for (unsigned int i = 0; i < m_area->v_waitingCustomerCells.size(); i++) {
 				if (m_area->getCellPathLength(m_destination.z, m_destination.x,
 					m_area->v_waitingCustomerCells.at(i).z, m_area->v_waitingCustomerCells.at(i).z) > 0) {
 					// The stove can reach the table, so the order is ok

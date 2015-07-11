@@ -113,7 +113,7 @@ void Patron::actOrWait() {
 				m_area->setTileStatus(m_tableCell.z, m_tableCell.x, TILE_OPEN);
 				m_area->setTileStatus(m_currentPosition.z, m_currentPosition.x, TILE_OPEN);
 
-				for (int i = 0; i < m_area->v_waitingCustomerCells.size(); i++) {
+				for (unsigned int i = 0; i < m_area->v_waitingCustomerCells.size(); i++) {
 					Cell vCell = m_area->v_waitingCustomerCells.at(i);
 					if (m_currentPosition.z == vCell.z && m_currentPosition.x == vCell.x) {
 						// Take the order out of the deque

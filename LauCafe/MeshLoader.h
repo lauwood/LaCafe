@@ -66,10 +66,6 @@ public:
 	// Updates the current animation frame and channel by calling upon the scene animator's calculate method
 	void UpdateAnimation();
 
-	void SetAnimation(unsigned int index);
-	unsigned int GetAnimation() { return m_AnimIndex; }
-	bool HasAnimations() { return m_IsAnimated; };
-
 	// Get and Set for the model's position
 	vec3 GetPosition() { return Position; }
 	void SetPosition(vec3 position) { Position = position; }
@@ -84,8 +80,6 @@ public:
 
 private:
 	bool m_ForceNoBones;
-	bool m_IsAnimated;
-	bool m_AnimIndex;
 
 	double CurrentTime;
 	double LastPlaying;
