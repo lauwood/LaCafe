@@ -108,7 +108,7 @@ void Employee::findNextDestination() {
 				m_isWalking = true;
 				destinationCells->erase(destinationCells->begin() + i);
 				m_destination = destination;
-				cout << "x: " << m_destination.x << ", z:" << m_destination.z << endl;
+				cout << "WAITER: heading to x: " << m_destination.x << " z: " << m_destination.z << endl;
 
 				m_pathToNextDestination = m_area->getCellPath(m_currentPosition.z, m_currentPosition.x,
 					m_destination.z, m_destination.x);
@@ -147,6 +147,8 @@ void Employee::findNextDestination() {
 
 				m_pathToNextDestination = m_area->getCellPath(m_currentPosition.z, m_currentPosition.x,
 					m_destination.z, m_destination.x);
+
+				cout << "DISHWASHER: heading to x: " << m_destination.x << " z: " << m_destination.z << endl;
 				break;
 			}
 		}
@@ -208,12 +210,14 @@ void Employee::actOrWait() {
 			break;
 		case RECEPTIONIST:
 			m_area->recStatus = REC_READY;
+			cout << "RECEPTIONIST: Ready" << endl;
 			break;
 		case COOK:
 		case BARISTA:
 			Cell stoveCell(m_destination);
 			m_area->setTileStatus(m_destination.z, m_destination.x, TILE_STOVE_FOOD);
 			m_area->v_doneCookingStoveCells.push_back(stoveCell);
+			cout << "COOK: Done cooking x: " << m_destination.x << " z: " << m_destination.z << endl;
 			break;
 		}
 	}
@@ -260,6 +264,7 @@ void Employee::update() {
 			actOrWait();
 		else if (m_area->recStatus == REC_JUST_DIRECTED) {
 			// Initiate cooldown after directing patron
+			cout << "RECEPTIONIST: Cooldown" << endl;
 			m_area->recStatus = REC_COOLDOWN;
 			m_isBusy = true;
 			setTimer();
@@ -275,6 +280,8 @@ void Employee::update() {
 					// The stove can reach the table, so the order is ok
 					Cell tableCell(m_area->v_waitingCustomerCells.at(i));
 					m_area->setTileStatus(tableCell.z, tableCell.x, TILE_TABLE_FOOD_COMING);
+					cout << "COOK: Setting x: " << tableCell.x << " z: " << tableCell.z <<
+						" to food coming." << endl;
 
 					m_isBusy = true;
 					m_area->setTileStatus(m_destination.z, m_destination.x, TILE_STOVE_COOKING);

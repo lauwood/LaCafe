@@ -69,6 +69,7 @@ void Patron::findNextDestination() {
 		m_tableCell = m_area->getAdjacentTable(m_destination.z, m_destination.x);
 		m_area->setTileStatus(m_destination.z, m_destination.x, TILE_RESERVED);
 		m_area->setTileStatus(m_tableCell.z, m_tableCell.x, TILE_RESERVED);
+		cout << "PATRON: Heading to x: " << m_tableCell.x << " z: " << m_tableCell.z << endl;
 	}
 
 	m_isWalking = true;
@@ -113,6 +114,8 @@ void Patron::actOrWait() {
 				m_area->setTileStatus(m_tableCell.z, m_tableCell.x, TILE_OPEN);
 				m_area->setTileStatus(m_currentPosition.z, m_currentPosition.x, TILE_OPEN);
 
+				cout << "PATRON: Timed out at table x: " << m_tableCell.x << " z: " << m_tableCell.z << endl;
+
 				for (unsigned int i = 0; i < m_area->v_waitingCustomerCells.size(); i++) {
 					Cell vCell = m_area->v_waitingCustomerCells.at(i);
 					if (m_currentPosition.z == vCell.z && m_currentPosition.x == vCell.x) {
@@ -139,6 +142,7 @@ void Patron::actOrWait() {
 			m_area->setTileStatus(m_tableCell.z, m_tableCell.x, TILE_TABLE_DIRTY);
 			m_area->setTileStatus(m_currentPosition.z, m_currentPosition.x, TILE_TABLE_DIRTY);
 			m_area->v_dirtyTableCells.push_back(Cell(m_tableCell));
+			cout << "PATRON: Done eating x: " << m_tableCell.x << " z: " << m_tableCell.z << endl;
 
 			//TODO: Rating calculations
 			//TODO: May need to change the "stage" to something else
