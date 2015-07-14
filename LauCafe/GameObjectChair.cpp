@@ -4,7 +4,7 @@ GameObjectChair::GameObjectChair(int z, int x) : GameObject(z, x) {
 }
 
 GameObjectChair::~GameObjectChair() {
-
+	delete model;
 }
 
 void GameObjectChair::Initialize(Mesh *ChairModel) {

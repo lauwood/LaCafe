@@ -68,45 +68,15 @@ int PlayState::Initialize() {
 		g_SquarePath->at(i).SetScale(vec3(0.5, 0.5, 0.5));
 	}
 
+	// Fill object vectors
+	Resume();
+
 	PersonModel = new Mesh("Models/Dude.fbx", "Shaders/Banana_vs.glsl", "Shaders/Banana_fs.glsl");
-	Mesh *ChairModel = new Mesh("Models/chair/chair.obj", "Shaders/Banana_vs.glsl", "Shaders/Banana_fs.glsl");
-	Mesh *PodiumModel = new Mesh("Models/Podium.fbx", "Shaders/Banana_vs.glsl", "Shaders/Banana_fs.glsl");
-	Mesh *StoveModel = new Mesh("Models/stove.fbx", "Shaders/Banana_vs.glsl", "Shaders/Banana_fs.glsl");
-
-	for (int i = 0; i < a->getHeight(); i++)
-		for (int j = 0; j < a->getWidth(); j++) {
-			TileType tileType = a->getTileType(i, j);
-			switch (tileType) {
-			case TABLE:
-				g_Tables.push_back(GameObjectTable(i, j));
-				break;
-			case TABLE_CHAIR:
-				g_Chairs.push_back(GameObjectChair(i, j));
-				break;
-			case STOVE:
-				g_Stoves.push_back(GameObjectStove(i, j));
-				break;
-			case RECEPTION:
-				g_Podium = GameObjectPodium(i, j);
-				break;
-			}
-		}
-
-	g_Podium.Initialize(PodiumModel);
-	for (unsigned int i = 0; i < g_Tables.size(); i++)
-		g_Tables.at(i).Initialize(NULL);
-	for (unsigned int i = 0; i < g_Chairs.size(); i++)
-		g_Chairs.at(i).Initialize(ChairModel);
-	for (unsigned int i = 0; i < g_Stoves.size(); i++)
-		g_Stoves.at(i).Initialize(StoveModel);
-
 	g_Receptionist = Employee(a, RECEPTIONIST, PersonModel);
-	g_Receptionist.setRole(RECEPTIONIST);
 
 	g_Employees.push_back(new Employee(a, COOK, PersonModel));
 	g_Employees.push_back(new Employee(a, COOK, PersonModel));
 	g_Employees.push_back(new Employee(a, WAITER, PersonModel));
-	//g_Employees.push_back(new Employee(a, WAITER, PersonModel));
 	g_Employees.push_back(new Employee(a, DISHWASHER, PersonModel));
 
 	return INIT_OK; // OK
@@ -115,27 +85,50 @@ int PlayState::Initialize() {
 void PlayState::Resume() {
 	StateRunning = true;
 
-	// In case obstacles were changed
-	a->fillPaths();
-	
+	Mesh *ChairModel = new Mesh("Models/chair/chair.obj", "Shaders/Banana_vs.glsl", "Shaders/Banana_fs.glsl");
+	Mesh *PodiumModel = new Mesh("Models/Podium.fbx", "Shaders/Banana_vs.glsl", "Shaders/Banana_fs.glsl");
+	Mesh *StoveModel = new Mesh("Models/stove.fbx", "Shaders/Banana_vs.glsl", "Shaders/Banana_fs.glsl");
+
+	// Deallocate memory first
 	while (g_Patron.size() > 0) {
 		delete g_Patron.back();
 		g_Patron.pop_back();
 	}
-
-	while (g_Obstacles.size() > 0) {
-		delete g_Obstacles.back();
-		g_Obstacles.pop_back();
+	while (g_GameObjects.size() > 0) {
+		delete g_GameObjects.back();
+		g_GameObjects.pop_back();
 	}
 
-	Mesh *PodiumModel = new Mesh("Models/Podium.fbx", "Shaders/Banana_vs.glsl", "Shaders/Banana_fs.glsl");
+	// Fill in the object array from the floor array
 	for (int i = 0; i < a->getHeight(); i++)
-		for (int j = 0; j < a->getWidth(); j++)
-			if (a->getTileType(i, j) == OBSTACLE) {
-				GameObjectPodium* obstacle = new GameObjectPodium(i, j);
-				obstacle->Initialize(PodiumModel);
-				g_Obstacles.push_back(obstacle);
+		for (int j = 0; j < a->getWidth(); j++) {
+			TileType tileType = a->getTileType(i, j);
+			switch (tileType) {
+			case TABLE:
+				g_GameObjects.push_back(new GameObjectTable(i, j));
+				g_GameObjects.back()->Initialize(NULL);
+				break;
+			case TABLE_CHAIR:
+				g_GameObjects.push_back(new GameObjectChair(i, j));
+				g_GameObjects.back()->Initialize(ChairModel);
+				break;
+			case STOVE:
+				g_GameObjects.push_back(new GameObjectStove(i, j));
+				g_GameObjects.back()->Initialize(StoveModel);
+				break;
+			case RECEPTION:
+				g_GameObjects.push_back(new GameObjectPodium(i, j));
+				g_GameObjects.back()->Initialize(PodiumModel);
+				break;
+			case OBSTACLE:
+				// Use podium as a placeholder model
+				g_GameObjects.push_back(new GameObjectPodium(i, j));
+				g_GameObjects.back()->Initialize(PodiumModel);
+				break;
 			}
+		}
+
+	a->fillPaths();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -303,6 +296,10 @@ void PlayState::Draw() {
 		p->Render();
 	}
 
+	for (GameObject *g : g_GameObjects) {
+		g->Render();
+	}
+
 	g_Axis.Render();
 
 	for (int i = 0; i < NUM_OF_SQUARES; i++) {
@@ -314,32 +311,6 @@ void PlayState::Draw() {
 		}
 		g_SquarePath->at(i).Render();
 	}
-
-	for (unsigned int i = 0; i < g_Tables.size(); i++)
-		g_Tables.at(i).Render();
-
-	for (unsigned int i = 0; i < g_Stoves.size(); i++)
-		g_Stoves.at(i).Render();
-
-	for (unsigned int i = 0; i < g_Chairs.size(); i++)
-		g_Chairs.at(i).Render();
-
-	for (unsigned int i = 0; i < g_Obstacles.size(); i++)
-		g_Obstacles.at(i)->Render();
-
-	/*for (GameObjectTable table : g_Tables) {
-		table.Render();
-	}*/
-	/*
-	for (GameObjectStove stove : g_Stoves) {
-		stove.Render();
-	}
-	
-	for (GameObjectChair chair : g_Chairs) {
-		chair.Render();
-	}*/
-
-	g_Podium.Render();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

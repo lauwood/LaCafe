@@ -4,7 +4,7 @@ GameObjectPodium::GameObjectPodium(int z, int x) : GameObject(z, x) {
 }
 
 GameObjectPodium::~GameObjectPodium() {
-
+	delete model;
 }
 
 void GameObjectPodium::Initialize(Mesh *PodiumModel) {

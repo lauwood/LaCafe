@@ -4,7 +4,7 @@ GameObjectStove::GameObjectStove(int z, int x) : GameObject(z, x) {
 }
 
 GameObjectStove::~GameObjectStove() {
-
+	delete model;
 }
 
 void GameObjectStove::Initialize(Mesh *StoveModel) {

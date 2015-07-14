@@ -51,13 +51,9 @@ private:
 	Model g_Axis;
 	Floor g_Floor;
 	Mesh Dude;
-	GameObjectPodium g_Podium;
-	vector<GameObjectPodium*> g_Obstacles;
-	
-	vector<GameObjectChair> g_Chairs;
-	vector<GameObjectTable> g_Tables;
-	vector<GameObjectStove> g_Stoves;
 	vector<Model> *g_SquarePath;
+
+	vector<GameObject*> g_GameObjects;
 
 	vector<Patron*> g_Patron;
 	vector<Employee*> g_Employees;
