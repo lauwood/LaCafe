@@ -90,14 +90,15 @@ void PlayState::Resume() {
 	Mesh *StoveModel = new Mesh("Models/stove.fbx", "Shaders/Banana_vs.glsl", "Shaders/Banana_fs.glsl");
 
 	// Deallocate memory first
-	while (g_Patron.size() > 0) {
-		delete g_Patron.back();
-		g_Patron.pop_back();
+	for (Patron *p : g_Patron) {
+		delete p;
 	}
-	while (g_GameObjects.size() > 0) {
-		delete g_GameObjects.back();
-		g_GameObjects.pop_back();
+	g_Patron.clear();
+
+	for (GameObject *g : g_GameObjects) {
+		delete g;
 	}
+	g_GameObjects.clear();
 
 	// Fill in the object array from the floor array
 	for (int i = 0; i < a->getHeight(); i++)
@@ -250,8 +251,8 @@ void PlayState::Input() {
 				}
 			}
 			SelectedSquare = closest_square_clicked;*/
-
-			g_Patron.push_back(new Patron(a, PersonModel));
+			if (a->podiumReachable())
+				g_Patron.push_back(new Patron(a, PersonModel));
 			//fprintf(stdout, "center of square: x: %.2f, z: %.2f", g_SquarePath->at(SelectedSquare).GetPosition().x, g_SquarePath->at(SelectedSquare).GetPosition().z);
 		}
 	}

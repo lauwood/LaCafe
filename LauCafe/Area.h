@@ -56,6 +56,7 @@ public:
 
 	bool isInBounds(int z, int x);
 	bool isWalkable(int z, int x);
+	bool podiumReachable() { return canReachPodium; }
 	TileStatus getTileStatus(int z, int x);
 
 	// Mutators
@@ -83,6 +84,9 @@ private:
 	Cell m_start;
 	int m_width;
 	int m_height;
+
+	// To prevent patrons from throwing exceptions
+	bool canReachPodium;
 
 	// Dynamic arrays for expandable restaurants
 	vector<TileType> v_typeVector;				// Represents the actual floor of the restaurant

@@ -40,6 +40,8 @@ Area::Area(int height, int width, int sz, int sx)
 	setTile(sz, sx, START);
 
 	recStatus = REC_READY;
+
+	canReachPodium = false;
 }
 
 Area::Area(int height, int width, int sz, int sx, vector<TileType> existingVector)
@@ -75,6 +77,8 @@ Area::Area(int height, int width, int sz, int sx, vector<TileType> existingVecto
 	setTile(sz, sx, START);
 
 	recStatus = REC_READY;
+
+	canReachPodium = false;
 }
 
 Area::~Area()
@@ -253,6 +257,8 @@ void Area::fillPaths()
 	clearPaths();
 	fillPathLength();
 
+	canReachPodium = false;
+
 	/*
 	* Pseudocode:
 	*	1. "Flood" the walkable matrix with shortest distance from the start point.
@@ -264,74 +270,81 @@ void Area::fillPaths()
 	*	5. Go to step 3 until the current distance is 0.
 	*/
 
-	for (int z = 0; z < m_height; z++)
-		for (int x = 0; x < m_width; x++) {
-			TileType tileType = v_typeVector[getIndex(z, x)];
-			TileType destinationType = getDestinationType(tileType);
+	Cell podiumCell;
 
+	for (int z = 0; z < m_height; z++)
+		for (int x = 0; x < m_width; x++)
 			for (int i = 0; i < m_height; i++)
 				for (int j = 0; j < m_width; j++) {
-					//if (v_typeVector[getIndex(i, j)] == destinationType) {
-						// The path matrix doesn't have the distance on the destination cell. Need surrounding minimum
-						int minLength1 = min(getCellPathLength(z, x, i, j + 1),
-							getCellPathLength(z, x, i, j - 1));
-						int minLength2 = min(getCellPathLength(z, x, i + 1, j),
-							getCellPathLength(z, x, i - 1, j));
-						int minLength = min(minLength1, minLength2);
-						int totalLength = minLength + 1;
+					// The path matrix doesn't have the distance on the destination cell. Need surrounding minimum
+					int minLength1 = min(getCellPathLength(z, x, i, j + 1),
+						getCellPathLength(z, x, i, j - 1));
+					int minLength2 = min(getCellPathLength(z, x, i + 1, j),
+						getCellPathLength(z, x, i - 1, j));
+					int minLength = min(minLength1, minLength2);
+					int totalLength = minLength + 1;
 
-						// Current coordinates
-						int xx = j;
-						int zz = i;
+					// Current coordinates
+					int xx = j;
+					int zz = i;
 
-						Cell* cell = new Cell;
-						cell->x = xx;
-						cell->z = zz;
-						// Only push the chair or start tile onto the path
-						if (getTileType(zz, xx) == TABLE_CHAIR || getTileType(zz, xx) == START)
-							v_pathVector.at(getIndex(z, x)).at(getIndex(i, j)).push_front(cell);
+					Cell* cell = new Cell;
+					cell->x = xx;
+					cell->z = zz;
+					// Only push the chair or start tile onto the path
+					if (getTileType(zz, xx) == TABLE_CHAIR || getTileType(zz, xx) == START)
+						v_pathVector.at(getIndex(z, x)).at(getIndex(i, j)).push_front(cell);
+					else if (getTileType(zz, xx) == RECEPTION) {
+						podiumCell.x = xx;
+						podiumCell.z = zz;
+					}
 
-						while (totalLength-- > 0) {
-							if (isInBounds(zz, xx - 1) && getCellPathLength(z, x, zz, xx - 1) == totalLength) {
-								// Push a new cell onto the deque for later use
-								Cell* c = new Cell;
-								c->x = --xx;
-								c->z = zz;
-								v_pathVector.at(getIndex(z, x)).at(getIndex(i, j)).push_front(c);
+					while (totalLength-- > 0) {
+						if (isInBounds(zz, xx - 1) && getCellPathLength(z, x, zz, xx - 1) == totalLength) {
+							// Push a new cell onto the deque for later use
+							Cell* c = new Cell;
+							c->x = --xx;
+							c->z = zz;
+							v_pathVector.at(getIndex(z, x)).at(getIndex(i, j)).push_front(c);
 
-								continue;
-							}
-
-							if (isInBounds(zz, xx + 1) && getCellPathLength(z, x, zz, xx + 1) == totalLength) {
-								Cell* c = new Cell;
-								c->x = ++xx;
-								c->z = zz;
-								v_pathVector.at(getIndex(z, x)).at(getIndex(i, j)).push_front(c);
-
-								continue;
-							}
-
-							if (isInBounds(zz - 1, xx) && getCellPathLength(z, x, zz - 1, xx) == totalLength) {
-								Cell* c = new Cell;
-								c->x = xx;
-								c->z = --zz;
-								v_pathVector.at(getIndex(z, x)).at(getIndex(i, j)).push_front(c);
-
-								continue;
-							}
-
-							if (isInBounds(zz + 1, xx) && getCellPathLength(z, x, zz + 1, xx) == totalLength) {
-								Cell* c = new Cell;
-								c->x = xx;
-								c->z = ++zz;
-								v_pathVector.at(getIndex(z, x)).at(getIndex(i, j)).push_front(c);
-
-								continue;
-							}
+							continue;
 						}
-					//}
+
+						if (isInBounds(zz, xx + 1) && getCellPathLength(z, x, zz, xx + 1) == totalLength) {
+							Cell* c = new Cell;
+							c->x = ++xx;
+							c->z = zz;
+							v_pathVector.at(getIndex(z, x)).at(getIndex(i, j)).push_front(c);
+
+							continue;
+						}
+
+						if (isInBounds(zz - 1, xx) && getCellPathLength(z, x, zz - 1, xx) == totalLength) {
+							Cell* c = new Cell;
+							c->x = xx;
+							c->z = --zz;
+							v_pathVector.at(getIndex(z, x)).at(getIndex(i, j)).push_front(c);
+
+							continue;
+						}
+
+						if (isInBounds(zz + 1, xx) && getCellPathLength(z, x, zz + 1, xx) == totalLength) {
+							Cell* c = new Cell;
+							c->x = xx;
+							c->z = ++zz;
+							v_pathVector.at(getIndex(z, x)).at(getIndex(i, j)).push_front(c);
+
+							continue;
+						}
+					}
 				}
-		}
+
+	int podiumLength1 = getCellPathLength(m_start.z, m_start.x, podiumCell.z + 1, podiumCell.x);
+	int podiumLength2 = getCellPathLength(m_start.z, m_start.x, podiumCell.z - 1, podiumCell.x);
+	int podiumLength3 = getCellPathLength(m_start.z, m_start.x, podiumCell.z, podiumCell.x + 1);
+	int podiumLength4 = getCellPathLength(m_start.z, m_start.x, podiumCell.z, podiumCell.x - 1);
+	canReachPodium = (podiumLength1 < INT_MAX) || (podiumLength2 < INT_MAX) ||
+		(podiumLength3 < INT_MAX) || (podiumLength4 < INT_MAX);
 }
 
 void Area::clearPaths() {
