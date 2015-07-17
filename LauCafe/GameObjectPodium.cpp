@@ -1,12 +1,5 @@
 #include "GameObjectPodium.h"
 
-GameObjectPodium::GameObjectPodium(int z, int x) : GameObject(z, x) {
-}
-
-GameObjectPodium::~GameObjectPodium() {
-	delete model;
-}
-
 void GameObjectPodium::Initialize(Mesh *PodiumModel) {
 	//model = Mesh("Models/Podium.fbx", "Shaders/Banana_vs.glsl", "Shaders/Banana_fs.glsl");
 	model = PodiumModel;

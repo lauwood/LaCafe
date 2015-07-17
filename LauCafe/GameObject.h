@@ -9,7 +9,6 @@ using namespace glm;
 class GameObject {
 public:
 	GameObject()				{}
-	GameObject(int z, int x)	{ this->z = z; this->x = x; }
 	~GameObject()				{}
 
 	virtual void Initialize(Mesh* model) = 0;

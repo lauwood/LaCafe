@@ -22,6 +22,7 @@ Area::Area(int height, int width, int sz, int sx)
 	v_statusVector = vector<TileStatus>(width * height);
 	fill(v_statusVector.begin(), v_statusVector.end(), TILE_OPEN);
 	v_decorationVector = vector<int>(width * height);
+	g_GameObjects = vector<GameObject*>(width * height);
 
 	// Set the default values of the path length to INT_MAX
 	v_pathLengthVector = vector<vector<int>>(width * height);
@@ -42,6 +43,8 @@ Area::Area(int height, int width, int sz, int sx)
 	recStatus = REC_READY;
 
 	canReachPodium = false;
+
+	fillObjectVector();
 }
 
 Area::Area(int height, int width, int sz, int sx, vector<TileType> existingVector)
@@ -57,6 +60,7 @@ Area::Area(int height, int width, int sz, int sx, vector<TileType> existingVecto
 	v_statusVector = vector<TileStatus>(width * height);
 	fill(v_statusVector.begin(), v_statusVector.end(), TILE_OPEN);
 	v_decorationVector = vector<int>(width * height);
+	g_GameObjects = vector<GameObject*>(width * height);
 
 	// Set the default values of the path length to INT_MAX
 	v_pathLengthVector = vector<vector<int>>(width * height);
@@ -79,11 +83,43 @@ Area::Area(int height, int width, int sz, int sx, vector<TileType> existingVecto
 	recStatus = REC_READY;
 
 	canReachPodium = false;
+	fillObjectVector();
 }
 
 Area::~Area()
 {
 	clearPaths();
+}
+
+void Area::fillObjectVector() {
+	// Fill in the object array from the floor array
+	for (int i = 0; i < getHeight(); i++)
+		for (int j = 0; j < getWidth(); j++) {
+			TileType tileType = getTileType(i, j);
+			switch (tileType) {
+			case TABLE:
+				g_GameObjects.at(getIndex(i, j)) = new GameObjectTable();
+				g_GameObjects.at(getIndex(i, j))->Initialize(NULL);
+				break;
+			case TABLE_CHAIR:
+				g_GameObjects.at(getIndex(i, j)) = new GameObjectChair();
+				g_GameObjects.at(getIndex(i, j))->Initialize(ChairModel);
+				break;
+			case STOVE:
+				g_GameObjects.at(getIndex(i, j)) = new GameObjectStove();
+				g_GameObjects.at(getIndex(i, j))->Initialize(StoveModel);
+				break;
+			case RECEPTION:
+				g_GameObjects.at(getIndex(i, j)) = new GameObjectPodium();
+				g_GameObjects.at(getIndex(i, j))->Initialize(PodiumModel);
+				break;
+			case OBSTACLE:
+				// Use podium as a placeholder model
+				g_GameObjects.at(getIndex(i, j)) = new GameObjectPodium();
+				g_GameObjects.at(getIndex(i, j))->Initialize(PodiumModel);
+				break;
+			}
+		}
 }
 
 
@@ -242,8 +278,38 @@ int Area::getIndex(int z, int x)
 
 void Area::setTile(int z, int x, TileType tileType)
 {
-	if (isInBounds(z, x))
-		v_typeVector[getIndex(z, x)] = tileType;
+	if (!isInBounds(z, x))
+		return;
+	
+	v_typeVector[getIndex(z, x)] = tileType;
+
+	switch (tileType) {
+	case TABLE:
+		g_GameObjects.at(getIndex(z, x)) = new GameObjectTable();
+		g_GameObjects.at(getIndex(z, x))->Initialize(NULL);
+		break;
+	case TABLE_CHAIR:
+		g_GameObjects.at(getIndex(z, x)) = new GameObjectChair();
+		g_GameObjects.at(getIndex(z, x))->Initialize(ChairModel);
+		break;
+	case STOVE:
+		g_GameObjects.at(getIndex(z, x)) = new GameObjectStove();
+		g_GameObjects.at(getIndex(z, x))->Initialize(StoveModel);
+		break;
+	case RECEPTION:
+		g_GameObjects.at(getIndex(z, x)) = new GameObjectPodium();
+		g_GameObjects.at(getIndex(z, x))->Initialize(PodiumModel);
+		break;
+	case OBSTACLE:
+		// Use podium as a placeholder model
+		g_GameObjects.at(getIndex(z, x)) = new GameObjectPodium();
+		g_GameObjects.at(getIndex(z, x))->Initialize(PodiumModel);
+		break;
+	default:
+		if (!g_GameObjects.at(getIndex(z, x)) == NULL)
+			delete g_GameObjects.at(getIndex(z, x));
+		g_GameObjects.at(getIndex(z, x)) = NULL;
+	}
 }
 
 void Area::setTileStatus(int z, int x, TileStatus status) {
@@ -277,11 +343,11 @@ void Area::fillPaths()
 			for (int i = 0; i < m_height; i++)
 				for (int j = 0; j < m_width; j++) {
 					// The path matrix doesn't have the distance on the destination cell. Need surrounding minimum
-					int minLength1 = min(getCellPathLength(z, x, i, j + 1),
+					int minLength1 = std::min(getCellPathLength(z, x, i, j + 1),
 						getCellPathLength(z, x, i, j - 1));
-					int minLength2 = min(getCellPathLength(z, x, i + 1, j),
+					int minLength2 = std::min(getCellPathLength(z, x, i + 1, j),
 						getCellPathLength(z, x, i - 1, j));
-					int minLength = min(minLength1, minLength2);
+					int minLength = std::min(minLength1, minLength2);
 					int totalLength = minLength + 1;
 
 					// Current coordinates

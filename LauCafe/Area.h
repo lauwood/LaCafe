@@ -2,6 +2,10 @@
 
 #include <vector>
 #include <deque>
+#include "GameObjectTable.h"
+#include "GameObjectChair.h"
+#include "GameObjectStove.h"
+#include "GameObjectPodium.h"
 
 using namespace std;
 
@@ -75,11 +79,14 @@ public:
 	deque<Cell> v_doneCookingStoveCells;
 	deque<Cell> v_dirtyTableCells;
 
+	vector<GameObject*> g_GameObjects;
+
 	ReceptionistStatus recStatus;
 private:
 	// This function is private to prevent accessing the right cell easily
 	int getIndex(int z, int x);
 	void fillPathLength();
+	void fillObjectVector();
 
 	Cell m_start;
 	int m_width;
@@ -94,4 +101,10 @@ private:
 	vector<vector<deque<Cell*>>> v_pathVector;	// Holds the shortest distance path for tables only
 	vector<TileStatus> v_statusVector;			// Tells the state of the tile
 	vector<int> v_decorationVector;				// Represents what decoration occupies the table (IDs)
+
+
+	Mesh *ChairModel = new Mesh("Models/chair/chair.obj", "Shaders/Banana_vs.glsl", "Shaders/Banana_fs.glsl");
+	Mesh *PodiumModel = new Mesh("Models/Podium.fbx", "Shaders/Banana_vs.glsl", "Shaders/Banana_fs.glsl");
+	Mesh *StoveModel = new Mesh("Models/stove.fbx", "Shaders/Banana_vs.glsl", "Shaders/Banana_fs.glsl");
+
 };

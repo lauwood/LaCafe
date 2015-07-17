@@ -1,12 +1,5 @@
 #include "GameObjectChair.h"
 
-GameObjectChair::GameObjectChair(int z, int x) : GameObject(z, x) {
-}
-
-GameObjectChair::~GameObjectChair() {
-	delete model;
-}
-
 void GameObjectChair::Initialize(Mesh *ChairModel) {
 	//model = Mesh("Models/chair/chair.obj", "Shaders/Banana_vs.glsl", "Shaders/Banana_fs.glsl");
 	model = ChairModel;

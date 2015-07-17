@@ -85,49 +85,11 @@ int PlayState::Initialize() {
 void PlayState::Resume() {
 	StateRunning = true;
 
-	Mesh *ChairModel = new Mesh("Models/chair/chair.obj", "Shaders/Banana_vs.glsl", "Shaders/Banana_fs.glsl");
-	Mesh *PodiumModel = new Mesh("Models/Podium.fbx", "Shaders/Banana_vs.glsl", "Shaders/Banana_fs.glsl");
-	Mesh *StoveModel = new Mesh("Models/stove.fbx", "Shaders/Banana_vs.glsl", "Shaders/Banana_fs.glsl");
-
 	// Deallocate memory first
 	for (Patron *p : g_Patron) {
 		delete p;
 	}
 	g_Patron.clear();
-
-	for (GameObject *g : g_GameObjects) {
-		delete g;
-	}
-	g_GameObjects.clear();
-
-	// Fill in the object array from the floor array
-	for (int i = 0; i < a->getHeight(); i++)
-		for (int j = 0; j < a->getWidth(); j++) {
-			TileType tileType = a->getTileType(i, j);
-			switch (tileType) {
-			case TABLE:
-				g_GameObjects.push_back(new GameObjectTable(i, j));
-				g_GameObjects.back()->Initialize(NULL);
-				break;
-			case TABLE_CHAIR:
-				g_GameObjects.push_back(new GameObjectChair(i, j));
-				g_GameObjects.back()->Initialize(ChairModel);
-				break;
-			case STOVE:
-				g_GameObjects.push_back(new GameObjectStove(i, j));
-				g_GameObjects.back()->Initialize(StoveModel);
-				break;
-			case RECEPTION:
-				g_GameObjects.push_back(new GameObjectPodium(i, j));
-				g_GameObjects.back()->Initialize(PodiumModel);
-				break;
-			case OBSTACLE:
-				// Use podium as a placeholder model
-				g_GameObjects.push_back(new GameObjectPodium(i, j));
-				g_GameObjects.back()->Initialize(PodiumModel);
-				break;
-			}
-		}
 
 	a->fillPaths();
 }
@@ -297,8 +259,9 @@ void PlayState::Draw() {
 		p->Render();
 	}
 
-	for (GameObject *g : g_GameObjects) {
-		g->Render();
+	for (GameObject *g : a->g_GameObjects) {
+		if (g != NULL)
+			g->Render();
 	}
 
 	g_Axis.Render();

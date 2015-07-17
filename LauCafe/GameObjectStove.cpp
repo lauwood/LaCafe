@@ -1,12 +1,5 @@
 #include "GameObjectStove.h"
 
-GameObjectStove::GameObjectStove(int z, int x) : GameObject(z, x) {
-}
-
-GameObjectStove::~GameObjectStove() {
-	delete model;
-}
-
 void GameObjectStove::Initialize(Mesh *StoveModel) {
 	//model = Mesh("Models/stove.fbx", "Shaders/Banana_vs.glsl", "Shaders/Banana_fs.glsl");
 	model = StoveModel;

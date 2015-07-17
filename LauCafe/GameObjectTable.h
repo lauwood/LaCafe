@@ -7,9 +7,8 @@
 
 class GameObjectTable : public GameObject {
 public:
-	GameObjectTable() {}
-	GameObjectTable(int z, int x);
-	~GameObjectTable();
+	GameObjectTable()		{}
+	~GameObjectTable()		{}
 
 	void Initialize(Mesh *TableModel);
 	void Render();

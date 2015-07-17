@@ -17,10 +17,6 @@
 #include "Area.h"
 #include "Patron.h"
 #include "Employee.h"
-#include "GameObjectTable.h"
-#include "GameObjectChair.h"
-#include "GameObjectStove.h"
-#include "GameObjectPodium.h"
 
 class PlayState : public GameState
 {
@@ -52,8 +48,6 @@ private:
 	Floor g_Floor;
 	Mesh Dude;
 	vector<Model> *g_SquarePath;
-
-	vector<GameObject*> g_GameObjects;
 
 	vector<Patron*> g_Patron;
 	vector<Employee*> g_Employees;

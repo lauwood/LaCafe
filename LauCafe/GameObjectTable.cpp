@@ -2,13 +2,6 @@
 
 #define Y_OFFSET 0.75
 
-GameObjectTable::GameObjectTable(int z, int x) : GameObject(z, x) {
-}
-
-GameObjectTable::~GameObjectTable() {
-
-}
-
 void GameObjectTable::Initialize(Mesh *TableModel) {
 	model.Initialize(Model::square2, 6, GL_TRIANGLES, "Shaders/Banana_vs.glsl", "Shaders/Banana_fs.glsl");
 	leg1.Initialize(Model::square, 6, GL_TRIANGLES, "Shaders/Banana_vs.glsl", "Shaders/Banana_fs.glsl");
