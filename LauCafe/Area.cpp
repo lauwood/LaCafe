@@ -43,8 +43,6 @@ Area::Area(int height, int width, int sz, int sx)
 	recStatus = REC_READY;
 
 	canReachPodium = false;
-
-	fillObjectVector();
 }
 
 Area::Area(int height, int width, int sz, int sx, vector<TileType> existingVector)
@@ -98,24 +96,24 @@ void Area::fillObjectVector() {
 			TileType tileType = getTileType(i, j);
 			switch (tileType) {
 			case TABLE:
-				g_GameObjects.at(getIndex(i, j)) = new GameObjectTable();
+				g_GameObjects.at(getIndex(i, j)) = new GameObjectTable(i, j);
 				g_GameObjects.at(getIndex(i, j))->Initialize(NULL);
 				break;
 			case TABLE_CHAIR:
-				g_GameObjects.at(getIndex(i, j)) = new GameObjectChair();
+				g_GameObjects.at(getIndex(i, j)) = new GameObjectChair(i, j);
 				g_GameObjects.at(getIndex(i, j))->Initialize(ChairModel);
 				break;
 			case STOVE:
-				g_GameObjects.at(getIndex(i, j)) = new GameObjectStove();
+				g_GameObjects.at(getIndex(i, j)) = new GameObjectStove(i, j);
 				g_GameObjects.at(getIndex(i, j))->Initialize(StoveModel);
 				break;
 			case RECEPTION:
-				g_GameObjects.at(getIndex(i, j)) = new GameObjectPodium();
+				g_GameObjects.at(getIndex(i, j)) = new GameObjectPodium(i, j);
 				g_GameObjects.at(getIndex(i, j))->Initialize(PodiumModel);
 				break;
 			case OBSTACLE:
 				// Use podium as a placeholder model
-				g_GameObjects.at(getIndex(i, j)) = new GameObjectPodium();
+				g_GameObjects.at(getIndex(i, j)) = new GameObjectPodium(i, j);
 				g_GameObjects.at(getIndex(i, j))->Initialize(PodiumModel);
 				break;
 			}
@@ -276,8 +274,7 @@ int Area::getIndex(int z, int x)
 ===========MUTATORS=============
 ==============================*/
 
-void Area::setTile(int z, int x, TileType tileType)
-{
+void Area::setTile(int z, int x, TileType tileType) {
 	if (!isInBounds(z, x))
 		return;
 	
@@ -285,24 +282,24 @@ void Area::setTile(int z, int x, TileType tileType)
 
 	switch (tileType) {
 	case TABLE:
-		g_GameObjects.at(getIndex(z, x)) = new GameObjectTable();
+		g_GameObjects.at(getIndex(z, x)) = new GameObjectTable(z, x);
 		g_GameObjects.at(getIndex(z, x))->Initialize(NULL);
 		break;
 	case TABLE_CHAIR:
-		g_GameObjects.at(getIndex(z, x)) = new GameObjectChair();
+		g_GameObjects.at(getIndex(z, x)) = new GameObjectChair(z, x);
 		g_GameObjects.at(getIndex(z, x))->Initialize(ChairModel);
 		break;
 	case STOVE:
-		g_GameObjects.at(getIndex(z, x)) = new GameObjectStove();
+		g_GameObjects.at(getIndex(z, x)) = new GameObjectStove(z, x);
 		g_GameObjects.at(getIndex(z, x))->Initialize(StoveModel);
 		break;
 	case RECEPTION:
-		g_GameObjects.at(getIndex(z, x)) = new GameObjectPodium();
+		g_GameObjects.at(getIndex(z, x)) = new GameObjectPodium(z, x);
 		g_GameObjects.at(getIndex(z, x))->Initialize(PodiumModel);
 		break;
 	case OBSTACLE:
 		// Use podium as a placeholder model
-		g_GameObjects.at(getIndex(z, x)) = new GameObjectPodium();
+		g_GameObjects.at(getIndex(z, x)) = new GameObjectPodium(z, x);
 		g_GameObjects.at(getIndex(z, x))->Initialize(PodiumModel);
 		break;
 	default:

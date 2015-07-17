@@ -102,9 +102,7 @@ private:
 	vector<TileStatus> v_statusVector;			// Tells the state of the tile
 	vector<int> v_decorationVector;				// Represents what decoration occupies the table (IDs)
 
-
 	Mesh *ChairModel = new Mesh("Models/chair/chair.obj", "Shaders/Banana_vs.glsl", "Shaders/Banana_fs.glsl");
 	Mesh *PodiumModel = new Mesh("Models/Podium.fbx", "Shaders/Banana_vs.glsl", "Shaders/Banana_fs.glsl");
 	Mesh *StoveModel = new Mesh("Models/stove.fbx", "Shaders/Banana_vs.glsl", "Shaders/Banana_fs.glsl");
-
 };

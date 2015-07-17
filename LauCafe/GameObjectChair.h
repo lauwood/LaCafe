@@ -6,8 +6,9 @@
 
 class GameObjectChair : public GameObject {
 public:
-	GameObjectChair()		{}
-	~GameObjectChair()		{}
+	GameObjectChair()									{}
+	GameObjectChair(int z, int x) : GameObject(z, x)	{}
+	~GameObjectChair()									{}
 
 	void Initialize(Mesh* ChairModel);
 	void Render();

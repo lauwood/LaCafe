@@ -6,8 +6,9 @@
 
 class GameObjectStove : public GameObject {
 public:
-	GameObjectStove()		{}
-	~GameObjectStove()		{}
+	GameObjectStove()									{}
+	GameObjectStove(int z, int x) : GameObject(z, x)	{}
+	~GameObjectStove()									{}
 
 	void Initialize(Mesh *StoveModel);
 	void Render();
