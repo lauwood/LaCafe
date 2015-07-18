@@ -124,6 +124,7 @@
     <ClCompile Include="EditState.cpp" />
     <ClCompile Include="Employee.cpp" />
     <ClCompile Include="Floor.cpp" />
+    <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="GameObjectChair.cpp" />
     <ClCompile Include="GameObjectPodium.cpp" />
     <ClCompile Include="GameObjectStove.cpp" />

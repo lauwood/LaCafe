@@ -6,9 +6,9 @@
 
 class GameObjectPodium : public GameObject {
 public:
-	GameObjectPodium()									{}
-	GameObjectPodium(int z, int x) : GameObject(z, x)	{}
-	~GameObjectPodium()									{}
+	GameObjectPodium()												{}
+//	GameObjectPodium(int z, int x, Area* a) : GameObject(z, x, a)	{}
+	~GameObjectPodium()												{}
 
 	void Initialize(Mesh *PodiumModel);
 	void Render();

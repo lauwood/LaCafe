@@ -6,6 +6,7 @@
 #include "GameObjectChair.h"
 #include "GameObjectStove.h"
 #include "GameObjectPodium.h"
+#include <unordered_map>
 
 using namespace std;
 
@@ -23,6 +24,11 @@ enum ReceptionistStatus { REC_READY, REC_JUST_DIRECTED, REC_COOLDOWN };
 struct Cell {
 	int x;
 	int z;
+};
+
+struct MeshAndCounter {
+	Mesh* mesh;
+	int count;
 };
 
 class Area
@@ -49,6 +55,7 @@ public:
 	Cell getStart() { return m_start; }
 	int getHeight() { return m_height; }
 	int getWidth() { return m_width; }
+	Mesh* getMesh(const char* m);
 
 	TileType getTileType(int z, int x);
 	TileType getDestinationType(TileType);
@@ -68,6 +75,7 @@ public:
 	void setTileStatus(int z, int x, TileStatus status);
 	void fillPaths();
 	void clearPaths();
+	void decrementMesh(const char* m);
 
 	// Debugging info
 	void printArray();
@@ -101,6 +109,8 @@ private:
 	vector<vector<deque<Cell*>>> v_pathVector;	// Holds the shortest distance path for tables only
 	vector<TileStatus> v_statusVector;			// Tells the state of the tile
 	vector<int> v_decorationVector;				// Represents what decoration occupies the table (IDs)
+
+	unordered_map<const char*, MeshAndCounter*> m_modelMap;
 
 	Mesh *ChairModel = new Mesh("Models/chair/chair.obj", "Shaders/Banana_vs.glsl", "Shaders/Banana_fs.glsl");
 	Mesh *PodiumModel = new Mesh("Models/Podium.fbx", "Shaders/Banana_vs.glsl", "Shaders/Banana_fs.glsl");

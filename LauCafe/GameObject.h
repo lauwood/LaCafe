@@ -6,14 +6,15 @@
 
 using namespace glm;
 
+class Area;
+
 class GameObject {
 public:
-	GameObject()				{}
-	GameObject(int z, int x)	{ this->x = x; this->z = z; }
-	~GameObject()				{}
+	GameObject() {}
+	GameObject(int z, int x, const char* m, Area* a);
+	~GameObject();
 
-	virtual void Initialize(Mesh* model) = 0;
-	virtual void Render() = 0;
+	void Render();
 
 	vec3 GetPosition() { return position; }
 	void SetPosition(vec3 pPosition) { position = pPosition; }
@@ -29,8 +30,11 @@ protected:
 	vec3 rotation;
 	vec3 scale;
 
-	int z;
-	int x;
+	Area* a;
+	Mesh* model;
+	const char* modelPath;	// Should change to an int when we change to itemIds
+
+	int x, z;	// Legacy, remove once legacy code is updated
 };
 
 #endif

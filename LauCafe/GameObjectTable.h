@@ -7,11 +7,10 @@
 
 class GameObjectTable : public GameObject {
 public:
-	GameObjectTable()									{}
-	GameObjectTable(int z, int x) : GameObject(z, x)	{}
-	~GameObjectTable()									{}
+	GameObjectTable()												{}
+	GameObjectTable(int z, int x, Area* a);
+	~GameObjectTable()												{}
 
-	void Initialize(Mesh *TableModel);
 	void Render();
 
 private:

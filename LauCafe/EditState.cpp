@@ -9,6 +9,8 @@
 EditState::EditState(GLFWwindow* window, Area* area) : GameState(window) {
 	a = area;
 	Initialize();
+
+	selectedItem = WALKABLE;	// Default is "nothing"
 }
 
 int EditState::Initialize() {
@@ -36,15 +38,16 @@ void EditState::Input() {
 		} // endfor
 		SelectedSquare = closest_square_clicked;
 		if (MouseActiveButton & MOUSE_LEFT) {
-			if (SelectedSquare != -1) {
+			if (SelectedSquare != -1 && selectedItem != WALKABLE) { // Don't want to delete things with left click
 				g_SquarePath->at(SelectedSquare).Obstacle();
-				a->setTile(closest_square_clicked / 10, closest_square_clicked % 10, OBSTACLE);
+				a->setTile(closest_square_clicked / 10, closest_square_clicked % 10, selectedItem);
 			}
 		}
 		else if (MouseActiveButton & MOUSE_RIGHT) {
 			if (SelectedSquare != -1) {
 				g_SquarePath->at(SelectedSquare).Unobstacle();
 				a->setTile(closest_square_clicked / 10, closest_square_clicked % 10, WALKABLE);
+				delete a->g_GameObjects.at(closest_square_clicked / 10 * a->getHeight() + closest_square_clicked % 10);
 			}
 		}
 	}
@@ -56,6 +59,9 @@ void EditState::Update() {
 }
 
 void EditState::Draw() {
+	glEnable(GL_DEPTH_TEST);
+	glDisable(GL_CULL_FACE);
+
 	for (int i = 0; i < NUM_OF_SQUARES; i++) {
 		if (SelectedSquare == i) {
 			g_SquarePath->at(i).Select();
@@ -64,5 +70,10 @@ void EditState::Draw() {
 			g_SquarePath->at(i).Unselect();
 		}
 		g_SquarePath->at(i).Render();
+	}
+
+	for (GameObject *g : a->g_GameObjects) {
+		if (g != NULL)
+			g->Render();
 	}
 }

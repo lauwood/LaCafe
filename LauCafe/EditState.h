@@ -32,6 +32,8 @@ private:
 	Area* a;
 	int SelectedSquare = -1;
 	std::vector<Model> *g_SquarePath;
+
+	TileType selectedItem;
 };
 
 #endif

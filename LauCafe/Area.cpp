@@ -41,8 +41,6 @@ Area::Area(int height, int width, int sz, int sx)
 	setTile(sz, sx, START);
 
 	recStatus = REC_READY;
-
-	canReachPodium = false;
 }
 
 Area::Area(int height, int width, int sz, int sx, vector<TileType> existingVector)
@@ -80,13 +78,13 @@ Area::Area(int height, int width, int sz, int sx, vector<TileType> existingVecto
 
 	recStatus = REC_READY;
 
-	canReachPodium = false;
 	fillObjectVector();
 }
 
 Area::~Area()
 {
 	clearPaths();
+	
 }
 
 void Area::fillObjectVector() {
@@ -96,25 +94,20 @@ void Area::fillObjectVector() {
 			TileType tileType = getTileType(i, j);
 			switch (tileType) {
 			case TABLE:
-				g_GameObjects.at(getIndex(i, j)) = new GameObjectTable(i, j);
-				g_GameObjects.at(getIndex(i, j))->Initialize(NULL);
+				//g_GameObjects.at(getIndex(i, j)) = new GameObjectTable(i, j, this);
 				break;
 			case TABLE_CHAIR:
-				g_GameObjects.at(getIndex(i, j)) = new GameObjectChair(i, j);
-				g_GameObjects.at(getIndex(i, j))->Initialize(ChairModel);
+				g_GameObjects.at(getIndex(i, j)) = new GameObject(i, j, "Models/chair/chair.obj", this);
 				break;
 			case STOVE:
-				g_GameObjects.at(getIndex(i, j)) = new GameObjectStove(i, j);
-				g_GameObjects.at(getIndex(i, j))->Initialize(StoveModel);
+				g_GameObjects.at(getIndex(i, j)) = new GameObject(i, j, "Models/stove.fbx", this);
 				break;
 			case RECEPTION:
-				g_GameObjects.at(getIndex(i, j)) = new GameObjectPodium(i, j);
-				g_GameObjects.at(getIndex(i, j))->Initialize(PodiumModel);
+				g_GameObjects.at(getIndex(i, j)) = new GameObject(i, j, "Models/Podium.fbx", this);
 				break;
 			case OBSTACLE:
 				// Use podium as a placeholder model
-				g_GameObjects.at(getIndex(i, j)) = new GameObjectPodium(i, j);
-				g_GameObjects.at(getIndex(i, j))->Initialize(PodiumModel);
+				g_GameObjects.at(getIndex(i, j)) = new GameObject(i, j, "Models/Podium.fbx", this);
 				break;
 			}
 		}
@@ -124,6 +117,25 @@ void Area::fillObjectVector() {
 /*==============================
 ==========ACCESSORS=============
 ==============================*/
+
+Mesh* Area::getMesh(const char* m) {
+	if (m_modelMap.count(m) == 0) {
+		// MeshAndCounter doesn't exist!
+		MeshAndCounter* mac = new MeshAndCounter;
+		mac->mesh = new Mesh(m, "Shaders/Banana_vs.glsl", "Shaders/Banana_fs.glsl");
+		mac->count = 1;
+
+		pair<const char*, MeshAndCounter*> value(m, mac);
+		m_modelMap.insert(value);
+
+		return mac->mesh;
+	}
+	else {
+		MeshAndCounter* mac = m_modelMap.at(m);
+		mac->count++;
+		return mac->mesh;
+	}
+}
 
 TileType Area::getTileType(int z, int x)
 {
@@ -282,25 +294,20 @@ void Area::setTile(int z, int x, TileType tileType) {
 
 	switch (tileType) {
 	case TABLE:
-		g_GameObjects.at(getIndex(z, x)) = new GameObjectTable(z, x);
-		g_GameObjects.at(getIndex(z, x))->Initialize(NULL);
+		//g_GameObjects.at(getIndex(z, x)) = new GameObjectTable(z, x, this);
 		break;
 	case TABLE_CHAIR:
-		g_GameObjects.at(getIndex(z, x)) = new GameObjectChair(z, x);
-		g_GameObjects.at(getIndex(z, x))->Initialize(ChairModel);
+		g_GameObjects.at(getIndex(z, x)) = new GameObject(z, x, "Models/chair/chair.obj", this);
 		break;
 	case STOVE:
-		g_GameObjects.at(getIndex(z, x)) = new GameObjectStove(z, x);
-		g_GameObjects.at(getIndex(z, x))->Initialize(StoveModel);
+		g_GameObjects.at(getIndex(z, x)) = new GameObject(z, x, "Models/stove.fbx", this);
 		break;
 	case RECEPTION:
-		g_GameObjects.at(getIndex(z, x)) = new GameObjectPodium(z, x);
-		g_GameObjects.at(getIndex(z, x))->Initialize(PodiumModel);
+		g_GameObjects.at(getIndex(z, x)) = new GameObject(z, x, "Models/Podium.fbx", this);
 		break;
 	case OBSTACLE:
 		// Use podium as a placeholder model
-		g_GameObjects.at(getIndex(z, x)) = new GameObjectPodium(z, x);
-		g_GameObjects.at(getIndex(z, x))->Initialize(PodiumModel);
+		g_GameObjects.at(getIndex(z, x)) = new GameObject(z, x, "Models/Podium.fbx", this);
 		break;
 	default:
 		if (!g_GameObjects.at(getIndex(z, x)) == NULL)
@@ -423,6 +430,15 @@ void Area::clearPaths() {
 	for (size_t i = 0; i < v_pathLengthVector.size(); i++)
 		for (size_t j = 0; j < v_pathLengthVector.size(); j++)
 			v_pathLengthVector.at(i).at(j) = INT_MAX;
+}
+
+void Area::decrementMesh(const char* m) {
+	MeshAndCounter* mac = m_modelMap.at(m);
+	if (--mac->count <= 0) {
+		delete mac->mesh;
+		delete mac;
+		m_modelMap.erase(m);
+	}
 }
 
 void Area::fillPathLength()

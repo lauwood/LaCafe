@@ -206,6 +206,9 @@
     <ClCompile Include="StateManager.cpp">
       <Filter>States</Filter>
     </ClCompile>
+    <ClCompile Include="GameObject.cpp">
+      <Filter>GameObjects</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\Shader_fs.glsl">
