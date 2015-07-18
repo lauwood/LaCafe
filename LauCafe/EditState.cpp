@@ -18,6 +18,9 @@ int EditState::Initialize() {
 }
 
 void EditState::Input() {
+	// Change to something else when UI is finished
+	selectedItem = OBSTACLE;
+
 	// Raycast
 	if (MouseActiveButton) {
 		double nx, ny;

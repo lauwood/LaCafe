@@ -78,16 +78,6 @@ Area::Area(int height, int width, int sz, int sx, vector<TileType> existingVecto
 
 	recStatus = REC_READY;
 
-	fillObjectVector();
-}
-
-Area::~Area()
-{
-	clearPaths();
-	
-}
-
-void Area::fillObjectVector() {
 	// Fill in the object array from the floor array
 	for (int i = 0; i < getHeight(); i++)
 		for (int j = 0; j < getWidth(); j++) {
@@ -113,6 +103,11 @@ void Area::fillObjectVector() {
 		}
 }
 
+Area::~Area()
+{
+	clearPaths();
+	
+}
 
 /*==============================
 ==========ACCESSORS=============

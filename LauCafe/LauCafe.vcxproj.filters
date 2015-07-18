@@ -48,15 +48,6 @@
     <ClInclude Include="GameObject.h">
       <Filter>GameObjects</Filter>
     </ClInclude>
-    <ClInclude Include="GameObjectChair.h">
-      <Filter>GameObjects</Filter>
-    </ClInclude>
-    <ClInclude Include="GameObjectPodium.h">
-      <Filter>GameObjects</Filter>
-    </ClInclude>
-    <ClInclude Include="GameObjectStove.h">
-      <Filter>GameObjects</Filter>
-    </ClInclude>
     <ClInclude Include="GameObjectTable.h">
       <Filter>GameObjects</Filter>
     </ClInclude>
@@ -175,15 +166,6 @@
     </ClCompile>
     <ClCompile Include="imgui\imgui.cpp">
       <Filter>imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="GameObjectChair.cpp">
-      <Filter>GameObjects</Filter>
-    </ClCompile>
-    <ClCompile Include="GameObjectPodium.cpp">
-      <Filter>GameObjects</Filter>
-    </ClCompile>
-    <ClCompile Include="GameObjectStove.cpp">
-      <Filter>GameObjects</Filter>
     </ClCompile>
     <ClCompile Include="GameObjectTable.cpp">
       <Filter>GameObjects</Filter>

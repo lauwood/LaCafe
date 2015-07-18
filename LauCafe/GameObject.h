@@ -31,7 +31,7 @@ protected:
 	vec3 scale;
 
 	Area* a;
-	Mesh* model;
+	Mesh model;
 	const char* modelPath;	// Should change to an int when we change to itemIds
 
 	int x, z;	// Legacy, remove once legacy code is updated

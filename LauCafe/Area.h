@@ -3,9 +3,6 @@
 #include <vector>
 #include <deque>
 #include "GameObjectTable.h"
-#include "GameObjectChair.h"
-#include "GameObjectStove.h"
-#include "GameObjectPodium.h"
 #include <unordered_map>
 
 using namespace std;
@@ -94,7 +91,6 @@ private:
 	// This function is private to prevent accessing the right cell easily
 	int getIndex(int z, int x);
 	void fillPathLength();
-	void fillObjectVector();
 
 	Cell m_start;
 	int m_width;
