@@ -1,7 +1,7 @@
 #ifndef PATRON_H
 #define PATRON_H
 
-#include "Area.h"
+#include "Restaurant.h"
 #include "Person.h"
 
 // Waiting serve = waiting for a cook
@@ -17,7 +17,7 @@ class Patron : public Person
 {
 public:
 	Patron() {}
-	Patron(Area* area, Mesh *model);
+	Patron(Restaurant* area, Mesh *model);
 	~Patron();
 
 	// Implement virtual functions

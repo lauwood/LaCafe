@@ -6,12 +6,12 @@
 
 using namespace glm;
 
-class Area;
+class Restaurant;
 
 class GameObject {
 public:
 	GameObject() {}
-	GameObject(int z, int x, const char* m, Area* a);
+	GameObject(int z, int x, const char* m, Restaurant* a);
 	~GameObject();
 
 	void Render();
@@ -30,7 +30,7 @@ protected:
 	vec3 rotation;
 	vec3 scale;
 
-	Area* a;
+	Restaurant* a;
 	Mesh model;
 	const char* modelPath;	// Should change to an int when we change to itemIds
 

@@ -78,9 +78,6 @@
     <ClInclude Include="AnimEvaluator.h">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="Area.h">
-      <Filter>Core</Filter>
-    </ClInclude>
     <ClInclude Include="Camera.h">
       <Filter>Core</Filter>
     </ClInclude>
@@ -117,6 +114,9 @@
     <ClInclude Include="stb_image.h">
       <Filter>Core</Filter>
     </ClInclude>
+    <ClInclude Include="Restaurant.h">
+      <Filter>Core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -144,9 +144,6 @@
       <Filter>Core</Filter>
     </ClCompile>
     <ClCompile Include="AnimEvaluator.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
-    <ClCompile Include="Area.cpp">
       <Filter>Core</Filter>
     </ClCompile>
     <ClCompile Include="Floor.cpp">
@@ -190,6 +187,9 @@
     </ClCompile>
     <ClCompile Include="GameObject.cpp">
       <Filter>GameObjects</Filter>
+    </ClCompile>
+    <ClCompile Include="Restaurant.cpp">
+      <Filter>Core</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

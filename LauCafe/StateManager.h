@@ -36,7 +36,7 @@ public:
 	void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
 	bool b_EditMode;
 private:
-	Area* a;
+	Restaurant* a;
 	int MouseActiveButton = 0;
 	GLFWwindow* window;
 	bool m_running;

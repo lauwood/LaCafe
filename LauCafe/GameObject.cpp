@@ -1,7 +1,7 @@
 #include "GameObject.h"
-#include "Area.h"
+#include "Restaurant.h"
 
-GameObject::GameObject(int z, int x, const char* m, Area* a) {
+GameObject::GameObject(int z, int x, const char* m, Restaurant* a) {
 	// For deletion and insertion into the Mesh unordered map
 	this->a = a;
 	this->modelPath = m;

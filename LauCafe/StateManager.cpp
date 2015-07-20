@@ -80,7 +80,7 @@ StateManager::StateManager(GLFWwindow* window) {
 	//							   Position			   Yaw	  Pitch
 	Globals::Camera.PositionCamera(1.06f, 8.0f, 4.41f, 1.57f, 1.25f);
 
-	a = new Area(10, 10, 0, 0);
+	a = new Restaurant(10, 10, 0, 0);
 	b_EditMode = false;
 
 	glfwSetInputMode(window, GLFW_STICKY_MOUSE_BUTTONS, GL_TRUE);
@@ -112,6 +112,9 @@ void StateManager::GameLoop() {
 		if (ShowDebugger) {
 			ImGui::Text("Debugger (hide with F2)");
 			ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+			ImGui::Text("Pop: %d", a->m_popularity);
+			ImGui::Text("Money: %.2f", a->m_money);
+			ImGui::Text("Exp: %d", a->m_exp);
 		}
 
 		Input();

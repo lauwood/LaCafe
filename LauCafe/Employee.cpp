@@ -1,7 +1,7 @@
 #include "Employee.h"
 #include "TimeManager.h"
 
-Employee::Employee(Area* area, Role role, Mesh *mesh) : Person(area)
+Employee::Employee(Restaurant* area, Role role, Mesh *mesh) : Person(area)
 {
 	m_isBusy = false;
 	m_isWalking = false;

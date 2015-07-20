@@ -6,7 +6,7 @@
 #include "StateManager.h"
 #include "Globals.h"
 
-EditState::EditState(GLFWwindow* window, Area* area) : GameState(window) {
+EditState::EditState(GLFWwindow* window, Restaurant* area) : GameState(window) {
 	a = area;
 	Initialize();
 

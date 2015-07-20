@@ -83,7 +83,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="AnimEvaluator.h" />
-    <ClInclude Include="Area.h" />
+    <ClInclude Include="Restaurant.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="CubeMap.h" />
     <ClInclude Include="EditState.h" />
@@ -115,7 +115,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AnimEvaluator.cpp" />
-    <ClCompile Include="Area.cpp" />
+    <ClCompile Include="Restaurant.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="CubeMap.cpp" />
     <ClCompile Include="EditState.cpp" />

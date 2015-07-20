@@ -614,7 +614,7 @@ ImGuiStyle::ImGuiStyle()
     ScrollbarRounding       = 0.0f;             // Radius of grab corners rounding for scrollbar
     GrabMinSize             = 10.0f;            // Minimum width/height of a grab box for slider/scrollbar
     DisplayWindowPadding    = ImVec2(22,22);    // Window positions are clamped to be visible within the display area by at least this amount. Only covers regular windows.
-    DisplaySafeAreaPadding  = ImVec2(4,4);      // If you cannot see the edge of your screen (e.g. on a TV) increase the safe area padding. Covers popups/tooltips as well regular windows.
+    DisplaySafeRestaurantPadding  = ImVec2(4,4);      // If you cannot see the edge of your screen (e.g. on a TV) increase the safe area padding. Covers popups/tooltips as well regular windows.
 
     Colors[ImGuiCol_Text]                   = ImVec4(0.90f, 0.90f, 0.90f, 1.00f);
     Colors[ImGuiCol_TextDisabled]           = ImVec4(0.60f, 0.60f, 0.60f, 1.00f);
@@ -3446,7 +3446,7 @@ static ImVec2 FindBestPopupWindowPos(const ImVec2& base_pos, const ImVec2& size,
 
     // Clamp into visible area while not overlapping the cursor
     ImRect r_outer(GetVisibleRect()); 
-    r_outer.Reduce(style.DisplaySafeAreaPadding);
+    r_outer.Reduce(style.DisplaySafeRestaurantPadding);
     ImVec2 base_pos_clamped = ImClamp(base_pos, r_outer.Min, r_outer.Max - size);
 
     for (int n = (*last_dir != -1) ? -1 : 0; n < 4; n++)   // Right, down, up, left. Favor last used direction.
@@ -3792,7 +3792,7 @@ bool ImGui::Begin(const char* name, bool* p_opened, const ImVec2& size_on_first_
         {
             // Center (any sort of window)
             ImRect fullscreen_rect(GetVisibleRect());
-            SetWindowPos(ImMax(style.DisplaySafeAreaPadding, fullscreen_rect.GetCenter() - window->SizeFull * 0.5f));
+            SetWindowPos(ImMax(style.DisplaySafeRestaurantPadding, fullscreen_rect.GetCenter() - window->SizeFull * 0.5f));
         }
         else if (flags & ImGuiWindowFlags_ChildMenu)
         {
@@ -3844,7 +3844,7 @@ bool ImGui::Begin(const char* name, bool* p_opened, const ImVec2& size_on_first_
         {
             if (!window_pos_set_by_api && window->AutoFitFramesX <= 0 && window->AutoFitFramesY <= 0 && g.IO.DisplaySize.x > 0.0f && g.IO.DisplaySize.y > 0.0f) // Ignore zero-sized display explicitly to avoid losing positions if a window manager reports zero-sized window when initializing or minimizing.
             {
-                ImVec2 padding = ImMax(style.DisplayWindowPadding, style.DisplaySafeAreaPadding);
+                ImVec2 padding = ImMax(style.DisplayWindowPadding, style.DisplaySafeRestaurantPadding);
                 window->PosFloat = ImMax(window->PosFloat + window->Size, padding) - window->Size;
                 window->PosFloat = ImMin(window->PosFloat, g.IO.DisplaySize - padding);
             }
@@ -8009,7 +8009,7 @@ bool ImGui::BeginMainMenuBar()
         ImGui::PopStyleVar(2);
         return false;
     }
-    g.CurrentWindow->DC.MenuBarOffsetX += g.Style.DisplaySafeAreaPadding.x;
+    g.CurrentWindow->DC.MenuBarOffsetX += g.Style.DisplaySafeRestaurantPadding.x;
     return true;
 }
 

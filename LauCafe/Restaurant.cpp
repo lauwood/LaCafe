@@ -1,4 +1,4 @@
-#include "Area.h"
+#include "Restaurant.h"
 #include <algorithm>
 #include <iostream>
 
@@ -9,7 +9,7 @@ using namespace std;
 * This is to keep from hopping through arrays
 */
 
-Area::Area(int height, int width, int sz, int sx)
+Restaurant::Restaurant(int height, int width, int sz, int sx)
 {
 	m_width = width;
 	m_height = height;
@@ -43,7 +43,7 @@ Area::Area(int height, int width, int sz, int sx)
 	recStatus = REC_READY;
 }
 
-Area::Area(int height, int width, int sz, int sx, vector<TileType> existingVector)
+Restaurant::Restaurant(int height, int width, int sz, int sx, vector<TileType> existingVector)
 {
 	m_width = width;
 	m_height = height;
@@ -103,7 +103,7 @@ Area::Area(int height, int width, int sz, int sx, vector<TileType> existingVecto
 		}
 }
 
-Area::~Area()
+Restaurant::~Restaurant()
 {
 	clearPaths();
 	
@@ -113,7 +113,7 @@ Area::~Area()
 ==========ACCESSORS=============
 ==============================*/
 
-Mesh* Area::getMesh(const char* m) {
+Mesh* Restaurant::getMesh(const char* m) {
 	if (m_modelMap.count(m) == 0) {
 		// MeshAndCounter doesn't exist!
 		MeshAndCounter* mac = new MeshAndCounter;
@@ -132,7 +132,7 @@ Mesh* Area::getMesh(const char* m) {
 	}
 }
 
-TileType Area::getTileType(int z, int x)
+TileType Restaurant::getTileType(int z, int x)
 {
 	if (!isInBounds(z, x))
 		return INVALID_TYPE;
@@ -140,7 +140,7 @@ TileType Area::getTileType(int z, int x)
 		return v_typeVector.at(getIndex(z, x));
 }
 
-TileType Area::getDestinationType(TileType origin) {
+TileType Restaurant::getDestinationType(TileType origin) {
 	switch (origin) {
 	case START:
 		return RECEPTION;
@@ -158,7 +158,7 @@ TileType Area::getDestinationType(TileType origin) {
 }
 
 // Used primarily in pathfinding
-int Area::getCellPathLength(int sz, int sx, int dz, int dx)
+int Restaurant::getCellPathLength(int sz, int sx, int dz, int dx)
 {
 	// Only used in a min comparison, use INT_MAX to use other option
 	if (!isInBounds(sz, sx) || !isInBounds(dz, dx) || !isWalkable(dz, dx))
@@ -168,7 +168,7 @@ int Area::getCellPathLength(int sz, int sx, int dz, int dx)
 }
 
 // Get the path from (sx, sz) to (dx, dz)
-deque<Cell*> Area::getCellPath(int sz, int sx, int dz, int dx)
+deque<Cell*> Restaurant::getCellPath(int sz, int sx, int dz, int dx)
 {
 	deque<Cell*> d;
 	if (!isInBounds(sz, sx) || !isInBounds(dz, dz))
@@ -177,7 +177,7 @@ deque<Cell*> Area::getCellPath(int sz, int sx, int dz, int dx)
 		return v_pathVector.at(getIndex(sz, sx)).at(getIndex(dz, dx));
 }
 
-Cell Area::getAdjacentTable(int z, int x) {
+Cell Restaurant::getAdjacentTable(int z, int x) {
 	Cell table;
 	table.x = table.z = -1;
 
@@ -201,7 +201,7 @@ Cell Area::getAdjacentTable(int z, int x) {
 	return table;
 }
 
-Cell Area::getAdjacentChair(int z, int x) {
+Cell Restaurant::getAdjacentChair(int z, int x) {
 	Cell chair;
 	chair.x = chair.z = -1;
 
@@ -225,7 +225,7 @@ Cell Area::getAdjacentChair(int z, int x) {
 	return chair;
 }
 
-Cell Area::getAdjacentStove(int z, int x) {
+Cell Restaurant::getAdjacentStove(int z, int x) {
 	Cell stove;
 	stove.x = stove.z = -1;
 
@@ -249,13 +249,13 @@ Cell Area::getAdjacentStove(int z, int x) {
 	return stove;
 }
 
-bool Area::isInBounds(int z, int x)
+bool Restaurant::isInBounds(int z, int x)
 {
 	return x < m_width && z < m_height && x >= 0 && z >= 0;
 }
 
 // 0 is walkable
-bool Area::isWalkable(int z, int x)
+bool Restaurant::isWalkable(int z, int x)
 {
 	if (isInBounds(z, x))
 		return v_typeVector[getIndex(z, x)] == WALKABLE;
@@ -263,7 +263,7 @@ bool Area::isWalkable(int z, int x)
 	return false;
 }
 
-TileStatus Area::getTileStatus(int z, int x) {
+TileStatus Restaurant::getTileStatus(int z, int x) {
 	if (isInBounds(z, x))
 		return v_statusVector.at(getIndex(z, x));
 	else
@@ -272,7 +272,7 @@ TileStatus Area::getTileStatus(int z, int x) {
 
 // Because we are using a vector to represent a 2D array, there must be a bit of math
 // to translate from two numbers to one
-int Area::getIndex(int z, int x)
+int Restaurant::getIndex(int z, int x)
 {
 	return x + m_height * z;
 }
@@ -281,7 +281,7 @@ int Area::getIndex(int z, int x)
 ===========MUTATORS=============
 ==============================*/
 
-void Area::setTile(int z, int x, TileType tileType) {
+void Restaurant::setTile(int z, int x, TileType tileType) {
 	if (!isInBounds(z, x))
 		return;
 	
@@ -311,12 +311,12 @@ void Area::setTile(int z, int x, TileType tileType) {
 	}
 }
 
-void Area::setTileStatus(int z, int x, TileStatus status) {
+void Restaurant::setTileStatus(int z, int x, TileStatus status) {
 	if (isInBounds(z, x))
 		v_statusVector.at(getIndex(z, x)) = status;
 }
 
-void Area::fillPaths()
+void Restaurant::fillPaths()
 {
 	// Clear the previously generated path matrix
 	clearPaths();
@@ -412,7 +412,7 @@ void Area::fillPaths()
 		(podiumLength3 < INT_MAX) || (podiumLength4 < INT_MAX);
 }
 
-void Area::clearPaths() {
+void Restaurant::clearPaths() {
 	for (size_t i = 0; i < v_pathVector.size(); i++) {
 		for (size_t j = 0; j < v_pathVector.size(); j++)
 			while (!v_pathVector.at(i).at(j).empty()) {
@@ -427,7 +427,7 @@ void Area::clearPaths() {
 			v_pathLengthVector.at(i).at(j) = INT_MAX;
 }
 
-void Area::decrementMesh(const char* m) {
+void Restaurant::decrementMesh(const char* m) {
 	MeshAndCounter* mac = m_modelMap.at(m);
 	if (--mac->count <= 0) {
 		delete mac->mesh;
@@ -436,7 +436,7 @@ void Area::decrementMesh(const char* m) {
 	}
 }
 
-void Area::fillPathLength()
+void Restaurant::fillPathLength()
 {
 	for (int i = 0; i < m_height; i++) {
 		for (int j = 0; j < m_width; j++) {
@@ -516,7 +516,7 @@ void Area::fillPathLength()
 ===========DEBUGGING============
 ==============================*/
 
-void Area::printArray()
+void Restaurant::printArray()
 {
 	cout << "Actual Floor Map" << endl;
 	for (int z = 0; z < this->m_height; z++) {
@@ -529,7 +529,7 @@ void Area::printArray()
 }
 
 // Prints all paths that customers take
-void Area::printPaths()
+void Restaurant::printPaths()
 {
 	cout << "Possible paths taken" << endl;
 	vector<int> pathMap(m_width * m_height);

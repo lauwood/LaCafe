@@ -28,7 +28,7 @@ struct MeshAndCounter {
 	int count;
 };
 
-class Area
+class Restaurant
 {
 public:
 	/*
@@ -43,10 +43,10 @@ public:
 	* dx: the horizontal coordinate of the destination cell
 	*/
 
-	Area() {}; // Used for avoiding a compile-time error
-	Area(int height, int width, int sz, int sx);
-	Area(int height, int width, int sz, int sx, vector<TileType> existingVector);
-	~Area();
+	Restaurant() {}; // Used for avoiding a compile-time error
+	Restaurant(int height, int width, int sz, int sx);
+	Restaurant(int height, int width, int sz, int sx, vector<TileType> existingVector);
+	~Restaurant();
 
 	// Accessors
 	Cell getStart() { return m_start; }
@@ -74,6 +74,8 @@ public:
 	void clearPaths();
 	void decrementMesh(const char* m);
 
+	void decrementPopularity() { if (m_popularity > 50) m_popularity--; }
+
 	// Debugging info
 	void printArray();
 	void printPaths();
@@ -87,6 +89,13 @@ public:
 	vector<GameObject*> g_GameObjects;
 
 	ReceptionistStatus recStatus;
+
+	// Level and statistics, move to private when done testing
+	int m_level = 1;
+	int m_popularity = 100;		// 1-500, represented by stars (1.0-5.0, ones digit hidden)
+	double m_multiplier = 1;	// Multiplies money and exp, affected by pop and decorations
+	double m_money = 0;
+	int m_exp = 0;
 private:
 	// This function is private to prevent accessing the right cell easily
 	int getIndex(int z, int x);

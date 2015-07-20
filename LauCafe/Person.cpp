@@ -1,7 +1,7 @@
 #include "Person.h"
 #include "TimeManager.h"
 
-Person::Person(Area* area)
+Person::Person(Restaurant* area)
 {
 	m_time = 0;
 	m_area = area;

@@ -14,14 +14,14 @@
 #include "CubeMap.h"
 #include "Raycast.h"
 #include <vector>
-#include "Area.h"
+#include "Restaurant.h"
 #include "Patron.h"
 #include "Employee.h"
 
 class PlayState : public GameState
 {
 public:
-	PlayState(GLFWwindow* window, Area* area);
+	PlayState(GLFWwindow* window, Restaurant* area);
 	
 	int Initialize();
 
@@ -53,7 +53,7 @@ private:
 	vector<Employee*> g_Employees;
 	Employee g_Receptionist;
 	Mesh *PersonModel;
-	Area* a;
+	Restaurant* a;
 };
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -1,7 +1,7 @@
 #include "Patron.h"
 #include "TimeManager.h"
 
-Patron::Patron(Area* area, Mesh *model) : Person(area) {
+Patron::Patron(Restaurant* area, Mesh *model) : Person(area) {
 	Cell entrance = area->getStart();
 	m_currentPosition.x = entrance.x;
 	m_currentPosition.z = entrance.z;
@@ -100,8 +100,11 @@ void Patron::actOrWait() {
 			m_area->recStatus = REC_JUST_DIRECTED;
 			findNextDestination();
 		}
-		else
+		else {
 			decrementOrTimeOut();
+			if (m_stage == PATRON_WALKING_EXIT)
+				m_area->decrementPopularity();
+		}
 		break;
 	case PATRON_WAITING_SERVE:
 		if (m_area->getTileStatus(m_tableCell.z, m_tableCell.x) == TILE_TABLE_FOOD_COMING) {
@@ -115,6 +118,7 @@ void Patron::actOrWait() {
 				m_area->setTileStatus(m_currentPosition.z, m_currentPosition.x, TILE_OPEN);
 
 				cout << "PATRON: Timed out at table x: " << m_tableCell.x << " z: " << m_tableCell.z << endl;
+				m_area->decrementPopularity();
 
 				for (unsigned int i = 0; i < m_area->v_waitingCustomerCells.size(); i++) {
 					Cell vCell = m_area->v_waitingCustomerCells.at(i);
@@ -143,6 +147,9 @@ void Patron::actOrWait() {
 			m_area->setTileStatus(m_currentPosition.z, m_currentPosition.x, TILE_TABLE_DIRTY);
 			m_area->v_dirtyTableCells.push_back(Cell(m_tableCell));
 			cout << "PATRON: Done eating x: " << m_tableCell.x << " z: " << m_tableCell.z << endl;
+			m_area->m_popularity++;
+			m_area->m_money += (rand() % (m_area->m_level * 10)) * m_area->m_multiplier + 1;
+			m_area->m_exp += (rand() % (m_area->m_level * 10)) * m_area->m_multiplier + 1;
 
 			//TODO: Rating calculations
 			//TODO: May need to change the "stage" to something else

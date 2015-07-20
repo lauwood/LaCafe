@@ -2,7 +2,7 @@
 
 #define Y_OFFSET 0.75
 
-GameObjectTable::GameObjectTable(int z, int x, Area* a) : GameObject(z, x, NULL, a) {
+GameObjectTable::GameObjectTable(int z, int x, Restaurant* a) : GameObject(z, x, NULL, a) {
 	model.Initialize(Model::square2, 6, GL_TRIANGLES, "Shaders/Banana_vs.glsl", "Shaders/Banana_fs.glsl");
 	leg1.Initialize(Model::square, 6, GL_TRIANGLES, "Shaders/Banana_vs.glsl", "Shaders/Banana_fs.glsl");
 	leg2.Initialize(Model::square, 6, GL_TRIANGLES, "Shaders/Banana_vs.glsl", "Shaders/Banana_fs.glsl");

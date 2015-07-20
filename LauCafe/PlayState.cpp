@@ -13,7 +13,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
-PlayState::PlayState(GLFWwindow* window, Area* area) : GameState(window) {
+PlayState::PlayState(GLFWwindow* window, Restaurant* area) : GameState(window) {
 	srand(time(NULL));
 
 	a = area;
@@ -239,6 +239,17 @@ void PlayState::Update() {
 	for (unsigned int i = 0; i < g_Employees.size(); i++)
 		g_Employees.at(i)->update();
 	g_Receptionist.update();
+
+	// Spawn a patron randomly: at popularity 100, spawn every 5 seconds (on average)
+	// Assume 100 fps (DT = 10) => 500 frames on average, assume 50 fps (DT = 20) => 250
+	// 1 fps => denominator = 500000, 2fps => denominator = 1000000
+	// Spawn rate = 1/5000 = 100 / 5000 * fps
+	double frames = TimeManager::Instance().CalculateFrameRate(false);
+	if (frames < 50) return;
+	int spawnPatronChance = rand() % 5000;
+	if(a->m_popularity > (spawnPatronChance * frames / 5))
+		if (a->podiumReachable())
+			g_Patron.push_back(new Patron(a, PersonModel));
 }
 
 ////////////////////////////////////////////////////////////////////////////////

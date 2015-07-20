@@ -1,6 +1,6 @@
 #pragma once
 #include "Person.h"
-#include "Area.h"
+#include "Restaurant.h"
 #include "MeshLoader.h"
 #include <stdlib.h>
 #include <time.h>
@@ -16,7 +16,7 @@ class Employee :
 {
 public:
 	Employee() {}
-	Employee(Area* area, Role role, Mesh* mesh);
+	Employee(Restaurant* area, Role role, Mesh* mesh);
 	~Employee();
 
 	// Implement virtual functions

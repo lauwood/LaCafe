@@ -9,13 +9,13 @@
 #include "Camera.h"
 #include "GameState.h"
 #include "Model.h"
-#include "Area.h"
+#include "Restaurant.h"
 #include <vector>
 
 class EditState : public GameState
 {
 public:
-	EditState(GLFWwindow* window, Area* area);
+	EditState(GLFWwindow* window, Restaurant* area);
 
 	int Initialize();
 
@@ -29,7 +29,7 @@ public:
 	std::vector<Model>* GetSquarePath() { return g_SquarePath; }
 	void SetSquarePath(std::vector<Model> *pSquarePath) { g_SquarePath = pSquarePath; }
 private:
-	Area* a;
+	Restaurant* a;
 	int SelectedSquare = -1;
 	std::vector<Model> *g_SquarePath;
 
